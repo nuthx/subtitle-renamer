@@ -1,4 +1,5 @@
 import sys
+import platform
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
@@ -10,9 +11,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MyMainWindow()
 
-    # 加载图标
-    icon = QIcon(getResource("image/icon.png"))
-    window.setWindowIcon(icon)
+    # Windows 下加载图标
+    if platform.system() == 'Windows':
+        icon = QIcon(getResource("image/icon.png"))
+        window.setWindowIcon(icon)
 
     # 加载 QSS
     style_file = getResource("style/style_light.qss")

@@ -7,7 +7,7 @@ from module.resource import getResource
 
 class Ui_MainWindow(object):
     def setupUI(self, MainWindow):
-        setThemeColor("#9CA9B9")
+        setThemeColor("#29ACE9")
 
         MainWindow.setWindowTitle("Subtitle Renamer")
         MainWindow.resize(1200, 720)
