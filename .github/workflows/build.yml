@@ -30,12 +30,12 @@ jobs:
     - name: Build (Windows)
       if: ${{ runner.os == 'windows' }}
       run: |
-        pyinstaller -wF main.py --icon='image/icon.png' --add-data 'style/style_light.qss;style' --add-data 'style/table.qss;style' --add-data 'image/icon.png;image' --name='SubtitleRenamer'
+        pyinstaller -wF main.py --icon='image/icon.ico' --add-data 'style/style_light.qss;style' --add-data 'style/table.qss;style' --add-data 'image/icon.png;image' --name='SubtitleRenamer'
 
     - name: Build (macOS)
       if: ${{ runner.os == 'macos' }}
       run: |
-        pyinstaller -wF main.py --add-data style:style --name=SubtitleRenamer
+        pyinstaller -wF main.py -i image/icon.icns --add-data style:style --name=SubtitleRenamer
 
     - name: Build (Linux)
       if: ${{ runner.os == 'linux' }}
