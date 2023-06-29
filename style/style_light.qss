@@ -1,0 +1,40 @@
+MyMainWindow {
+    background: #F5F5F5;
+}
+
+#titleLabel {
+    font-size: 28px;
+    color: #000;
+}
+
+#subtitleLabel {
+    font-size: 13px;
+    color: #666;
+}
+
+#tableFrame {
+    background: #FFF;
+    border: 1px solid #EDEDED;
+    border-radius: 8px;
+}
+
+#infoFrame {
+    background: #FFF;
+    margin-top: -1px;
+    border: 1px solid #EDEDED;
+    border-radius: 8px;
+}
+
+#cnLabel {
+    font-size: 20px;
+    color: #000;
+}
+
+#jpLabel {
+    font-size: 13px;
+    color: #666;
+}
+
+#separator {
+    background: red;
+}
