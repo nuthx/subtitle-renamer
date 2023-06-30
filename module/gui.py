@@ -91,7 +91,7 @@ class Ui_MainWindow(object):
 
         self.vBoxLayout = QVBoxLayout(self.centralWidget)
         self.vBoxLayout.setSpacing(0)
-        self.vBoxLayout.setContentsMargins(36, 24, 36, 24)
+        self.vBoxLayout.setContentsMargins(36, 20, 36, 24)
         self.vBoxLayout.addLayout(self.headerLayout)
         self.vBoxLayout.addSpacing(24)
         self.vBoxLayout.addWidget(self.tableFrame, 0)
