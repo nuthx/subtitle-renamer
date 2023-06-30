@@ -1,7 +1,7 @@
 import time
 import send2trash
-from PySide6.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtWidgets import QMainWindow, QTableWidgetItem
+from PySide6.QtCore import Qt
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition
 
 from module.gui import Ui_MainWindow
