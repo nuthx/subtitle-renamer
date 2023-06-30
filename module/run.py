@@ -27,7 +27,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.trash_list = []
         self.table.clearContents()
         self.table.setRowCount(0)
-        self.messageLabel.setText("")
 
     def dragEnterEvent(self, event):
         event.acceptProposedAction()

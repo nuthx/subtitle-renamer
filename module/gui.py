@@ -7,16 +7,12 @@ from module.resource import getResource
 
 
 class Ui_MainWindow(object):
-    def __init__(self):
-        super().__init__()
-
     def setupUI(self, MainWindow):
-        setThemeColor("#29ACE9")
+        setThemeColor("#1B96DE")
 
         MainWindow.setWindowTitle("Subtitle Renamer")
         MainWindow.resize(1200, 720)
         MainWindow.setAcceptDrops(True)
-        # MainWindow.setFixedSize(self.size())  # 禁止拉伸窗口
 
         # 标题区域
 
@@ -63,93 +59,92 @@ class Ui_MainWindow(object):
         self.tableFrame.setObjectName("tableFrame")
         self.tableFrame.setLayout(self.tableLayout)
 
-        # 底部语言区域
+        # 执行区域
 
-        self.allowSc = CheckBox("简体", self)
+        self.allowSc = CheckBox("重命名简体字幕", self)
         self.allowSc.setChecked(True)
 
-        self.scFormat = EditableComboBox(self)
-        self.scFormat.setMaximumWidth(200)
-        self.scFormat.addItems([".sc", ".chs", ".zh-Hans"])
-        self.scFormat.setPlaceholderText("不添加简体扩展名")
-
-        self.scLayout = QHBoxLayout()
-        self.scLayout.setContentsMargins(0, 0, 0, 0)
-        self.scLayout.addWidget(self.allowSc)
-        self.scLayout.addSpacing(16)
-        self.scLayout.addWidget(self.scFormat)
-
-        self.allowTc = CheckBox("繁体", self)
+        self.allowTc = CheckBox("重命名繁体字幕", self)
         self.allowTc.setChecked(False)
-
-        self.tcFormat = EditableComboBox(self)
-        self.tcFormat.setMaximumWidth(200)
-        self.tcFormat.addItems([".tc", ".cht", ".zh-Hant"])
-        self.tcFormat.setPlaceholderText("不添加繁体扩展名")
-
-        self.tcLayout = QHBoxLayout()
-        self.tcLayout.setContentsMargins(0, 0, 0, 0)
-        self.tcLayout.addWidget(self.allowTc)
-        self.tcLayout.addSpacing(16)
-        self.tcLayout.addWidget(self.tcFormat)
-
-        # self.deleteSub = CheckBox("删除多余文件（包括未勾选的简繁字幕）", self)
-        # self.deleteSub.setChecked(True)
-
-        self.infoLayout = QHBoxLayout()
-        self.infoLayout.setSpacing(40)
-        self.infoLayout.setContentsMargins(24, 16, 30, 14)  # 修正四边间距
-        self.infoLayout.addLayout(self.scLayout, 0)
-        self.infoLayout.addLayout(self.tcLayout, 0)
-
-        self.infoFrame = QFrame()
-        self.infoFrame.setObjectName("infoFrame")
-        self.infoFrame.setLayout(self.infoLayout)
-        self.infoFrame.setMaximumHeight(242)
-
-        self.messageLabel = QLabel("")
 
         self.clearButton = PushButton("清空列表", self)
         self.clearButton.setFixedWidth(120)
         self.renameButton = PrimaryPushButton("重命名", self)
         self.renameButton.setFixedWidth(120)
 
+        self.actionLayout = QHBoxLayout()
+        self.actionLayout.addWidget(self.allowSc)
+        self.actionLayout.addSpacing(32)
+        self.actionLayout.addWidget(self.allowTc)
+        self.actionLayout.addStretch(0)
+        self.actionLayout.addWidget(self.clearButton)
+        self.actionLayout.addSpacing(12)
+        self.actionLayout.addWidget(self.renameButton)
 
-
-
-
-
-
-
-
-
-        self.buttonLayout = QHBoxLayout()
-        self.buttonLayout.setSpacing(12)
-        self.buttonLayout.setContentsMargins(0, 0, 0, 0)
-        self.buttonLayout.setObjectName("infoLayout")
-        self.buttonLayout.addWidget(self.messageLabel)
-        self.buttonLayout.addStretch(0)
-        self.buttonLayout.addWidget(self.clearButton)
-        self.buttonLayout.addWidget(self.renameButton)
-
-        self.buttonFrame = QFrame()
-        self.buttonFrame.setObjectName("buttonFrame")
-        self.buttonFrame.setLayout(self.buttonLayout)
+        # 框架叠叠乐
 
         self.centralWidget = QWidget(MainWindow)
 
         self.vBoxLayout = QVBoxLayout(self.centralWidget)
         self.vBoxLayout.setSpacing(0)
         self.vBoxLayout.setContentsMargins(36, 24, 36, 24)
-        # self.vBoxLayout.addWidget(self.titleFrame, 0)
         self.vBoxLayout.addLayout(self.headerLayout)
         self.vBoxLayout.addSpacing(24)
         self.vBoxLayout.addWidget(self.tableFrame, 0)
         self.vBoxLayout.addSpacing(24)
-        self.vBoxLayout.addWidget(self.infoFrame, 0)
-        self.vBoxLayout.addSpacing(24)
-        self.vBoxLayout.addWidget(self.buttonFrame, 0)
+        self.vBoxLayout.addLayout(self.actionLayout, 0)
 
         MainWindow.setCentralWidget(self.centralWidget)
 
         QMetaObject.connectSlotsByName(MainWindow)
+
+
+
+
+
+
+
+
+        # self.deleteSub = CheckBox("删除多余文件（包括未勾选的简繁字幕）", self)
+        # self.deleteSub.setChecked(True)
+
+        # self.infoLayout = QHBoxLayout()
+        # self.infoLayout.setSpacing(40)
+        # self.infoLayout.setContentsMargins(24, 16, 30, 14)  # 修正四边间距
+        # self.infoLayout.addLayout(self.scLayout, 0)
+        # self.infoLayout.addLayout(self.tcLayout, 0)
+        #
+        # self.infoFrame = QFrame()
+        # self.infoFrame.setObjectName("infoFrame")
+        # self.infoFrame.setLayout(self.infoLayout)
+        # self.infoFrame.setMaximumHeight(242)
+        #
+        #
+        #
+        # self.scFormat = EditableComboBox(self)
+        # self.scFormat.setMaximumWidth(200)
+        # self.scFormat.addItems([".sc", ".chs", ".zh-Hans"])
+        # self.scFormat.setPlaceholderText("不添加简体扩展名")
+
+        # self.tcFormat = EditableComboBox(self)
+        # self.tcFormat.setMaximumWidth(200)
+        # self.tcFormat.addItems([".tc", ".cht", ".zh-Hant"])
+        # self.tcFormat.setPlaceholderText("不添加繁体扩展名")
+        #
+        #
+        #
+        #
+        # self.buttonLayout = QHBoxLayout()
+        # self.buttonLayout.setSpacing(12)
+        # self.buttonLayout.setContentsMargins(0, 0, 0, 0)
+        # self.buttonLayout.setObjectName("infoLayout")
+        # self.buttonLayout.addWidget(self.messageLabel)
+        # self.buttonLayout.addStretch(0)
+        # self.buttonLayout.addWidget(self.clearButton)
+        # self.buttonLayout.addWidget(self.renameButton)
+        #
+        # self.buttonFrame = QFrame()
+        # self.buttonFrame.setObjectName("buttonFrame")
+        # self.buttonFrame.setLayout(self.buttonLayout)
+
+
