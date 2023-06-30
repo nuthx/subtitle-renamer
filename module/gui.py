@@ -1,5 +1,6 @@
 from PySide6.QtCore import Qt, QMetaObject
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QAbstractItemView
+from PySide6.QtGui import QFontDatabase, QFont
 from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, EditableComboBox, CheckBox, \
                            ToolButton, FluentIcon
 from qfluentwidgets.common.style_sheet import styleSheetManager
@@ -9,6 +10,8 @@ from module.resource import getResource
 class Ui_MainWindow(object):
     def setupUI(self, MainWindow):
         setThemeColor("#1B96DE")
+        font_id = QFontDatabase.addApplicationFont(getResource("font/Study-Bold.otf"))
+        font_family = QFontDatabase.applicationFontFamilies(font_id)
 
         MainWindow.setWindowTitle("Subtitle Renamer")
         MainWindow.resize(1200, 720)
@@ -18,11 +21,12 @@ class Ui_MainWindow(object):
 
         self.titleLabel = QLabel("SubtitleRenamer")
         self.titleLabel.setObjectName("titleLabel")
+        self.titleLabel.setFont(QFont(font_family))
+
         self.subtitleLabel = QLabel("有点厉害的动画字幕重命名工具")
         self.subtitleLabel.setObjectName('subtitleLabel')
 
         self.titleLayout = QVBoxLayout()
-        self.titleLayout.setSpacing(8)
         self.titleLayout.setContentsMargins(0, 0, 0, 0)
         self.titleLayout.addWidget(self.titleLabel, 0, Qt.AlignTop)
         self.titleLayout.addWidget(self.subtitleLabel, 0, Qt.AlignTop)
