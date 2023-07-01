@@ -1,21 +1,20 @@
 from PySide6.QtCore import Qt, QMetaObject
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QAbstractItemView
 from PySide6.QtGui import QFontDatabase, QFont
-from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, EditableComboBox, CheckBox, \
-                           ToolButton, FluentIcon
+from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon
 from qfluentwidgets.common.style_sheet import styleSheetManager
 from module.resource import getResource
 
 
-class Ui_MainWindow(object):
-    def setupUI(self, MainWindow):
+class MainWindow(object):
+    def setupUI(self, this_window):
         setThemeColor("#1B96DE")
         font_id = QFontDatabase.addApplicationFont(getResource("font/Study-Bold.otf"))
         font_family = QFontDatabase.applicationFontFamilies(font_id)
 
-        MainWindow.setWindowTitle("Subtitle Renamer")
-        MainWindow.resize(1200, 720)
-        MainWindow.setAcceptDrops(True)
+        this_window.setWindowTitle("Subtitle Renamer")
+        this_window.resize(1200, 720)
+        this_window.setAcceptDrops(True)
 
         # 标题区域
 
@@ -87,7 +86,7 @@ class Ui_MainWindow(object):
 
         # 框架叠叠乐
 
-        self.centralWidget = QWidget(MainWindow)
+        self.centralWidget = QWidget(this_window)
 
         self.vBoxLayout = QVBoxLayout(self.centralWidget)
         self.vBoxLayout.setSpacing(0)
@@ -98,9 +97,9 @@ class Ui_MainWindow(object):
         self.vBoxLayout.addSpacing(24)
         self.vBoxLayout.addLayout(self.actionLayout, 0)
 
-        MainWindow.setCentralWidget(self.centralWidget)
+        this_window.setCentralWidget(self.centralWidget)
 
-        QMetaObject.connectSlotsByName(MainWindow)
+        QMetaObject.connectSlotsByName(this_window)
 
 
 

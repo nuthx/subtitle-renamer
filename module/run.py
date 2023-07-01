@@ -1,16 +1,17 @@
 import time
 import send2trash
-from PySide6.QtWidgets import QMainWindow, QTableWidgetItem
+from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition
 
-from module.gui import Ui_MainWindow
+from gui.mainui import MainWindow
+from gui.setting import SettingWindow
 from module.function import *
 
 
-class MyMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, parent=None):
-        super(MyMainWindow, self).__init__(parent)
+class MyMainWindow(QMainWindow, MainWindow):
+    def __init__(self):
+        super().__init__()
         self.setupUI(self)
         self.initUI()
         self.initList()
@@ -18,6 +19,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def initUI(self):
         self.clearButton.clicked.connect(self.initList)
         self.renameButton.clicked.connect(self.startRename)
+        self.settingButton.clicked.connect(self.goSetting)
+
+    def goSetting(self):
+        setting = MySettingWindow()
+        setting.exec()
 
     def initList(self):
         self.file_list = []
@@ -181,3 +187,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 position=InfoBarPosition.TOP,
                 duration=2000, parent=self
             )
+
+
+class MySettingWindow(QDialog, SettingWindow):
+    def __init__(self):
+        super().__init__()
+        self.setupUI(self)
