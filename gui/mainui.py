@@ -20,7 +20,7 @@ class MainWindow(object):
 
         this_window.setWindowTitle("Subtitle Renamer")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
-        this_window.resize(1200, 720)
+        this_window.resize(1200, 660)
         this_window.setAcceptDrops(True)
 
         # 标题区域
@@ -110,54 +110,3 @@ class MainWindow(object):
         this_window.setCentralWidget(self.centralWidget)
 
         QMetaObject.connectSlotsByName(this_window)
-
-
-
-
-
-
-
-
-        # self.deleteSub = CheckBox("删除多余文件（包括未勾选的简繁字幕）", self)
-        # self.deleteSub.setChecked(True)
-
-        # self.infoLayout = QHBoxLayout()
-        # self.infoLayout.setSpacing(40)
-        # self.infoLayout.setContentsMargins(24, 16, 30, 14)  # 修正四边间距
-        # self.infoLayout.addLayout(self.scLayout, 0)
-        # self.infoLayout.addLayout(self.tcLayout, 0)
-        #
-        # self.infoFrame = QFrame()
-        # self.infoFrame.setObjectName("infoFrame")
-        # self.infoFrame.setLayout(self.infoLayout)
-        # self.infoFrame.setMaximumHeight(242)
-        #
-        #
-        #
-        # self.scFormat = EditableComboBox(self)
-        # self.scFormat.setMaximumWidth(200)
-        # self.scFormat.addItems([".sc", ".chs", ".zh-Hans"])
-        # self.scFormat.setPlaceholderText("不添加简体扩展名")
-
-        # self.tcFormat = EditableComboBox(self)
-        # self.tcFormat.setMaximumWidth(200)
-        # self.tcFormat.addItems([".tc", ".cht", ".zh-Hant"])
-        # self.tcFormat.setPlaceholderText("不添加繁体扩展名")
-        #
-        #
-        #
-        #
-        # self.buttonLayout = QHBoxLayout()
-        # self.buttonLayout.setSpacing(12)
-        # self.buttonLayout.setContentsMargins(0, 0, 0, 0)
-        # self.buttonLayout.setObjectName("infoLayout")
-        # self.buttonLayout.addWidget(self.messageLabel)
-        # self.buttonLayout.addStretch(0)
-        # self.buttonLayout.addWidget(self.clearButton)
-        # self.buttonLayout.addWidget(self.renameButton)
-        #
-        # self.buttonFrame = QFrame()
-        # self.buttonFrame.setObjectName("buttonFrame")
-        # self.buttonFrame.setLayout(self.buttonLayout)
-
-

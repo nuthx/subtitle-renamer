@@ -1,6 +1,9 @@
+import os
+import platform
+
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PySide6.QtGui import QIcon
-from qfluentwidgets import setThemeColor, PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox
+from qfluentwidgets import PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox
 from module.resource import getResource
 
 
@@ -88,6 +91,24 @@ class SettingWindow(object):
         self.encodeType.setCurrentIndex(0)  # 默认第一个
         self.encodeCard = self.settingCard(self.encodeTitle, self.encodeInfo, self.encodeType)
 
+        # 配置文件
+
+        if platform.system() == "Windows":
+            self.config_dir = os.environ["APPDATA"]
+        elif platform.system() == "Darwin":
+            self.config_dir = os.path.expanduser("~/Library/Application Support")
+        elif platform.system() == "Linux":
+            self.config_dir = os.path.expanduser("~/.config")
+        else:
+            self.config_dir = "N/A"
+
+        self.configPathTitle = QLabel("配置文件")
+        self.configPathInfo = QLabel(f"配置文件路径：{self.config_dir}")
+
+        self.configPathButton = PushButton("打开文件夹", self)
+        self.configPathButton.setFixedWidth(120)
+        self.configPathCard = self.settingCard(self.configPathTitle, self.configPathInfo, self.configPathButton)
+
         # 按钮
 
         self.applyButton = PushButton("取消", self)
@@ -115,6 +136,7 @@ class SettingWindow(object):
         layout.addWidget(self.moveSubCard)
         layout.addWidget(self.removeSubCard)
         layout.addWidget(self.encodeCard)
+        layout.addWidget(self.configPathCard)
         layout.addSpacing(12)
         layout.addLayout(self.buttonLayout)
 

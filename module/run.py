@@ -1,5 +1,6 @@
 import time
 import send2trash
+import subprocess
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition
@@ -193,3 +194,16 @@ class MySettingWindow(QDialog, SettingWindow):
     def __init__(self):
         super().__init__()
         self.setupUI(self)
+        self.initUI()
+
+    def initUI(self):
+        self.configPathButton.clicked.connect(self.openConfigFolder)
+
+    def openConfigFolder(self):
+        print("8")
+        if platform.system() == "Windows":
+            subprocess.call(["explorer", os.environ["APPDATA"]])
+        elif platform.system() == "Darwin":
+            subprocess.call(["open", os.path.expanduser("~/Library/Application Support")])
+        elif platform.system() == "Linux":
+            subprocess.call(["xdg-open", os.path.expanduser("~/.config")])
