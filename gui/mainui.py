@@ -1,18 +1,25 @@
 from PySide6.QtCore import Qt, QMetaObject
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QAbstractItemView
-from PySide6.QtGui import QFontDatabase, QFont
-from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon
+from PySide6.QtGui import QFontDatabase, QFont, QIcon
+from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon, ToolButton
 from qfluentwidgets.common.style_sheet import styleSheetManager
 from module.resource import getResource
 
 
 class MainWindow(object):
     def setupUI(self, this_window):
+        # 配置主题色与字体
         setThemeColor("#1B96DE")
         font_id = QFontDatabase.addApplicationFont(getResource("font/Study-Bold.otf"))
         font_family = QFontDatabase.applicationFontFamilies(font_id)
 
+        # 加载 QSS
+        with open(getResource("style/style_light.qss"), "r", encoding="UTF-8") as file:
+            style_sheet = file.read()
+        this_window.setStyleSheet(style_sheet)
+
         this_window.setWindowTitle("Subtitle Renamer")
+        this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
         this_window.resize(1200, 720)
         this_window.setAcceptDrops(True)
 
@@ -30,12 +37,15 @@ class MainWindow(object):
         self.titleLayout.addWidget(self.titleLabel, 0, Qt.AlignTop)
         self.titleLayout.addWidget(self.subtitleLabel, 0, Qt.AlignTop)
 
+        self.infoButton = ToolButton(FluentIcon.INFO, self)
         self.settingButton = PushButton("设置", self, FluentIcon.SETTING)
 
         self.headerLayout = QHBoxLayout()
         self.headerLayout.setContentsMargins(0, 0, 0, 0)
         self.headerLayout.addLayout(self.titleLayout)
         self.headerLayout.addStretch(0)
+        self.headerLayout.addWidget(self.infoButton, 0)
+        self.headerLayout.addSpacing(12)
         self.headerLayout.addWidget(self.settingButton, 0)
 
         # 表格区域
