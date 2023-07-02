@@ -1,7 +1,6 @@
 import os
 import platform
-
-from PySide6.QtCore import QFileInfo, QSettings
+import configparser
 
 
 # 配置文件路径
@@ -25,58 +24,54 @@ def configPath():
     return config_path
 
 
+# 初始化配置
+def initConfig(config_file):
+    config = configparser.ConfigParser()
+
+    config.add_section("Extension")
+    config.set("Extension", "sc", "")
+    config.set("Extension", "tc", "")
+
+    config.add_section("General")
+    config.set("General", "move_to_anime_folder", "1")
+    config.set("General", "remove_unused_sub", "1")
+    config.set("General", "encode", "None")
+
+    config.add_section("Funny")
+    config.set("Funny", "open_times", "0")
+    config.set("Funny", "usage_times", "0")
+    config.set("Funny", "renamed_sub", "0")
+
+    # 写入配置内容
+    with open(config_file, "w") as content:
+        config.write(content)
 
 
+# 检测配置文件合法性
+def checkConfig(config, config_file):
+    if config.get("General", "move_to_anime_folder") not in ["0", "1"]:
+        config.set("General", "move_to_anime_folder", "1")
 
+    if config.get("General", "remove_unused_sub") not in ["0", "1"]:
+        config.set("General", "remove_unused_sub", "1")
 
+    if config.get("General", "encode") not in ["None", "UTF-8", "ANSI"]:
+        config.set("General", "encode", "None")
 
+    # 写入配置内容
+    with open(config_file, "w") as content:
+        config.write(content)
 
 
 # 读取配置
-def readConfig(self):
-    config_file = QFileInfo("config.ini")
-    settings = QSettings("config.ini", QSettings.IniFormat)
+def readConfig():
+    config = configparser.ConfigParser()
+    config_file = configPath() + os.sep + "config.ini"
 
-    # 如果不存在配置文件，则创建
-    if not config_file.exists():
-        open(config_file.filePath(), "w").write("")  # 创建配置文件，并写入空内容
-        name_type = "{b_initial_name}/[{b_typecode}] [{b_release_date}] {b_jp_name}"  # 默认格式
-        settings.setValue("type", name_type)
+    # 不存在则创建新配置
+    if not os.path.exists(config_file):
+        initConfig(config_file)
 
-    input_text = settings.value("type", "")
-    self.type_input.setText(str(input_text))
-
-
-
-
-
-
-
-def save_config(self):
-    input_text = self.type_input.text()
-
-    # 花括号内容是否合规模块
-    work_type = ["b_id", "romaji_name", "b_jp_name", "b_cn_name", "b_initial_name", "b_type", "b_typecode",
-                 "b_release_date", "b_episodes"]
-    pattern = r"\{(.*?)\}"
-    matches = re.findall(pattern, input_text)
-    for match in matches:
-        if match not in work_type:
-            self.warning_dialog("不支持的格式变量，请检查花括号内容")
-            return
-
-    # 花括号是否成对
-    if not function.check_braces(input_text):
-        self.warning_dialog("花括号结构有误，请检查")
-        return
-
-    # 是否有多个斜杠
-    if input_text.count("/") > 1:
-        self.warning_dialog("最多支持一个父文件夹嵌套")
-        return
-
-    # 写入配置
-    settings = QtCore.QSettings("config.ini", QtCore.QSettings.IniFormat)
-    settings.setValue("type", input_text)
-    self.success_dialog("配置已保存<br>请重新分析后再开始重命名")
-
+    config.read(config_file)
+    checkConfig(config, config_file)
+    return config

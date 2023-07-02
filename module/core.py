@@ -17,15 +17,12 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.setupUI(self)
         self.initUI()
         self.initList()
+        readConfig()
 
     def initUI(self):
         self.clearButton.clicked.connect(self.initList)
         self.renameButton.clicked.connect(self.startRename)
-        self.settingButton.clicked.connect(self.goSetting)
-
-    def goSetting(self):
-        setting = MySettingWindow()
-        setting.exec()
+        self.settingButton.clicked.connect(self.openSetting)
 
     def initList(self):
         self.file_list = []
@@ -190,12 +187,18 @@ class MyMainWindow(QMainWindow, MainWindow):
                 duration=2000, parent=self
             )
 
+    @staticmethod
+    def openSetting():
+        setting = MySettingWindow()
+        setting.exec()
+
 
 class MySettingWindow(QDialog, SettingWindow):
     def __init__(self):
         super().__init__()
         self.setupUI(self)
         self.initUI()
+        self.config = readConfig()
 
     def initUI(self):
         self.configPathButton.clicked.connect(self.openConfigPath)

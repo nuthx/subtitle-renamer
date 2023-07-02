@@ -88,7 +88,7 @@ class SettingWindow(object):
         self.encodeType = ComboBox(self)
         self.encodeType.setMinimumWidth(200)
         self.encodeType.setMaximumWidth(200)
-        self.encodeType.addItems(["不转换", "UTF-8"])
+        self.encodeType.addItems(["不转换", "UTF-8", "ANSI"])
         self.encodeType.setCurrentIndex(0)  # 默认第一个
         self.encodeCard = self.settingCard(self.encodeTitle, self.encodeInfo, self.encodeType)
 
