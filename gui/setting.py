@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PySide6.QtGui import QIcon
 from qfluentwidgets import PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox
 from module.resource import getResource
+from module.config import configPath
 
 
 class SettingWindow(object):
@@ -93,17 +94,8 @@ class SettingWindow(object):
 
         # 配置文件
 
-        if platform.system() == "Windows":
-            self.config_dir = os.environ["APPDATA"]
-        elif platform.system() == "Darwin":
-            self.config_dir = os.path.expanduser("~/Library/Application Support")
-        elif platform.system() == "Linux":
-            self.config_dir = os.path.expanduser("~/.config")
-        else:
-            self.config_dir = "N/A"
-
         self.configPathTitle = QLabel("配置文件")
-        self.configPathInfo = QLabel(f"配置文件路径：{self.config_dir}")
+        self.configPathInfo = QLabel(f"配置文件路径：{configPath()}")
 
         self.configPathButton = PushButton("打开文件夹", self)
         self.configPathButton.setFixedWidth(120)

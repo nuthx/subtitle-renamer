@@ -5,9 +5,10 @@ from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition
 
-from gui.mainui import MainWindow
+from gui.mainwindow import MainWindow
 from gui.setting import SettingWindow
 from module.function import *
+from module.config import *
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -197,13 +198,15 @@ class MySettingWindow(QDialog, SettingWindow):
         self.initUI()
 
     def initUI(self):
-        self.configPathButton.clicked.connect(self.openConfigFolder)
+        self.configPathButton.clicked.connect(self.openConfigPath)
 
-    def openConfigFolder(self):
-        print("8")
-        if platform.system() == "Windows":
-            subprocess.call(["explorer", os.environ["APPDATA"]])
-        elif platform.system() == "Darwin":
-            subprocess.call(["open", os.path.expanduser("~/Library/Application Support")])
-        elif platform.system() == "Linux":
-            subprocess.call(["xdg-open", os.path.expanduser("~/.config")])
+    @staticmethod
+    def openConfigPath():
+        config_path = configPath()
+        if config_path != "N/A":
+            if platform.system() == "Windows":
+                subprocess.call(["explorer", config_path])
+            elif platform.system() == "Darwin":
+                subprocess.call(["open", config_path])
+            elif platform.system() == "Linux":
+                subprocess.call(["xdg-open", config_path])
