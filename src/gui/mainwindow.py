@@ -3,18 +3,18 @@ from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame,
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
 from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon, ToolButton
 from qfluentwidgets.common.style_sheet import styleSheetManager
-from module.resource import getResource
+from src.module.resource import getResource
 
 
 class MainWindow(object):
     def setupUI(self, this_window):
         # 配置主题色与字体
         setThemeColor("#1B96DE")
-        font_id = QFontDatabase.addApplicationFont(getResource("font/Study-Bold.otf"))
+        font_id = QFontDatabase.addApplicationFont(getResource("src/font/Study-Bold.otf"))
         font_family = QFontDatabase.applicationFontFamilies(font_id)
 
         # 加载 QSS
-        with open(getResource("style/style_light.qss"), "r", encoding="UTF-8") as file:
+        with open(getResource("src/style/style_light.qss"), "r", encoding="UTF-8") as file:
             style_sheet = file.read()
         this_window.setStyleSheet(style_sheet)
 
@@ -61,7 +61,7 @@ class MainWindow(object):
         self.table.setColumnWidth(1, 375)
         self.table.setColumnWidth(2, 375)
         styleSheetManager.deregister(self.table)  # 禁用皮肤，启用自定义 QSS
-        with open(getResource("style/table.qss"), encoding="utf-8") as file:
+        with open(getResource("src/style/table.qss"), encoding="utf-8") as file:
             self.table.setStyleSheet(file.read())
 
         self.tableLayout = QHBoxLayout()

@@ -1,15 +1,14 @@
 import time
 import send2trash
 import subprocess
-import configparser
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition
 
-from gui.mainwindow import MainWindow
-from gui.setting import SettingWindow
-from module.function import *
-from module.config import *
+from src.gui.mainwindow import MainWindow
+from src.gui.setting import SettingWindow
+from src.function import *
+from src.module.config import *
 
 
 class MyMainWindow(QMainWindow, MainWindow):

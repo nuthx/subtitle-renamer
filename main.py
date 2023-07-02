@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import QApplication
 
-from module.core import MyMainWindow
+from src.core import MyMainWindow
 
 
 if __name__ == "__main__":

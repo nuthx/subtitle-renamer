@@ -2,7 +2,7 @@ import os
 import platform
 import shutil
 
-from module.detectsub import detectSubLanguage
+from src.module.detectsub import detectSubLanguage
 
 
 def formatRawFileList(raw_file_list, file_list):
