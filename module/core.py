@@ -1,6 +1,7 @@
 import time
 import send2trash
 import subprocess
+import configparser
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition
@@ -199,13 +200,63 @@ class MySettingWindow(QDialog, SettingWindow):
         self.setupUI(self)
         self.initUI()
         self.config = readConfig()
+        self.loadConfig()
 
     def initUI(self):
         self.configPathButton.clicked.connect(self.openConfigPath)
+        self.applyButton.clicked.connect(self.saveConfig)  # 保存配置
+        self.cancelButton.clicked.connect(lambda: self.close())  # 关闭窗口
+
+    def loadConfig(self):
+        self.scFormat.setText(self.config.get("Extension", "sc"))
+        self.tcFormat.setText(self.config.get("Extension", "tc"))
+
+        if self.config.get("General", "move_to_anime_folder") == "1":
+            self.moveSubSwitch.setChecked(True)
+        else:
+            self.moveSubSwitch.setChecked(False)
+
+        if self.config.get("General", "remove_unused_sub") == "1":
+            self.removeSubSwitch.setChecked(True)
+        else:
+            self.removeSubSwitch.setChecked(False)
+
+        if self.config.get("General", "encode") == "UTF-8":
+            self.encodeType.setCurrentText("UTF-8")
+        elif self.config.get("General", "encode") == "ANSI":
+            self.encodeType.setCurrentText("ANSI")
+        else:
+            self.encodeType.setCurrentText("不转换")
+
+    def saveConfig(self):
+        self.config.set("Extension", "sc", self.scFormat.currentText())
+        self.config.set("Extension", "tc", self.tcFormat.currentText())
+
+        if self.moveSubSwitch.isChecked():
+            self.config.set("General", "move_to_anime_folder", "1")
+        else:
+            self.config.set("General", "move_to_anime_folder", "0")
+
+        if self.removeSubSwitch.isChecked():
+            self.config.set("General", "remove_unused_sub", "1")
+        else:
+            self.config.set("General", "remove_unused_sub", "0")
+
+        if self.encodeType.currentText() == "UTF-8":
+            self.config.set("General", "encode", "UTF-8")
+        elif self.encodeType.currentText() == "ANSI":
+            self.config.set("General", "encode", "ANSI")
+        else:
+            self.config.set("General", "encode", "None")
+
+        with open(configPath()[1], "w") as content:
+            self.config.write(content)
+
+        self.close()
 
     @staticmethod
     def openConfigPath():
-        config_path = configPath()
+        config_path = configPath()[0]
         if config_path != "N/A":
             if platform.system() == "Windows":
                 subprocess.call(["explorer", config_path])

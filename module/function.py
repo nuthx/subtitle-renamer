@@ -1,6 +1,7 @@
 import os
 import platform
 import shutil
+
 from module.detectsub import detectSubLanguage
 
 

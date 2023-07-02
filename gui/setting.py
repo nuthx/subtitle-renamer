@@ -1,9 +1,7 @@
-import os
-import platform
-
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PySide6.QtGui import QIcon
 from qfluentwidgets import PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox
+
 from module.resource import getResource
 from module.config import configPath
 
@@ -95,7 +93,7 @@ class SettingWindow(object):
         # 配置文件
 
         self.configPathTitle = QLabel("配置文件")
-        self.configPathInfo = QLabel(f"配置文件路径：{configPath()}")
+        self.configPathInfo = QLabel(f"配置文件路径：{configPath()[0]}")
 
         self.configPathButton = PushButton("打开文件夹", self)
         self.configPathButton.setFixedWidth(120)
@@ -103,16 +101,16 @@ class SettingWindow(object):
 
         # 按钮
 
-        self.applyButton = PushButton("取消", self)
-        self.applyButton.setFixedWidth(120)
-        self.cancelButton = PrimaryPushButton("保存", self)
+        self.cancelButton = PushButton("取消", self)
         self.cancelButton.setFixedWidth(120)
+        self.applyButton = PrimaryPushButton("保存", self)
+        self.applyButton.setFixedWidth(120)
 
         self.buttonLayout = QHBoxLayout()
         self.buttonLayout.setSpacing(12)
         self.buttonLayout.addStretch(0)
-        self.buttonLayout.addWidget(self.applyButton)
         self.buttonLayout.addWidget(self.cancelButton)
+        self.buttonLayout.addWidget(self.applyButton)
         self.buttonLayout.addStretch(0)
 
         # 叠叠乐

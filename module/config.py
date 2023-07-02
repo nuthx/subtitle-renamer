@@ -16,12 +16,13 @@ def configPath():
         return "N/A"
 
     config_path = config_path + os.sep + "SubtitleRenamer"
+    config_file = config_path + os.sep + "config.ini"
 
     # 是否存在该路径，否则创建
     if not os.path.exists(config_path):
         os.makedirs(config_path)
 
-    return config_path
+    return config_path, config_file
 
 
 # 初始化配置
@@ -66,7 +67,7 @@ def checkConfig(config, config_file):
 # 读取配置
 def readConfig():
     config = configparser.ConfigParser()
-    config_file = configPath() + os.sep + "config.ini"
+    config_file = configPath()[1]
 
     # 不存在则创建新配置
     if not os.path.exists(config_file):
