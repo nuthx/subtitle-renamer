@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, QMetaObject
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QAbstractItemView
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QAbstractItemView, QHeaderView
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
 from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon, ToolButton
 from qfluentwidgets.common.style_sheet import styleSheetManager
@@ -57,12 +57,15 @@ class MainWindow(object):
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 禁止双击编辑
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(["视频文件", "简体字幕", "繁体字幕"])
-        self.table.setColumnWidth(0, 376)  # 1126
-        self.table.setColumnWidth(1, 375)
-        self.table.setColumnWidth(2, 375)
+        # self.table.setColumnWidth(0, 376)  # 1126
+        # self.table.setColumnWidth(1, 375)
+        # self.table.setColumnWidth(2, 375)
         styleSheetManager.deregister(self.table)  # 禁用皮肤，启用自定义 QSS
         with open(getResource("src/style/table.qss"), encoding="utf-8") as file:
             self.table.setStyleSheet(file.read())
+
+        self.header = self.table.horizontalHeader()
+        self.header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)  # 列宽平均分配
 
         self.tableLayout = QHBoxLayout()
         self.tableLayout.setContentsMargins(0, 0, 0, 0)

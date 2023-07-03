@@ -73,22 +73,21 @@ class MyMainWindow(QMainWindow, MainWindow):
         for video_name in self.video_list:
             video_name_lonely = os.path.basename(video_name)
             self.table.setItem(video_id, 0, QTableWidgetItem(video_name_lonely))
-            self.table.resizeColumnsToContents()  # 自动匹配列宽
             video_id += 1
 
         sc_id = 0
         for sc_name in self.sc_list:
             sc_name_lonely = os.path.basename(sc_name)
             self.table.setItem(sc_id, 1, QTableWidgetItem(sc_name_lonely))
-            self.table.resizeColumnsToContents()  # 自动匹配列宽
             sc_id += 1
 
         tc_id = 0
         for tc_name in self.tc_list:
             tc_name_lonely = os.path.basename(tc_name)
             self.table.setItem(tc_id, 2, QTableWidgetItem(tc_name_lonely))
-            self.table.resizeColumnsToContents()  # 自动匹配列宽
             tc_id += 1
+
+        self.table.resizeColumnsToContents()  # 自动匹配列宽
 
     def startRename(self):
         # 读取配置
