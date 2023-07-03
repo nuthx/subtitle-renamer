@@ -17,7 +17,6 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.setupUI(self)
         self.initUI()
         self.initList()
-        readConfig()
 
     def initUI(self):
         self.clearButton.clicked.connect(self.initList)
@@ -29,9 +28,12 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.video_list = []
         self.sc_list = []
         self.tc_list = []
-        self.trash_list = []
         self.table.clearContents()
         self.table.setRowCount(0)
+
+    def openSetting(self):
+        setting = MySettingWindow()
+        setting.exec()
 
     def dragEnterEvent(self, event):
         event.acceptProposedAction()
@@ -89,40 +91,11 @@ class MyMainWindow(QMainWindow, MainWindow):
             tc_id += 1
 
     def startRename(self):
-        # 是否有视频与字幕文件
-        if not self.video_list:
-            self.showInfo("warning", "", "请添加视频文件")
-            return
+        # 读取配置
+        self.loadConfig()
 
-        if not self.sc_list and not self.tc_list:
-            self.showInfo("warning", "", "请添加字幕文件")
-            return
-
-        # 勾选的语言下必须存在字幕文件
-        if self.allowSc.isChecked() and not self.sc_list \
-                or self.allowTc.isChecked() and not self.tc_list:
-            if not self.sc_list:
-                self.showInfo("error", "", "未发现待命名的简体字幕文件，请确认勾选情况")
-                return
-            elif not self.tc_list:
-                self.showInfo("error", "", "未发现待命名的繁体字幕文件，请确认勾选情况")
-                return
-
-        # 必须勾选简体或繁体
-        if not self.allowSc.isChecked() and not self.allowTc.isChecked():
-            self.showInfo("error", "", "请勾选需要重命名的字幕格式：简体或繁体")
-            return
-
-        # 简体繁体的扩展名不可相同
-        if self.allowSc.isChecked() and self.allowTc.isChecked() \
-                and self.tcFormat.currentText() == self.scFormat.currentText():
-            self.showInfo("error", "", "简体扩展名与繁体扩展名不可相同")
-            return
-
-        # 视频与字幕个数需相等
-        if len(self.sc_list) != 0 and len(self.video_list) != len(self.sc_list) \
-                or len(self.tc_list) != 0 and len(self.video_list) != len(self.tc_list):
-            self.showInfo("error", "", "视频与字幕的数量不相等")
+        # 命名前检查
+        if not self.renameCheck():
             return
 
         # 未勾选的语言加入 delete_list
@@ -164,6 +137,52 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.initList()
         self.showInfo("success", "", "重命名成功")
 
+    def loadConfig(self):
+        config = readConfig()
+
+        self.sc_extension = config.get("Extension", "sc")
+        self.tc_extension = config.get("Extension", "tc")
+
+        self.move_to_anime_folder = config.get("General", "move_to_anime_folder")
+        self.remove_unused_sub = config.get("General", "remove_unused_sub")
+        self.encode = config.get("General", "encode")
+
+    def renameCheck(self):
+        # 是否有视频与字幕文件
+        if not self.video_list:
+            self.showInfo("warning", "", "请添加视频文件")
+            return False
+
+        if not self.sc_list and not self.tc_list:
+            self.showInfo("warning", "", "请添加字幕文件")
+            return False
+
+        # 必须勾选简体或繁体
+        if not self.allowSc.isChecked() and not self.allowTc.isChecked():
+            self.showInfo("error", "", "请勾选需要重命名的字幕格式：简体或繁体")
+            return False
+
+        # 勾选的语言下必须存在字幕文件
+        if self.allowSc.isChecked() and not self.sc_list:
+            self.showInfo("error", "", "未发现待命名的简体字幕文件，请确认勾选情况")
+            return False
+
+        if self.allowTc.isChecked() and not self.tc_list:
+            self.showInfo("error", "", "未发现待命名的繁体字幕文件，请确认勾选情况")
+            return False
+
+        # 简体繁体的扩展名不可相同
+        if self.allowSc.isChecked() and self.allowTc.isChecked() \
+                and self.sc_extension == self.tc_extension:
+            self.showInfo("error", "", "简体扩展名与繁体扩展名不可相同")
+            return False
+
+        # 视频与字幕个数需相等
+        if len(self.sc_list) != 0 and len(self.video_list) != len(self.sc_list) \
+                or len(self.tc_list) != 0 and len(self.video_list) != len(self.tc_list):
+            self.showInfo("error", "", "视频与字幕的数量不相等")
+            return False
+
     def showInfo(self, state, title, content):
         if state == "success":
             InfoBar.success(
@@ -186,11 +205,6 @@ class MyMainWindow(QMainWindow, MainWindow):
                 position=InfoBarPosition.TOP,
                 duration=2000, parent=self
             )
-
-    @staticmethod
-    def openSetting():
-        setting = MySettingWindow()
-        setting.exec()
 
 
 class MySettingWindow(QDialog, SettingWindow):
