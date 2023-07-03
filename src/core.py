@@ -21,6 +21,7 @@ class MyMainWindow(QMainWindow, MainWindow):
     def initUI(self):
         self.clearButton.clicked.connect(self.initList)
         self.renameButton.clicked.connect(self.startRename)
+        self.introButton.clicked.connect(self.openIntro)
         self.settingButton.clicked.connect(self.openSetting)
 
     def initList(self):
@@ -30,6 +31,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.tc_list = []
         self.table.clearContents()
         self.table.setRowCount(0)
+
+    def openIntro(self):
+        self.showInfo("warning", "开发中", "咕咕咕咕咕咕")
 
     def openSetting(self):
         setting = MySettingWindow()
