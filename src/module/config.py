@@ -34,8 +34,8 @@ def initConfig(config_file):
     config.set("Extension", "tc", "")
 
     config.add_section("General")
-    config.set("General", "move_to_anime_folder", "1")
-    config.set("General", "remove_unused_sub", "1")
+    config.set("General", "move_to_anime_folder", "true")
+    config.set("General", "remove_unused_sub", "true")
     config.set("General", "encode", "None")
 
     config.add_section("Funny")
@@ -50,11 +50,11 @@ def initConfig(config_file):
 
 # 检测配置文件合法性
 def checkConfig(config, config_file):
-    if config.get("General", "move_to_anime_folder") not in ["0", "1"]:
-        config.set("General", "move_to_anime_folder", "1")
+    if config.get("General", "move_to_anime_folder") not in ["true", "false"]:
+        config.set("General", "move_to_anime_folder", "true")
 
-    if config.get("General", "remove_unused_sub") not in ["0", "1"]:
-        config.set("General", "remove_unused_sub", "1")
+    if config.get("General", "remove_unused_sub") not in ["true", "false"]:
+        config.set("General", "remove_unused_sub", "true")
 
     if config.get("General", "encode") not in ["None", "UTF-8", "ANSI"]:
         config.set("General", "encode", "None")

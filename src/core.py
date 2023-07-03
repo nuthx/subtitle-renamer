@@ -106,15 +106,15 @@ class MyMainWindow(QMainWindow, MainWindow):
             delete_list.extend(self.tc_list)
 
         # 删除未勾选的语言
-        if self.deleteSub.isChecked() and delete_list:
+        if self.move_to_folder and delete_list:
             # 获得 delete_list 文件名
-            delete_name_list = []
+            delete_list_lonely = []
             for item in delete_list:
                 item_lonely = os.path.basename(item)
-                delete_name_list.append(item_lonely)
+                delete_list_lonely.append(item_lonely)
 
             # 弹窗提醒待删除文件
-            delete_file = "<br>".join(delete_name_list)  # 转为字符串形式
+            delete_file = "<br>".join(delete_list_lonely)  # 转为字符串形式
             notice = MessageBox("下列文件将被删除", delete_file, self)
             if notice.exec():
                 send2trash.send2trash(delete_list)
@@ -123,13 +123,13 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         # 字幕重命名
         if self.allowSc.isChecked():
-            state_sc = renameAction(self.scFormat.currentText(), self.video_list, self.sc_list)
+            state_sc = renameAction(self.sc_extension, self.video_list, self.sc_list)
             if state_sc == 516:
                 self.showInfo("error", "重命名失败", "目标文件夹存在同名的简体字幕")
                 return
 
         if self.allowTc.isChecked():
-            state_tc = renameAction(self.tcFormat.currentText(), self.video_list, self.tc_list)
+            state_tc = renameAction(self.tc_extension, self.video_list, self.tc_list)
             if state_tc == 516:
                 self.showInfo("error", "重命名失败", "目标文件夹存在同名的繁体字幕")
                 return
@@ -143,8 +143,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.sc_extension = config.get("Extension", "sc")
         self.tc_extension = config.get("Extension", "tc")
 
-        self.move_to_anime_folder = config.get("General", "move_to_anime_folder")
-        self.remove_unused_sub = config.get("General", "remove_unused_sub")
+        self.move_to_folder = config.getboolean("General", "move_to_anime_folder")
+        self.remove_unused = config.getboolean("General", "remove_unused_sub")
         self.encode = config.get("General", "encode")
 
     def renameCheck(self):
@@ -224,12 +224,12 @@ class MySettingWindow(QDialog, SettingWindow):
         self.scFormat.setText(self.config.get("Extension", "sc"))
         self.tcFormat.setText(self.config.get("Extension", "tc"))
 
-        if self.config.get("General", "move_to_anime_folder") == "1":
+        if self.config.getboolean("General", "move_to_anime_folder"):
             self.moveSubSwitch.setChecked(True)
         else:
             self.moveSubSwitch.setChecked(False)
 
-        if self.config.get("General", "remove_unused_sub") == "1":
+        if self.config.getboolean("General", "remove_unused_sub"):
             self.removeSubSwitch.setChecked(True)
         else:
             self.removeSubSwitch.setChecked(False)
@@ -246,14 +246,14 @@ class MySettingWindow(QDialog, SettingWindow):
         self.config.set("Extension", "tc", self.tcFormat.currentText())
 
         if self.moveSubSwitch.isChecked():
-            self.config.set("General", "move_to_anime_folder", "1")
+            self.config.set("General", "move_to_anime_folder", "true")
         else:
-            self.config.set("General", "move_to_anime_folder", "0")
+            self.config.set("General", "move_to_anime_folder", "false")
 
         if self.removeSubSwitch.isChecked():
-            self.config.set("General", "remove_unused_sub", "1")
+            self.config.set("General", "remove_unused_sub", "true")
         else:
-            self.config.set("General", "remove_unused_sub", "0")
+            self.config.set("General", "remove_unused_sub", "false")
 
         if self.encodeType.currentText() == "UTF-8":
             self.config.set("General", "encode", "UTF-8")
