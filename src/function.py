@@ -1,6 +1,8 @@
 import os
 import platform
 import shutil
+import codecs
+import chardet
 
 from src.module.detectsub import detectSubLanguage
 
@@ -90,7 +92,24 @@ def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
         if os.path.exists(new_sub):
             return 516
 
-    # 重命名
+    # 1 => 修改编码
+    if encode == "UTF-8":
+        for this_sub in sub_list:
+            # 识别
+            with open(this_sub, "rb") as file:
+                sub_data = file.read()
+                result = chardet.detect(sub_data)
+                encoding = result["encoding"]
+                if encoding.lower() == "gb2312":  # 修正解码错误
+                    encoding = "gb18030"
+
+            # 忽略错误，强行转换，最为致命~
+            with codecs.open(this_sub, "r", encoding=encoding, errors="ignore") as file:
+                content = file.read()
+            with codecs.open(this_sub, "w", encoding=encode, errors="ignore") as file:
+                file.write(content)
+
+    # 2 => 重命名
     for this_sub in sub_list:
         new_sub = new_sub_list[sub_id_b]
         shutil.copy(this_sub, new_sub)

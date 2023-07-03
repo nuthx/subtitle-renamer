@@ -271,8 +271,6 @@ class MySettingWindow(QDialog, SettingWindow):
 
         if self.encodeType.currentText() == "UTF-8":
             self.config.set("General", "encode", "UTF-8")
-        elif self.encodeType.currentText() == "ANSI":
-            self.config.set("General", "encode", "ANSI")
         else:
             self.config.set("General", "encode", "None")
 

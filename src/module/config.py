@@ -56,7 +56,7 @@ def checkConfig(config, config_file):
     if config.get("General", "remove_unused_sub") not in ["true", "false"]:
         config.set("General", "remove_unused_sub", "true")
 
-    if config.get("General", "encode") not in ["None", "UTF-8", "ANSI"]:
+    if config.get("General", "encode") not in ["None", "UTF-8"]:
         config.set("General", "encode", "None")
 
     # 写入配置内容
