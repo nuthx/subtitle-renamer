@@ -183,8 +183,6 @@ class MyMainWindow(QMainWindow, MainWindow):
             self.showInfo("error", "", "未发现待命名的繁体字幕文件，请确认勾选情况")
             return False
 
-        return True
-
         # 简体繁体的扩展名不可相同
         if self.allowSc.isChecked() and self.allowTc.isChecked() \
                 and self.sc_extension == self.tc_extension:
@@ -192,10 +190,12 @@ class MyMainWindow(QMainWindow, MainWindow):
             return False
 
         # 视频与字幕个数需相等
-        if len(self.sc_list) != 0 and len(self.video_list) != len(self.sc_list) \
-                or len(self.tc_list) != 0 and len(self.video_list) != len(self.tc_list):
+        if (self.allowSc.isChecked() and len(self.video_list) != len(self.sc_list)) \
+                or (self.allowTc.isChecked() and len(self.video_list) != len(self.tc_list)):
             self.showInfo("error", "", "视频与字幕的数量不相等")
             return False
+
+        return True
 
     def showInfo(self, state, title, content):
         if state == "success":
