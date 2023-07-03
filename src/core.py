@@ -106,7 +106,7 @@ class MyMainWindow(QMainWindow, MainWindow):
             delete_list.extend(self.tc_list)
 
         # 删除未勾选的语言
-        if self.move_to_folder and delete_list:
+        if self.remove_unused and delete_list:
             # 获得 delete_list 文件名
             delete_list_lonely = []
             for item in delete_list:
@@ -123,13 +123,25 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         # 字幕重命名
         if self.allowSc.isChecked():
-            state_sc = renameAction(self.sc_extension, self.video_list, self.sc_list)
+            state_sc = renameAction(
+                self.sc_extension,
+                self.video_list,
+                self.sc_list,
+                self.move_to_folder,
+                self.encode
+            )
             if state_sc == 516:
                 self.showInfo("error", "重命名失败", "目标文件夹存在同名的简体字幕")
                 return
 
         if self.allowTc.isChecked():
-            state_tc = renameAction(self.tc_extension, self.video_list, self.tc_list)
+            state_tc = renameAction(
+                self.tc_extension,
+                self.video_list,
+                self.tc_list,
+                self.move_to_folder,
+                self.encode
+            )
             if state_tc == 516:
                 self.showInfo("error", "重命名失败", "目标文件夹存在同名的繁体字幕")
                 return
@@ -170,6 +182,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         if self.allowTc.isChecked() and not self.tc_list:
             self.showInfo("error", "", "未发现待命名的繁体字幕文件，请确认勾选情况")
             return False
+
+        return True
 
         # 简体繁体的扩展名不可相同
         if self.allowSc.isChecked() and self.allowTc.isChecked() \
