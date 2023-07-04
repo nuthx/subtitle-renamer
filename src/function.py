@@ -93,7 +93,7 @@ def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
             return 516
 
     # 1 => 修改编码
-    if encode == "UTF-8":
+    if encode == "UTF-8" or encode == "UTF-8-SIG":
         for this_sub in sub_list:
             # 识别
             with open(this_sub, "rb") as file:

@@ -240,42 +240,16 @@ class MySettingWindow(QDialog, SettingWindow):
     def loadConfig(self):
         self.scFormat.setText(self.config.get("Extension", "sc"))
         self.tcFormat.setText(self.config.get("Extension", "tc"))
-
-        if self.config.getboolean("General", "move_to_anime_folder"):
-            self.moveSubSwitch.setChecked(True)
-        else:
-            self.moveSubSwitch.setChecked(False)
-
-        if self.config.getboolean("General", "remove_unused_sub"):
-            self.removeSubSwitch.setChecked(True)
-        else:
-            self.removeSubSwitch.setChecked(False)
-
-        if self.config.get("General", "encode") == "UTF-8":
-            self.encodeType.setCurrentText("UTF-8")
-        elif self.config.get("General", "encode") == "ANSI":
-            self.encodeType.setCurrentText("ANSI")
-        else:
-            self.encodeType.setCurrentText("不转换")
+        self.moveSubSwitch.setChecked(self.config.getboolean("General", "move_to_anime_folder"))
+        self.removeSubSwitch.setChecked(self.config.getboolean("General", "remove_unused_sub"))
+        self.encodeType.setCurrentText(self.config.get("General", "encode"))
 
     def saveConfig(self):
         self.config.set("Extension", "sc", self.scFormat.currentText())
         self.config.set("Extension", "tc", self.tcFormat.currentText())
-
-        if self.moveSubSwitch.isChecked():
-            self.config.set("General", "move_to_anime_folder", "true")
-        else:
-            self.config.set("General", "move_to_anime_folder", "false")
-
-        if self.removeSubSwitch.isChecked():
-            self.config.set("General", "remove_unused_sub", "true")
-        else:
-            self.config.set("General", "remove_unused_sub", "false")
-
-        if self.encodeType.currentText() == "UTF-8":
-            self.config.set("General", "encode", "UTF-8")
-        else:
-            self.config.set("General", "encode", "None")
+        self.config.set("General", "move_to_anime_folder", str(self.moveSubSwitch.isChecked()).lower())
+        self.config.set("General", "remove_unused_sub", str(self.moveSubSwitch.isChecked()).lower())
+        self.config.set("General", "encode", self.encodeType.currentText())
 
         with open(configPath()[1], "w") as content:
             self.config.write(content)

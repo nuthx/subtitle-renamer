@@ -36,7 +36,7 @@ def initConfig(config_file):
     config.add_section("General")
     config.set("General", "move_to_anime_folder", "true")
     config.set("General", "remove_unused_sub", "true")
-    config.set("General", "encode", "None")
+    config.set("General", "encode", "不转换")
 
     config.add_section("Funny")
     config.set("Funny", "open_times", "0")
@@ -56,7 +56,7 @@ def checkConfig(config, config_file):
     if config.get("General", "remove_unused_sub") not in ["true", "false"]:
         config.set("General", "remove_unused_sub", "true")
 
-    if config.get("General", "encode") not in ["None", "UTF-8"]:
+    if config.get("General", "encode") not in ["不转换", "UTF-8", "UTF-8-SIG"]:
         config.set("General", "encode", "None")
 
     # 写入配置内容
