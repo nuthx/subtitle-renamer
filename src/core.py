@@ -2,8 +2,8 @@ import time
 import send2trash
 import subprocess
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
-from PySide6.QtCore import Qt
-from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition
+from PySide6.QtCore import Qt, QPoint
+from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
 from src.gui.setting import SettingWindow
@@ -19,6 +19,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.initList()
 
     def initUI(self):
+        self.table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self.showMenu)
+
         self.clearButton.clicked.connect(self.initList)
         self.renameButton.clicked.connect(self.startRename)
         self.introButton.clicked.connect(self.openIntro)
@@ -92,6 +95,44 @@ class MyMainWindow(QMainWindow, MainWindow):
             tc_id += 1
 
         self.table.resizeColumnsToContents()  # 自动匹配列宽
+
+    def showMenu(self, pos):
+        menu = RoundMenu(parent=self)
+        delete_this_file = Action(FluentIcon.CLOSE, "删除此文件")
+        delete_this_line = Action(FluentIcon.DELETE, "删除整行内容")
+        menu.addAction(delete_this_file)
+        menu.addAction(delete_this_line)
+
+        # 必须选中单元格才会显示
+        if self.table.itemAt(pos) is not None:
+            # 在微调后的位置显示
+            menu.exec(self.table.mapToGlobal(pos) + QPoint(0, 30), ani=True)
+
+            # 计算单元格坐标
+            clicked_item = self.table.itemAt(pos)
+            row = self.table.row(clicked_item)
+            column = self.table.column(clicked_item)
+            print(row, column)
+
+            delete_this_file.triggered.connect(lambda: self.deleteThisFile(row, column))
+            delete_this_line.triggered.connect(lambda: self.deleteThisLine(row))
+
+    def deleteThisFile(self, row, column):
+        if column == 0:
+            del self.video_list[row]
+        elif column == 1:
+            del self.sc_list[row]
+        elif column == 2:
+            del self.tc_list[row]
+        self.table.clearContents()
+        self.table.setRowCount(0)
+        self.showInTable()
+
+    def deleteThisLine(self, row):
+        del self.video_list[row], self.sc_list[row], self.tc_list[row]
+        self.table.clearContents()
+        self.table.setRowCount(0)
+        self.showInTable()
 
     def startRename(self):
         # 读取配置
