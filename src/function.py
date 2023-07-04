@@ -1,7 +1,10 @@
 import os
 import platform
 import shutil
-from module.detectsub import detectSubLanguage
+import codecs
+import chardet
+
+from src.module.detectsub import detectSubLanguage
 
 
 def formatRawFileList(raw_file_list, file_list):
@@ -60,7 +63,7 @@ def splitList(file_list):
     return video_list, sc_list, tc_list
 
 
-def renameAction(lang_format, video_list, sub_list):
+def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
     new_sub_list = []
     sub_id_a = 0
     sub_id_b = 0
@@ -70,10 +73,16 @@ def renameAction(lang_format, video_list, sub_list):
         this_sub = sub_list[sub_id_a]
         this_video_name = os.path.splitext(os.path.basename(this_video))[0]  # 视频文件名（无扩展名）
         this_video_path = os.path.dirname(this_video)  # 视频路径
+        this_sub_path = os.path.dirname(this_sub)  # 字幕路径
         this_sub_extension = os.path.splitext(os.path.basename(this_sub))[-1]  # 字幕扩展名
         separator = os.sep  # 系统路径分隔符
 
-        new_sub = this_video_path + separator + this_video_name + lang_format + this_sub_extension
+        # 是否要移动至视频文件夹
+        if move_to_folder:
+            new_sub = this_video_path + separator + this_video_name + lang_format + this_sub_extension
+        else:
+            new_sub = this_sub_path + separator + this_video_name + lang_format + this_sub_extension
+
         new_sub_list.append(new_sub)
         new_sub_list.sort()
         sub_id_a += 1
@@ -83,11 +92,26 @@ def renameAction(lang_format, video_list, sub_list):
         if os.path.exists(new_sub):
             return 516
 
-    # 重命名
+    # 1 => 修改编码
+    if encode == "UTF-8" or encode == "UTF-8-SIG":
+        for this_sub in sub_list:
+            # 识别
+            with open(this_sub, "rb") as file:
+                sub_data = file.read()
+                result = chardet.detect(sub_data)
+                encoding = result["encoding"]
+                if encoding.lower() == "gb2312":  # 修正解码错误
+                    encoding = "gb18030"
+
+            # 忽略错误，强行转换，最为致命~
+            with codecs.open(this_sub, "r", encoding=encoding, errors="ignore") as file:
+                content = file.read()
+            with codecs.open(this_sub, "w", encoding=encode, errors="ignore") as file:
+                file.write(content)
+
+    # 2 => 重命名
     for this_sub in sub_list:
         new_sub = new_sub_list[sub_id_b]
         shutil.copy(this_sub, new_sub)
         os.remove(this_sub)
-        # os.rename(this_sub, new_sub)
-        # print(f"{this_sub} → {new_sub}")
         sub_id_b += 1

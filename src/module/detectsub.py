@@ -8,10 +8,13 @@ def detectSubLanguage(file_name):
     subtitle = []
 
     # 检测文本编码
-    with open(file_name, 'rb') as file:
-        raw_data = file.read()
-        result = chardet.detect(raw_data)
-        encoding = result['encoding']
+    with open(file_name, "rb") as file:
+        sub_data = file.read()
+        result = chardet.detect(sub_data)
+        encoding = result["encoding"]
+        if encoding.lower() == "gb2312":  # 修正解码错误
+            encoding = "gb18030"
+        print(encoding)
 
     # 判断字幕格式
     name_struct = file_name.split(".")
@@ -19,7 +22,7 @@ def detectSubLanguage(file_name):
 
     # 提取字幕内容到 subtitle
     if file_extension == "srt":
-        with open(file_name, 'r', encoding=encoding) as file:
+        with open(file_name, "r", encoding=encoding) as file:
             result = file.read()
 
         # 匹配序号和时间
@@ -31,7 +34,7 @@ def detectSubLanguage(file_name):
         subtitle = [match.strip() for match in matches]
 
     else:
-        with open(file_name, 'r', encoding=encoding) as file:
+        with open(file_name, "r", encoding=encoding) as file:
             result = ass.parse(file).events
 
         # 分离正文内容内容到 subtitle
@@ -60,7 +63,7 @@ def detectSubLanguage(file_name):
             tc += 1
 
     # 打印数量
-    print(f"INFO 该字幕简繁比为{sc}:{tc}")
+    print(f"该字幕简繁比为{sc}:{tc}（{file_name}）")
 
     # 判断简繁，计算比例 0.8：1
     if sc * 0.8 > tc:

@@ -3,13 +3,13 @@ MyMainWindow {
 }
 
 #titleLabel {
-    font-size: 28px;
-    color: #000;
+    font-size: 32px;
+    color: #444;
 }
 
 #subtitleLabel {
     font-size: 13px;
-    color: #666;
+    color: #555;
 }
 
 #tableFrame {
