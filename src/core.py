@@ -114,6 +114,8 @@ class MyMainWindow(QMainWindow, MainWindow):
             delete_list_lonely = []
             for item in delete_list:
                 item_lonely = os.path.basename(item)
+                if len(item_lonely) > 70:  # 截取最后 70 位
+                    item_lonely = "..." + item_lonely[-70:]
                 delete_list_lonely.append(item_lonely)
 
             # 弹窗提醒待删除文件
