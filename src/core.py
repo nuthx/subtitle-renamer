@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt, QPoint
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
+from src.gui.intro import IntroWindow
 from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
@@ -36,7 +37,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.table.setRowCount(0)
 
     def openIntro(self):
-        self.showInfo("warning", "开发中", "咕咕咕咕咕咕")
+        intro = MyIntroWindow()
+        intro.exec()
 
     def openSetting(self):
         setting = MySettingWindow()
@@ -265,6 +267,23 @@ class MyMainWindow(QMainWindow, MainWindow):
                 position=InfoBarPosition.TOP,
                 duration=2000, parent=self
             )
+
+
+class MyIntroWindow(QDialog, IntroWindow):
+    def __init__(self):
+        super().__init__()
+        self.setupUI(self)
+        self.initUI()
+
+    def initUI(self):
+        print("ok")
+
+
+
+
+
+
+
 
 
 class MySettingWindow(QDialog, SettingWindow):
