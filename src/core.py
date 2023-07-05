@@ -1,6 +1,7 @@
 import time
 import send2trash
 import subprocess
+import threading
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
@@ -20,14 +21,39 @@ class SplitListThread(QObject):
         self.file_list = file_list
         self.main_window = main_window
 
+        self.video_list = []
+        self.sc_list = []
+        self.tc_list = []
+
     def split(self):
         start_time = time.time()
 
-        # 分离视频与字幕
-        self.split_list = splitList(self.file_list)
+        for file_name in self.file_list:
+            lovely = 0
+            thread = threading.Thread(target=self.splitThread, args=(file_name, lovely))
+            thread.start()
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
         self.finished.emit()
+
+    def splitThread(self, file_name, lovely):
+        video_extension = ["mkv", "mp4", "avi", "flv", "webm", "m4v", "mov", "3gp", "rm", "rmvb"]
+        subtitle_extension = ["ass", "ssa", "srt"]
+
+        name_struct = file_name.split(".")
+        extension = name_struct[-1].lower()
+
+        # 视频文件
+        if extension in video_extension:
+            self.video_list.append(file_name)
+
+        # 字幕文件
+        elif extension in subtitle_extension:
+            sub_language = detectSubLanguage(file_name)
+            if sub_language == "sc":
+                self.sc_list.append(file_name)
+            elif sub_language == "tc":
+                self.tc_list.append(file_name)
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -85,9 +111,14 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.thread.quit()
         self.thread.wait()
 
-        self.video_list = self.worker.split_list[0]
-        self.sc_list = self.worker.split_list[1]
-        self.tc_list = self.worker.split_list[2]
+        self.video_list = self.worker.video_list.sort()
+        self.sc_list = self.worker.sc_list.sort()
+        self.tc_list = self.worker.tc_list.sort()
+        print(self.worker.video_list)
+        print(self.worker.video_list.sort())
+        print(self.video_list)
+        print("0")
+
 
         self.showInTable()
 
