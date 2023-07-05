@@ -2,6 +2,7 @@ import time
 import send2trash
 import subprocess
 import threading
+import multiprocessing
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
@@ -13,22 +14,29 @@ from src.function import *
 from src.module.config import *
 
 
-class SplitListThread(QObject):
+class Worker(QThread):
     finished = Signal()
 
-    def __init__(self, file_name, main_window):
+    def __init__(self, file_list):
         super().__init__()
-        self.file_name = file_name
-        self.main_window = main_window
+        self.file_list = file_list
+        # self.main_window = main_window
 
         self.video_list = []
         self.sc_list = []
         self.tc_list = []
 
-    def split(self):
+    def run(self):
         start_time = time.time()
 
-        self.splitThread(self.file_name)
+        processes = []
+        for file_name in self.file_list:
+            process = multiprocessing.Process(target=self.splitThread, args=(file_name,))
+            process.start()
+            processes.append(process)  # 等待进程结束
+
+        for process in processes:
+            process.join()
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
         self.finished.emit()
@@ -93,36 +101,39 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.raw_file_list = event.mimeData().urls()
         self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
 
-        start_time = time.time()
+        self.worker = Worker(self.file_list)
+        self.worker.finished.connect(self.dropFinish)
+        self.worker.start()
+        #
+        # self.thread = SplitListThread(self)
+        # self.thread.finished.connect(self.dropFinish)
+        # self.thread.start()
+        #
+        # start_time = time.time()
 
         # 多线程执行
-        threads = []
-        for file_name in self.file_list:
-            lovely = 0
-            thread = threading.Thread(target=self.splitThread, args=(file_name, lovely))
-            thread.start()
-            threads.append(thread)
-
-        # 等待所有线程执行完毕
-        for thread in threads:
-            thread.join()
-
-        self.video_list.sort()
-        self.sc_list.sort()
-        self.tc_list.sort()
-
-        self.showInTable()
-
-        self.used_time = (time.time() - start_time) * 1000  # 计时结束
-        if self.used_time > 1000:
-            used_time_s = "{:.2f}".format(self.used_time / 1000)  # 取 2 位小数
-            self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
-        else:
-            used_time_ms = "{:.0f}".format(self.used_time)  # 舍弃小数
-            self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
 
 
-    def splitThread(self, file_name, lovely):
+        # # 等待所有线程执行完毕
+        # for process in processes:
+        #     process.join()
+        #
+        # self.video_list.sort()
+        # self.sc_list.sort()
+        # self.tc_list.sort()
+        #
+        # self.showInTable()
+        #
+        # self.used_time = (time.time() - start_time) * 1000  # 计时结束
+        # if self.used_time > 1000:
+        #     used_time_s = "{:.2f}".format(self.used_time / 1000)  # 取 2 位小数
+        #     self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
+        # else:
+        #     used_time_ms = "{:.0f}".format(self.used_time)  # 舍弃小数
+        #     self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
+
+
+    def splitProcess(self, file_name):
         video_extension = ["mkv", "mp4", "avi", "flv", "webm", "m4v", "mov", "3gp", "rm", "rmvb"]
         subtitle_extension = ["ass", "ssa", "srt"]
 
@@ -143,26 +154,26 @@ class MyMainWindow(QMainWindow, MainWindow):
 
     def dropFinish(self):
         # 等待线程完成
-        self.thread.quit()
-        self.thread.wait()
+        self.worker.quit()
+        self.worker.wait()
 
-        self.video_list = self.worker.video_list.sort()
-        self.sc_list = self.worker.sc_list.sort()
-        self.tc_list = self.worker.tc_list.sort()
-        print(self.worker.video_list)
-        print(self.worker.video_list.sort())
-        print(self.video_list)
+        # self.video_list = self.worker.video_list.sort()
+        # self.sc_list = self.worker.sc_list.sort()
+        # self.tc_list = self.worker.tc_list.sort()
+        # print(self.worker.video_list)
+        # print(self.worker.video_list.sort())
+        # print(self.video_list)
         print("0")
 
 
-        self.showInTable()
-
-        if self.worker.used_time > 1000:
-            used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
-            self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
-        else:
-            used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
-            self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
+        # self.showInTable()
+        #
+        # if self.worker.used_time > 1000:
+        #     used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
+        #     self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
+        # else:
+        #     used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
+        #     self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
 
     def showInTable(self):
         # 计算列表行数
