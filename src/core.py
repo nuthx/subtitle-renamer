@@ -2,7 +2,7 @@ import time
 import send2trash
 import subprocess
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
-from PySide6.QtCore import Qt, QPoint
+from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
@@ -10,6 +10,30 @@ from src.gui.intro import IntroWindow
 from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
+
+
+class SplitListThread(QObject):
+    finished = Signal()
+
+    def __init__(self, raw_file_list, file_list):
+        super().__init__()
+        self.raw_file_list = raw_file_list
+        self.file_list = file_list
+
+    def split(self):
+        start_time = time.time()  # 计时
+
+        # 格式化本地路径
+        self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
+
+        # 分离视频与字幕
+        self.split_list = splitList(self.file_list)
+        self.video_list = self.split_list[0]
+        self.sc_list = self.split_list[1]
+        self.tc_list = self.split_list[2]
+
+        self.used_time = (time.time() - start_time) * 1000  # 计时结束
+        self.finished.emit()  # 发送完成信号
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -48,50 +72,51 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        # 计时
-        start_time = time.time()
+        self.raw_file_list = event.mimeData().urls()  # 获取本地路径
 
-        # 获取并格式化本地路径
-        raw_file_list = event.mimeData().urls()
-        self.file_list = formatRawFileList(raw_file_list, self.file_list)
+        # 放入子线程
+        self.thread = QThread()
+        self.worker = SplitListThread(self.raw_file_list, self.file_list)
+        self.worker.moveToThread(self.thread)
 
-        # 分类视频与简繁字幕
-        self.split_list = splitList(self.file_list)
-        self.video_list = self.split_list[0]
-        self.sc_list = self.split_list[1]
-        self.tc_list = self.split_list[2]
+        self.worker.finished.connect(self.dropFinish)
+        self.thread.started.connect(self.worker.split)
+
+        self.thread.start()
+
+    def dropFinish(self):
+        # 等待线程完成
+        self.thread.quit()
+        self.thread.wait()
+
         self.showInTable()
 
-        # 计时
-        end_time = time.time()
-        execution_time = end_time - start_time
-        execution_ms = execution_time * 1000
-        if execution_ms > 1000:
-            execution_time = "{:.2f}".format(execution_time)  # 取 2 位小数
-            self.showInfo("success", "添加成功", f"耗时{execution_time}s")
+        if self.worker.used_time > 1000:
+            used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
+            self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
         else:
-            execution_ms = "{:.0f}".format(execution_ms)  # 舍弃小数
-            self.showInfo("success", "添加成功", f"耗时{execution_ms}ms")
+            used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
+            self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
 
     def showInTable(self):
         # 计算列表行数
-        max_len = max(len(self.video_list), len(self.sc_list), len(self.tc_list))
+        max_len = max(len(self.worker.video_list), len(self.worker.sc_list), len(self.worker.tc_list))
         self.table.setRowCount(max_len)
 
         video_id = 0
-        for video_name in self.video_list:
+        for video_name in self.worker.video_list:
             video_name_lonely = os.path.basename(video_name)
             self.table.setItem(video_id, 0, QTableWidgetItem(video_name_lonely))
             video_id += 1
 
         sc_id = 0
-        for sc_name in self.sc_list:
+        for sc_name in self.worker.sc_list:
             sc_name_lonely = os.path.basename(sc_name)
             self.table.setItem(sc_id, 1, QTableWidgetItem(sc_name_lonely))
             sc_id += 1
 
         tc_id = 0
-        for tc_name in self.tc_list:
+        for tc_name in self.worker.tc_list:
             tc_name_lonely = os.path.basename(tc_name)
             self.table.setItem(tc_id, 2, QTableWidgetItem(tc_name_lonely))
             tc_id += 1
