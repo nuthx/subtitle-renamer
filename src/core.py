@@ -1,7 +1,6 @@
 import time
 import send2trash
 import subprocess
-import threading
 import multiprocessing
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
@@ -14,51 +13,37 @@ from src.function import *
 from src.module.config import *
 
 
-class Worker(QThread):
+class SplitListThread(QObject):
     finished = Signal()
 
-    def __init__(self, file_list):
+    def __init__(self, file_list, main_window):
         super().__init__()
         self.file_list = file_list
-        # self.main_window = main_window
+        self.main_window = main_window
+
+    def split(self):
+        start_time = time.time()
+
+        pool = multiprocessing.Pool()
+        results = pool.map(splitList, self.file_list)
+        pool.close()
+        pool.join()
 
         self.video_list = []
         self.sc_list = []
         self.tc_list = []
 
-    def run(self):
-        start_time = time.time()
+        for result in results:
+            self.video_list.extend(result[0])
+            self.sc_list.extend(result[1])
+            self.tc_list.extend(result[2])
 
-        processes = []
-        for file_name in self.file_list:
-            process = multiprocessing.Process(target=self.splitThread, args=(file_name,))
-            process.start()
-            processes.append(process)  # 等待进程结束
-
-        for process in processes:
-            process.join()
+        self.video_list.sort()
+        self.sc_list.sort()
+        self.tc_list.sort()
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
         self.finished.emit()
-
-    def splitThread(self, file_name):
-        video_extension = ["mkv", "mp4", "avi", "flv", "webm", "m4v", "mov", "3gp", "rm", "rmvb"]
-        subtitle_extension = ["ass", "ssa", "srt"]
-
-        name_struct = file_name.split(".")
-        extension = name_struct[-1].lower()
-
-        # 视频文件
-        if extension in video_extension:
-            self.video_list.append(file_name)
-
-        # 字幕文件
-        elif extension in subtitle_extension:
-            sub_language = detectSubLanguage(file_name)
-            if sub_language == "sc":
-                self.sc_list.append(file_name)
-            elif sub_language == "tc":
-                self.tc_list.append(file_name)
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -101,79 +86,33 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.raw_file_list = event.mimeData().urls()
         self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
 
-        self.worker = Worker(self.file_list)
+        # 放入子线程
+        self.thread = QThread()
+        self.worker = SplitListThread(self.file_list, self)
+        self.worker.moveToThread(self.thread)
+
         self.worker.finished.connect(self.dropFinish)
-        self.worker.start()
-        #
-        # self.thread = SplitListThread(self)
-        # self.thread.finished.connect(self.dropFinish)
-        # self.thread.start()
-        #
-        # start_time = time.time()
+        self.thread.started.connect(self.worker.split)
 
-        # 多线程执行
-
-
-        # # 等待所有线程执行完毕
-        # for process in processes:
-        #     process.join()
-        #
-        # self.video_list.sort()
-        # self.sc_list.sort()
-        # self.tc_list.sort()
-        #
-        # self.showInTable()
-        #
-        # self.used_time = (time.time() - start_time) * 1000  # 计时结束
-        # if self.used_time > 1000:
-        #     used_time_s = "{:.2f}".format(self.used_time / 1000)  # 取 2 位小数
-        #     self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
-        # else:
-        #     used_time_ms = "{:.0f}".format(self.used_time)  # 舍弃小数
-        #     self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
-
-
-    def splitProcess(self, file_name):
-        video_extension = ["mkv", "mp4", "avi", "flv", "webm", "m4v", "mov", "3gp", "rm", "rmvb"]
-        subtitle_extension = ["ass", "ssa", "srt"]
-
-        name_struct = file_name.split(".")
-        extension = name_struct[-1].lower()
-
-        # 视频文件
-        if extension in video_extension:
-            self.video_list.append(file_name)
-
-        # 字幕文件
-        elif extension in subtitle_extension:
-            sub_language = detectSubLanguage(file_name)
-            if sub_language == "sc":
-                self.sc_list.append(file_name)
-            elif sub_language == "tc":
-                self.tc_list.append(file_name)
+        self.thread.start()
 
     def dropFinish(self):
         # 等待线程完成
-        self.worker.quit()
-        self.worker.wait()
+        self.thread.quit()
+        self.thread.wait()
 
-        # self.video_list = self.worker.video_list.sort()
-        # self.sc_list = self.worker.sc_list.sort()
-        # self.tc_list = self.worker.tc_list.sort()
-        # print(self.worker.video_list)
-        # print(self.worker.video_list.sort())
-        # print(self.video_list)
-        print("0")
+        self.video_list = self.worker.video_list
+        self.sc_list = self.worker.sc_list
+        self.tc_list = self.worker.tc_list
 
+        self.showInTable()
 
-        # self.showInTable()
-        #
-        # if self.worker.used_time > 1000:
-        #     used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
-        #     self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
-        # else:
-        #     used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
-        #     self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
+        if self.worker.used_time > 1000:
+            used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
+            self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
+        else:
+            used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
+            self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
 
     def showInTable(self):
         # 计算列表行数
