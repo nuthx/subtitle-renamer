@@ -21,16 +21,13 @@ class SplitListThread(QObject):
         self.file_list = file_list
 
     def split(self):
-        start_time = time.time()  # 计时
+        start_time = time.time()
 
         # 格式化本地路径
         self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
 
         # 分离视频与字幕
         self.split_list = splitList(self.file_list)
-        self.video_list = self.split_list[0]
-        self.sc_list = self.split_list[1]
-        self.tc_list = self.split_list[2]
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
         self.finished.emit()  # 发送完成信号
@@ -89,6 +86,10 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.thread.quit()
         self.thread.wait()
 
+        self.video_list = self.worker.split_list[0]
+        self.sc_list = self.worker.split_list[1]
+        self.tc_list = self.worker.split_list[2]
+
         self.showInTable()
 
         if self.worker.used_time > 1000:
@@ -100,23 +101,23 @@ class MyMainWindow(QMainWindow, MainWindow):
 
     def showInTable(self):
         # 计算列表行数
-        max_len = max(len(self.worker.video_list), len(self.worker.sc_list), len(self.worker.tc_list))
+        max_len = max(len(self.video_list), len(self.sc_list), len(self.tc_list))
         self.table.setRowCount(max_len)
 
         video_id = 0
-        for video_name in self.worker.video_list:
+        for video_name in self.video_list:
             video_name_lonely = os.path.basename(video_name)
             self.table.setItem(video_id, 0, QTableWidgetItem(video_name_lonely))
             video_id += 1
 
         sc_id = 0
-        for sc_name in self.worker.sc_list:
+        for sc_name in self.sc_list:
             sc_name_lonely = os.path.basename(sc_name)
             self.table.setItem(sc_id, 1, QTableWidgetItem(sc_name_lonely))
             sc_id += 1
 
         tc_id = 0
-        for tc_name in self.worker.tc_list:
+        for tc_name in self.tc_list:
             tc_name_lonely = os.path.basename(tc_name)
             self.table.setItem(tc_id, 2, QTableWidgetItem(tc_name_lonely))
             tc_id += 1
@@ -139,7 +140,6 @@ class MyMainWindow(QMainWindow, MainWindow):
             clicked_item = self.table.itemAt(pos)
             row = self.table.row(clicked_item)
             column = self.table.column(clicked_item)
-            print(row, column)
 
             delete_this_file.triggered.connect(lambda: self.deleteThisFile(row, column))
             delete_this_line.triggered.connect(lambda: self.deleteThisLine(row))
