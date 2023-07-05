@@ -15,22 +15,19 @@ from src.module.config import *
 class SplitListThread(QObject):
     finished = Signal()
 
-    def __init__(self, raw_file_list, file_list):
+    def __init__(self, file_list, main_window):
         super().__init__()
-        self.raw_file_list = raw_file_list
         self.file_list = file_list
+        self.main_window = main_window
 
     def split(self):
         start_time = time.time()
-
-        # 格式化本地路径
-        self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
 
         # 分离视频与字幕
         self.split_list = splitList(self.file_list)
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
-        self.finished.emit()  # 发送完成信号
+        self.finished.emit()
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -69,11 +66,13 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        self.raw_file_list = event.mimeData().urls()  # 获取本地路径
+        # 获取并格式化本地路径
+        self.raw_file_list = event.mimeData().urls()
+        self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
 
         # 放入子线程
         self.thread = QThread()
-        self.worker = SplitListThread(self.raw_file_list, self.file_list)
+        self.worker = SplitListThread(self.file_list, self)
         self.worker.moveToThread(self.thread)
 
         self.worker.finished.connect(self.dropFinish)
