@@ -18,7 +18,7 @@ class MainWindow(object):
             style_sheet = file.read()
         this_window.setStyleSheet(style_sheet)
 
-        this_window.setWindowTitle("Subtitle Renamer")
+        this_window.setWindowTitle("SubtitleRenamer")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
         this_window.resize(1200, 660)
         this_window.setAcceptDrops(True)
