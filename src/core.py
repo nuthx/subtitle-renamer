@@ -2,6 +2,8 @@ import time
 import send2trash
 import subprocess
 import multiprocessing
+import cProfile
+import pstats
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
@@ -24,10 +26,19 @@ class SplitListThread(QObject):
     def split(self):
         start_time = time.time()
 
+        # 性能分析
+        # pr = cProfile.Profile()
+        # pr.enable()
+
         pool = multiprocessing.Pool()
         results = pool.map(splitList, self.file_list)
         pool.close()
         pool.join()
+
+        # 结束分析
+        # pr.disable()
+        # ps = pstats.Stats(pr).sort_stats('cumulative')
+        # ps.print_stats()
 
         self.video_list = []
         self.sc_list = []
@@ -37,10 +48,6 @@ class SplitListThread(QObject):
             self.video_list.extend(result[0])
             self.sc_list.extend(result[1])
             self.tc_list.extend(result[2])
-
-        self.video_list.sort()
-        self.sc_list.sort()
-        self.tc_list.sort()
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
         self.finished.emit()
@@ -82,6 +89,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
+        self.showInfo("info", "添加中", "请等待识别完成")
+
         # 获取并格式化本地路径
         self.raw_file_list = event.mimeData().urls()
         self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
@@ -101,9 +110,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.thread.quit()
         self.thread.wait()
 
-        self.video_list = self.worker.video_list
-        self.sc_list = self.worker.sc_list
-        self.tc_list = self.worker.tc_list
+        self.video_list = sorted(self.worker.video_list)
+        self.sc_list = sorted(self.worker.sc_list)
+        self.tc_list = sorted(self.worker.tc_list)
 
         self.showInTable()
 
@@ -286,22 +295,15 @@ class MyMainWindow(QMainWindow, MainWindow):
         return True
 
     def showInfo(self, state, title, content):
-        if state == "success":
-            InfoBar.success(
-                title=title, content=content,
-                orient=Qt.Horizontal, isClosable=True,
-                position=InfoBarPosition.TOP,
-                duration=2000, parent=self
-            )
-        elif state == "warning":
-            InfoBar.warning(
-                title=title, content=content,
-                orient=Qt.Horizontal, isClosable=True,
-                position=InfoBarPosition.TOP,
-                duration=2000, parent=self
-            )
-        elif state == "error":
-            InfoBar.error(
+        info_state = {
+            "info": InfoBar.info,
+            "success": InfoBar.success,
+            "warning": InfoBar.warning,
+            "error": InfoBar.error
+        }
+
+        if state in info_state:
+            info_state[state](
                 title=title, content=content,
                 orient=Qt.Horizontal, isClosable=True,
                 position=InfoBarPosition.TOP,
