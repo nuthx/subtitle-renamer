@@ -9,7 +9,7 @@ from src.module.config import configPath
 class SettingWindow(object):
     def setupUI(self, this_window):
         # 加载 QSS
-        with open(getResource("src/style/setting_light.qss"), "r", encoding="UTF-8") as file:
+        with open(getResource("src/style/style_light.qss"), "r", encoding="UTF-8") as file:
             style_sheet = file.read()
         this_window.setStyleSheet(style_sheet)
 

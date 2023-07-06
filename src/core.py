@@ -64,10 +64,11 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self.showMenu)
 
-        self.clearButton.clicked.connect(self.initList)
-        self.renameButton.clicked.connect(self.startRename)
         self.introButton.clicked.connect(self.openIntro)
         self.settingButton.clicked.connect(self.openSetting)
+        self.removeButton.clicked.connect(self.justRemoveSub)
+        self.clearButton.clicked.connect(self.initList)
+        self.renameButton.clicked.connect(self.startRename)
 
     def initList(self):
         self.file_list = []
@@ -202,18 +203,7 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         # 删除未勾选的语言
         if self.remove_unused and delete_list:
-            # 获得 delete_list 文件名
-            delete_list_lonely = []
-            for item in delete_list:
-                item_lonely = os.path.basename(item)
-                if len(item_lonely) > 70:  # 截取最后 70 位
-                    item_lonely = "..." + item_lonely[-70:]
-                delete_list_lonely.append(item_lonely)
-
-            # 弹窗提醒待删除文件
-            delete_file = "<br>".join(delete_list_lonely)  # 转为字符串形式
-            notice = MessageBox("下列文件将被删除", delete_file, self)
-            if notice.exec():
+            if self.removeCheck(delete_list):
                 send2trash.send2trash(delete_list)
             else:
                 return
@@ -294,6 +284,40 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         return True
 
+    def removeCheck(self, delete_list):
+        # 获得 delete_list 文件名
+        delete_list_lonely = []
+        for item in delete_list:
+            item_lonely = os.path.basename(item)
+            if len(item_lonely) > 70:  # 截取最后 70 位
+                item_lonely = "..." + item_lonely[-70:]
+            delete_list_lonely.append(item_lonely)
+
+        # 弹窗提醒待删除文件
+        delete_file = "<br>".join(delete_list_lonely)  # 转为字符串形式
+        notice = MessageBox("下列文件将被删除", delete_file, self)
+        if notice.exec():
+            return True
+        else:
+            return False
+
+    def justRemoveSub(self):
+        delete_list = []
+        if self.allowSc.isChecked():
+            delete_list.extend(self.sc_list)
+        if self.allowTc.isChecked():
+            delete_list.extend(self.tc_list)
+
+        if delete_list:
+            if self.removeCheck(delete_list):
+                send2trash.send2trash(delete_list)
+                self.initList()
+                self.showInfo("success", "", "删除成功")
+            else:
+                return
+        else:
+            self.showInfo("warning", "", "没有要删除的文件")
+
     def showInfo(self, state, title, content):
         info_state = {
             "info": InfoBar.info,
@@ -352,7 +376,7 @@ class MySettingWindow(QDialog, SettingWindow):
         self.config.set("Extension", "sc", self.scFormat.currentText())
         self.config.set("Extension", "tc", self.tcFormat.currentText())
         self.config.set("General", "move_to_anime_folder", str(self.moveSubSwitch.isChecked()).lower())
-        self.config.set("General", "remove_unused_sub", str(self.moveSubSwitch.isChecked()).lower())
+        self.config.set("General", "remove_unused_sub", str(self.removeSubSwitch.isChecked()).lower())
         self.config.set("General", "encode", self.encodeType.currentText())
 
         with open(configPath()[1], "w") as content:

@@ -77,11 +77,18 @@ class MainWindow(object):
 
         # 执行区域
 
-        self.allowSc = CheckBox("重命名简体字幕", self)
+        self.allowSc = CheckBox("简体", self)
         self.allowSc.setChecked(True)
 
-        self.allowTc = CheckBox("重命名繁体字幕", self)
+        self.allowTc = CheckBox("繁体", self)
         self.allowTc.setChecked(False)
+
+        self.removeButton = PushButton("删除选中字幕", self)
+        self.removeButton.setFixedWidth(120)
+
+        self.separator = QFrame()
+        self.separator.setObjectName("separator")
+        self.separator.setFixedSize(1, 30)
 
         self.clearButton = PushButton("清空列表", self)
         self.clearButton.setFixedWidth(120)
@@ -93,6 +100,10 @@ class MainWindow(object):
         self.actionLayout.addSpacing(32)
         self.actionLayout.addWidget(self.allowTc)
         self.actionLayout.addStretch(0)
+        self.actionLayout.addWidget(self.removeButton)
+        self.actionLayout.addSpacing(20)
+        self.actionLayout.addWidget(self.separator)
+        self.actionLayout.addSpacing(20)
         self.actionLayout.addWidget(self.clearButton)
         self.actionLayout.addSpacing(12)
         self.actionLayout.addWidget(self.renameButton)
