@@ -40,8 +40,8 @@ def initConfig(config_file):
 
     config.add_section("Funny")
     config.set("Funny", "open_times", "0")
-    config.set("Funny", "usage_times", "0")
-    config.set("Funny", "renamed_sub", "0")
+    config.set("Funny", "rename_times", "0")
+    config.set("Funny", "rename_num", "0")
 
     # 写入配置内容
     with open(config_file, "w") as content:

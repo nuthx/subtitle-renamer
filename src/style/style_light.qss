@@ -63,3 +63,9 @@ MySettingWindow {
     border: 1px solid #EDEDED;
     border-radius: 8px;
 }
+
+/* Info */
+
+#versionLabel {
+    color: #777;
+}

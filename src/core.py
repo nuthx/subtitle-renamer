@@ -342,7 +342,18 @@ class MyIntroWindow(QDialog, IntroWindow):
         self.initUI()
 
     def initUI(self):
-        print("ok")
+        self.configPathButton.clicked.connect(self.openConfigPath)
+
+    @staticmethod
+    def openConfigPath():
+        config_path = configPath()[0]
+        if config_path != "N/A":
+            if platform.system() == "Windows":
+                subprocess.call(["explorer", config_path])
+            elif platform.system() == "Darwin":
+                subprocess.call(["open", config_path])
+            elif platform.system() == "Linux":
+                subprocess.call(["xdg-open", config_path])
 
 
 
@@ -361,7 +372,6 @@ class MySettingWindow(QDialog, SettingWindow):
         self.loadConfig()
 
     def initUI(self):
-        self.configPathButton.clicked.connect(self.openConfigPath)
         self.applyButton.clicked.connect(self.saveConfig)  # 保存配置
         self.cancelButton.clicked.connect(lambda: self.close())  # 关闭窗口
 
@@ -383,14 +393,3 @@ class MySettingWindow(QDialog, SettingWindow):
             self.config.write(content)
 
         self.close()
-
-    @staticmethod
-    def openConfigPath():
-        config_path = configPath()[0]
-        if config_path != "N/A":
-            if platform.system() == "Windows":
-                subprocess.call(["explorer", config_path])
-            elif platform.system() == "Darwin":
-                subprocess.call(["open", config_path])
-            elif platform.system() == "Linux":
-                subprocess.call(["xdg-open", config_path])
