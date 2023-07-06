@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt, QMetaObject
+from PySide6.QtCore import Qt, QMetaObject, QThreadPool
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QAbstractItemView, QHeaderView
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
 from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon, ToolButton

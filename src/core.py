@@ -1,8 +1,11 @@
 import time
 import send2trash
 import subprocess
+import multiprocessing
+import cProfile
+import pstats
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
-from PySide6.QtCore import Qt, QPoint
+from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
@@ -10,6 +13,44 @@ from src.gui.intro import IntroWindow
 from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
+
+
+class SplitListThread(QObject):
+    finished = Signal()
+
+    def __init__(self, file_list, main_window):
+        super().__init__()
+        self.file_list = file_list
+        self.main_window = main_window
+
+    def split(self):
+        start_time = time.time()
+
+        # 性能分析
+        # pr = cProfile.Profile()
+        # pr.enable()
+
+        pool = multiprocessing.Pool()
+        results = pool.map(splitList, self.file_list)
+        pool.close()
+        pool.join()
+
+        # 结束分析
+        # pr.disable()
+        # ps = pstats.Stats(pr).sort_stats('cumulative')
+        # ps.print_stats()
+
+        self.video_list = []
+        self.sc_list = []
+        self.tc_list = []
+
+        for result in results:
+            self.video_list.extend(result[0])
+            self.sc_list.extend(result[1])
+            self.tc_list.extend(result[2])
+
+        self.used_time = (time.time() - start_time) * 1000  # 计时结束
+        self.finished.emit()
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -48,30 +89,39 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        # 计时
-        start_time = time.time()
+        self.showInfo("info", "添加中", "请等待识别完成")
 
         # 获取并格式化本地路径
-        raw_file_list = event.mimeData().urls()
-        self.file_list = formatRawFileList(raw_file_list, self.file_list)
+        self.raw_file_list = event.mimeData().urls()
+        self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
 
-        # 分类视频与简繁字幕
-        self.split_list = splitList(self.file_list)
-        self.video_list = self.split_list[0]
-        self.sc_list = self.split_list[1]
-        self.tc_list = self.split_list[2]
+        # 放入子线程
+        self.thread = QThread()
+        self.worker = SplitListThread(self.file_list, self)
+        self.worker.moveToThread(self.thread)
+
+        self.worker.finished.connect(self.dropFinish)
+        self.thread.started.connect(self.worker.split)
+
+        self.thread.start()
+
+    def dropFinish(self):
+        # 等待线程完成
+        self.thread.quit()
+        self.thread.wait()
+
+        self.video_list = sorted(self.worker.video_list)
+        self.sc_list = sorted(self.worker.sc_list)
+        self.tc_list = sorted(self.worker.tc_list)
+
         self.showInTable()
 
-        # 计时
-        end_time = time.time()
-        execution_time = end_time - start_time
-        execution_ms = execution_time * 1000
-        if execution_ms > 1000:
-            execution_time = "{:.2f}".format(execution_time)  # 取 2 位小数
-            self.showInfo("success", "添加成功", f"耗时{execution_time}s")
+        if self.worker.used_time > 1000:
+            used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
+            self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
         else:
-            execution_ms = "{:.0f}".format(execution_ms)  # 舍弃小数
-            self.showInfo("success", "添加成功", f"耗时{execution_ms}ms")
+            used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
+            self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
 
     def showInTable(self):
         # 计算列表行数
@@ -114,7 +164,6 @@ class MyMainWindow(QMainWindow, MainWindow):
             clicked_item = self.table.itemAt(pos)
             row = self.table.row(clicked_item)
             column = self.table.column(clicked_item)
-            print(row, column)
 
             delete_this_file.triggered.connect(lambda: self.deleteThisFile(row, column))
             delete_this_line.triggered.connect(lambda: self.deleteThisLine(row))
@@ -246,22 +295,15 @@ class MyMainWindow(QMainWindow, MainWindow):
         return True
 
     def showInfo(self, state, title, content):
-        if state == "success":
-            InfoBar.success(
-                title=title, content=content,
-                orient=Qt.Horizontal, isClosable=True,
-                position=InfoBarPosition.TOP,
-                duration=2000, parent=self
-            )
-        elif state == "warning":
-            InfoBar.warning(
-                title=title, content=content,
-                orient=Qt.Horizontal, isClosable=True,
-                position=InfoBarPosition.TOP,
-                duration=2000, parent=self
-            )
-        elif state == "error":
-            InfoBar.error(
+        info_state = {
+            "info": InfoBar.info,
+            "success": InfoBar.success,
+            "warning": InfoBar.warning,
+            "error": InfoBar.error
+        }
+
+        if state in info_state:
+            info_state[state](
                 title=title, content=content,
                 orient=Qt.Horizontal, isClosable=True,
                 position=InfoBarPosition.TOP,
