@@ -29,6 +29,9 @@ def configPath():
 def initConfig(config_file):
     config = configparser.ConfigParser()
 
+    config.add_section("Application")
+    config.set("Application", "version", "1.2")
+
     config.add_section("Extension")
     config.set("Extension", "sc", "")
     config.set("Extension", "tc", "")
@@ -59,16 +62,16 @@ def checkConfig(config, config_file):
     if config.get("General", "encode") not in ["不转换", "UTF-8", "UTF-8-SIG"]:
         config.set("General", "encode", "None")
 
-    # 迁移旧版配置
-    if config.has_option("Funny", "usage_times"):
-        rename_times = config.get("Funny", "usage_times")
-        config.set("Funny", "rename_times", rename_times)
-        config.remove_option("Funny", "usage_times")
-
-    if config.has_option("Funny", "renamed_sub"):
-        rename_num = config.get("Funny", "renamed_sub")
-        config.set("Funny", "rename_num", rename_num)
-        config.remove_option("Funny", "renamed_sub")
+    # # 迁移旧版配置
+    # if config.has_option("Funny", "usage_times"):
+    #     rename_times = config.get("Funny", "usage_times")
+    #     config.set("Funny", "rename_times", rename_times)
+    #     config.remove_option("Funny", "usage_times")
+    #
+    # if config.has_option("Funny", "renamed_sub"):
+    #     rename_num = config.get("Funny", "renamed_sub")
+    #     config.set("Funny", "rename_num", rename_num)
+    #     config.remove_option("Funny", "renamed_sub")
 
     # 写入配置内容
     with open(config_file, "w") as content:
@@ -85,5 +88,11 @@ def readConfig():
         initConfig(config_file)
 
     config.read(config_file)
+
+    # # 版本过旧则删除重建
+    # if not config.has_section("Application"):
+    #     os.remove(config_file)
+    #     print(config_file)
+
     checkConfig(config, config_file)
     return config
