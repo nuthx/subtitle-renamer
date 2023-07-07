@@ -376,9 +376,9 @@ class MyAboutWindow(QDialog, AboutWindow):
                 subprocess.call(["xdg-open", config_path])
 
     def loadConfig(self):
-        self.openTimes.setText(self.config.get("Funny", "open_times"))
-        self.renameTimes.setText(self.config.get("Funny", "rename_times"))
-        self.renameNum.setText(self.config.get("Funny", "rename_num"))
+        self.openTimes.setText(self.config.get("Counter", "open_times"))
+        self.renameTimes.setText(self.config.get("Counter", "rename_times"))
+        self.renameNum.setText(self.config.get("Counter", "rename_num"))
 
 
 class MySettingWindow(QDialog, SettingWindow):

@@ -3,8 +3,8 @@ from src.module.config import readConfig, configPath
 
 def addOpenTimes():
     config = readConfig()
-    open_times = int(config.get("Funny", "open_times")) + 1
-    config.set("Funny", "open_times", str(open_times))
+    open_times = int(config.get("Counter", "open_times")) + 1
+    config.set("Counter", "open_times", str(open_times))
 
     with open(configPath()[1], "w") as content:
         config.write(content)
@@ -12,8 +12,8 @@ def addOpenTimes():
 
 def addRenameTimes():
     config = readConfig()
-    rename_times = int(config.get("Funny", "rename_times")) + 1
-    config.set("Funny", "rename_times", str(rename_times))
+    rename_times = int(config.get("Counter", "rename_times")) + 1
+    config.set("Counter", "rename_times", str(rename_times))
 
     with open(configPath()[1], "w") as content:
         config.write(content)
@@ -21,8 +21,8 @@ def addRenameTimes():
 
 def addRenameNum(rename_num):
     config = readConfig()
-    rename_num = int(config.get("Funny", "rename_num")) + rename_num
-    config.set("Funny", "rename_num", str(rename_num))
+    rename_num = int(config.get("Counter", "rename_num")) + rename_num
+    config.set("Counter", "rename_num", str(rename_num))
 
     with open(configPath()[1], "w") as content:
         config.write(content)

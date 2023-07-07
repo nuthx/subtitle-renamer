@@ -41,10 +41,10 @@ def initConfig(config_file):
     config.set("General", "remove_unused_sub", "true")
     config.set("General", "encode", "不转换")
 
-    config.add_section("Funny")
-    config.set("Funny", "open_times", "0")
-    config.set("Funny", "rename_times", "0")
-    config.set("Funny", "rename_num", "0")
+    config.add_section("Counter")
+    config.set("Counter", "open_times", "0")
+    config.set("Counter", "rename_times", "0")
+    config.set("Counter", "rename_num", "0")
 
     # 写入配置内容
     with open(config_file, "w") as content:
@@ -62,17 +62,6 @@ def checkConfig(config, config_file):
     if config.get("General", "encode") not in ["不转换", "UTF-8", "UTF-8-SIG"]:
         config.set("General", "encode", "None")
 
-    # # 迁移旧版配置
-    # if config.has_option("Funny", "usage_times"):
-    #     rename_times = config.get("Funny", "usage_times")
-    #     config.set("Funny", "rename_times", rename_times)
-    #     config.remove_option("Funny", "usage_times")
-    #
-    # if config.has_option("Funny", "renamed_sub"):
-    #     rename_num = config.get("Funny", "renamed_sub")
-    #     config.set("Funny", "rename_num", rename_num)
-    #     config.remove_option("Funny", "renamed_sub")
-
     # 写入配置内容
     with open(config_file, "w") as content:
         config.write(content)
@@ -88,11 +77,11 @@ def readConfig():
         initConfig(config_file)
 
     config.read(config_file)
-
-    # # 版本过旧则删除重建
-    # if not config.has_section("Application"):
-    #     os.remove(config_file)
-    #     print(config_file)
-
     checkConfig(config, config_file)
+
+    # 版本过旧则删除重建
+    if not config.has_section("Application"):
+        os.remove(config_file)
+        initConfig(config_file)
+
     return config
