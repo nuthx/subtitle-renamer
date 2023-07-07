@@ -13,7 +13,7 @@
 
 ## 介绍
 
-本项目是基于 Python 的视频字幕批量重命名工具，**推荐用于重命名动画字幕**，应该也用于重命名电影字幕。
+世界上又多了一个基于 Python 的视频字幕批量重命名工具，**用于重命名动画与电影字幕**。
 
 <p align="center">
     <img src="image/screenshot.png" alt="SubtitleRenamer">
