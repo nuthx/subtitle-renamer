@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PySide6.QtGui import QIcon, QPixmap
-from qfluentwidgets import PushButton, FluentIcon, ToolButton
+from qfluentwidgets import FluentIcon, ToolButton
 
 from src.module.resource import getResource
 from src.module.config import configPath

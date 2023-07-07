@@ -13,6 +13,7 @@ from src.gui.intro import IntroWindow
 from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
+from src.module.count import *
 
 
 class SplitListThread(QObject):
@@ -61,6 +62,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.initList()
 
     def initUI(self):
+        addOpenTimes()
+
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self.showMenu)
 
@@ -188,6 +191,7 @@ class MyMainWindow(QMainWindow, MainWindow):
 
     def startRename(self):
         # 读取配置
+        self.config = readConfig()
         self.loadConfig()
 
         # 命名前检查
@@ -208,6 +212,9 @@ class MyMainWindow(QMainWindow, MainWindow):
             else:
                 return
 
+        # 计算重命名数量
+        rename_num = 0
+
         # 字幕重命名
         if self.allowSc.isChecked():
             state_sc = renameAction(
@@ -220,6 +227,8 @@ class MyMainWindow(QMainWindow, MainWindow):
             if state_sc == 516:
                 self.showInfo("error", "重命名失败", "目标文件夹存在同名的简体字幕")
                 return
+            else:
+                rename_num = rename_num + len(self.sc_list)
 
         if self.allowTc.isChecked():
             state_tc = renameAction(
@@ -232,19 +241,21 @@ class MyMainWindow(QMainWindow, MainWindow):
             if state_tc == 516:
                 self.showInfo("error", "重命名失败", "目标文件夹存在同名的繁体字幕")
                 return
+            else:
+                rename_num = rename_num + len(self.sc_list)
 
         self.initList()
+        addRenameTimes()
+        addRenameNum(rename_num)
         self.showInfo("success", "", "重命名成功")
 
     def loadConfig(self):
-        config = readConfig()
+        self.sc_extension = self.config.get("Extension", "sc")
+        self.tc_extension = self.config.get("Extension", "tc")
 
-        self.sc_extension = config.get("Extension", "sc")
-        self.tc_extension = config.get("Extension", "tc")
-
-        self.move_to_folder = config.getboolean("General", "move_to_anime_folder")
-        self.remove_unused = config.getboolean("General", "remove_unused_sub")
-        self.encode = config.get("General", "encode")
+        self.move_to_folder = self.config.getboolean("General", "move_to_anime_folder")
+        self.remove_unused = self.config.getboolean("General", "remove_unused_sub")
+        self.encode = self.config.get("General", "encode")
 
     def renameCheck(self):
         # 是否有视频与字幕文件
@@ -273,6 +284,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         # 简体繁体的扩展名不可相同
         if self.allowSc.isChecked() and self.allowTc.isChecked() \
                 and self.sc_extension == self.tc_extension:
+            print(self.sc_extension)
+            print(self.tc_extension)
             self.showInfo("error", "", "简体扩展名与繁体扩展名不可相同")
             return False
 
@@ -340,6 +353,8 @@ class MyIntroWindow(QDialog, IntroWindow):
         super().__init__()
         self.setupUI(self)
         self.initUI()
+        self.config = readConfig()
+        self.loadConfig()
 
     def initUI(self):
         self.configPathButton.clicked.connect(self.openConfigPath)
@@ -354,6 +369,11 @@ class MyIntroWindow(QDialog, IntroWindow):
                 subprocess.call(["open", config_path])
             elif platform.system() == "Linux":
                 subprocess.call(["xdg-open", config_path])
+
+    def loadConfig(self):
+        self.openTimes.setText(self.config.get("Funny", "open_times"))
+        self.renameTimes.setText(self.config.get("Funny", "rename_times"))
+        self.renameNum.setText(self.config.get("Funny", "rename_num"))
 
 
 

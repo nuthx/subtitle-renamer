@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame,
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
 from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon, ToolButton
 from qfluentwidgets.common.style_sheet import styleSheetManager
+
 from src.module.resource import getResource
 
 
