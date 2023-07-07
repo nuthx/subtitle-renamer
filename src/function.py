@@ -30,7 +30,7 @@ def formatRawFileList(raw_file_list, file_list):
     return file_list
 
 
-def splitList(file_list):
+def splitList(file_name):
     video_list = []
     sc_list = []
     tc_list = []
@@ -40,21 +40,20 @@ def splitList(file_list):
     # sc_part = ["sc.", "chs.", "[sc]", "[chs]", "sc_", "chs_", "track3", "Subtitles03"]
     # tc_part = ["tc.", "cht.", "[tc]", "[cht]", "tc_", "cht_", "track4", "Subtitles04"]
 
-    for file_name in file_list:
-        name_struct = file_name.split(".")
-        extension = name_struct[-1].lower()
+    name_struct = file_name.split(".")
+    extension = name_struct[-1].lower()
 
-        # 视频文件
-        if extension in video_extension:
-            video_list.append(file_name)
+    # 视频文件
+    if extension in video_extension:
+        video_list.append(file_name)
 
-        # 字幕文件
-        elif extension in subtitle_extension:
-            sub_language = detectSubLanguage(file_name)
-            if sub_language == "sc":
-                sc_list.append(file_name)
-            elif sub_language == "tc":
-                tc_list.append(file_name)
+    # 字幕文件
+    elif extension in subtitle_extension:
+        sub_language = detectSubLanguage(file_name)
+        if sub_language == "sc":
+            sc_list.append(file_name)
+        elif sub_language == "tc":
+            tc_list.append(file_name)
 
     # 重要：排序
     video_list.sort()

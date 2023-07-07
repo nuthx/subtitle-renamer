@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame,
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
 from qfluentwidgets import setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon, ToolButton
 from qfluentwidgets.common.style_sheet import styleSheetManager
+
 from src.module.resource import getResource
 
 
@@ -18,7 +19,7 @@ class MainWindow(object):
             style_sheet = file.read()
         this_window.setStyleSheet(style_sheet)
 
-        this_window.setWindowTitle("Subtitle Renamer")
+        this_window.setWindowTitle("SubtitleRenamer")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
         this_window.resize(1200, 660)
         this_window.setAcceptDrops(True)
@@ -37,14 +38,14 @@ class MainWindow(object):
         self.titleLayout.addWidget(self.titleLabel, 0, Qt.AlignTop)
         self.titleLayout.addWidget(self.subtitleLabel, 0, Qt.AlignTop)
 
-        self.introButton = ToolButton(FluentIcon.INFO, self)
+        self.aboutButton = ToolButton(FluentIcon.INFO, self)
         self.settingButton = PushButton("设置", self, FluentIcon.SETTING)
 
         self.headerLayout = QHBoxLayout()
         self.headerLayout.setContentsMargins(0, 0, 0, 0)
         self.headerLayout.addLayout(self.titleLayout)
         self.headerLayout.addStretch(0)
-        self.headerLayout.addWidget(self.introButton, 0)
+        self.headerLayout.addWidget(self.aboutButton, 0)
         self.headerLayout.addSpacing(12)
         self.headerLayout.addWidget(self.settingButton, 0)
 
@@ -77,11 +78,18 @@ class MainWindow(object):
 
         # 执行区域
 
-        self.allowSc = CheckBox("重命名简体字幕", self)
+        self.allowSc = CheckBox("简体", self)
         self.allowSc.setChecked(True)
 
-        self.allowTc = CheckBox("重命名繁体字幕", self)
+        self.allowTc = CheckBox("繁体", self)
         self.allowTc.setChecked(False)
+
+        self.removeButton = PushButton("删除选中字幕", self)
+        self.removeButton.setFixedWidth(120)
+
+        self.separator = QFrame()
+        self.separator.setObjectName("separator")
+        self.separator.setFixedSize(1, 30)
 
         self.clearButton = PushButton("清空列表", self)
         self.clearButton.setFixedWidth(120)
@@ -93,6 +101,10 @@ class MainWindow(object):
         self.actionLayout.addSpacing(32)
         self.actionLayout.addWidget(self.allowTc)
         self.actionLayout.addStretch(0)
+        self.actionLayout.addWidget(self.removeButton)
+        self.actionLayout.addSpacing(20)
+        self.actionLayout.addWidget(self.separator)
+        self.actionLayout.addSpacing(20)
         self.actionLayout.addWidget(self.clearButton)
         self.actionLayout.addSpacing(12)
         self.actionLayout.addWidget(self.renameButton)
