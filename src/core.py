@@ -184,7 +184,12 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.showInTable()
 
     def deleteThisLine(self, row):
-        del self.video_list[row], self.sc_list[row], self.tc_list[row]
+        if row < len(self.video_list):
+            del self.video_list[row]
+        if row < len(self.sc_list):
+            del self.sc_list[row]
+        if row < len(self.tc_list):
+            del self.tc_list[row]
         self.table.clearContents()
         self.table.setRowCount(0)
         self.showInTable()
