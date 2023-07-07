@@ -13,7 +13,7 @@ from src.gui.about import AboutWindow
 from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
-# from src.module.count import *
+from src.module.counter import *
 
 
 class SplitListThread(QObject):
@@ -62,7 +62,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.initList()
 
     def initUI(self):
-        # addOpenTimes()
+        addOpenTimes(readConfig(), configPath())
 
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self.showMenu)
@@ -250,8 +250,8 @@ class MyMainWindow(QMainWindow, MainWindow):
                 rename_num = rename_num + len(self.sc_list)
 
         self.initList()
-        # addRenameTimes()
-        # addRenameNum(rename_num)
+        addRenameTimes(self.config, configPath())
+        addRenameNum(self.config, configPath(), rename_num)
         self.showInfo("success", "", "重命名成功")
 
     def loadConfig(self):

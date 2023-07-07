@@ -1,28 +1,22 @@
-from src.module.config import readConfig, configPath
-
-
-def addOpenTimes():
-    config = readConfig()
+def addOpenTimes(config, config_path):
     open_times = int(config.get("Counter", "open_times")) + 1
     config.set("Counter", "open_times", str(open_times))
 
-    with open(configPath()[1], "w") as content:
+    with open(config_path[1], "w") as content:
         config.write(content)
 
 
-def addRenameTimes():
-    config = readConfig()
+def addRenameTimes(config, config_path):
     rename_times = int(config.get("Counter", "rename_times")) + 1
     config.set("Counter", "rename_times", str(rename_times))
 
-    with open(configPath()[1], "w") as content:
+    with open(config_path[1], "w") as content:
         config.write(content)
 
 
-def addRenameNum(rename_num):
-    config = readConfig()
+def addRenameNum(config, config_path, rename_num):
     rename_num = int(config.get("Counter", "rename_num")) + rename_num
     config.set("Counter", "rename_num", str(rename_num))
 
-    with open(configPath()[1], "w") as content:
+    with open(config_path[1], "w") as content:
         config.write(content)
