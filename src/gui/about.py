@@ -7,7 +7,7 @@ from src.module.resource import getResource
 from src.module.config import configPath
 
 
-class IntroWindow(object):
+class AboutWindow(object):
     def setupUI(self, this_window):
         # 加载 QSS
         with open(getResource("src/style/style_light.qss"), "r", encoding="UTF-8") as file:

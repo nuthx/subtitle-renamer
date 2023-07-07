@@ -1,5 +1,5 @@
 MyMainWindow,
-MyIntroWindow,
+MyAboutWindow,
 MySettingWindow {
     background: #F5F5F5;
 }

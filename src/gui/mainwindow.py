@@ -38,14 +38,14 @@ class MainWindow(object):
         self.titleLayout.addWidget(self.titleLabel, 0, Qt.AlignTop)
         self.titleLayout.addWidget(self.subtitleLabel, 0, Qt.AlignTop)
 
-        self.introButton = ToolButton(FluentIcon.INFO, self)
+        self.aboutButton = ToolButton(FluentIcon.INFO, self)
         self.settingButton = PushButton("设置", self, FluentIcon.SETTING)
 
         self.headerLayout = QHBoxLayout()
         self.headerLayout.setContentsMargins(0, 0, 0, 0)
         self.headerLayout.addLayout(self.titleLayout)
         self.headerLayout.addStretch(0)
-        self.headerLayout.addWidget(self.introButton, 0)
+        self.headerLayout.addWidget(self.aboutButton, 0)
         self.headerLayout.addSpacing(12)
         self.headerLayout.addWidget(self.settingButton, 0)
 

@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
-from src.gui.intro import IntroWindow
+from src.gui.about import AboutWindow
 from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
@@ -67,7 +67,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self.showMenu)
 
-        self.introButton.clicked.connect(self.openIntro)
+        self.aboutButton.clicked.connect(self.openAbout)
         self.settingButton.clicked.connect(self.openSetting)
         self.removeButton.clicked.connect(self.justRemoveSub)
         self.clearButton.clicked.connect(self.initList)
@@ -81,9 +81,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.table.clearContents()
         self.table.setRowCount(0)
 
-    def openIntro(self):
-        intro = MyIntroWindow()
-        intro.exec()
+    def openAbout(self):
+        about = MyAboutWindow()
+        about.exec()
 
     def openSetting(self):
         setting = MySettingWindow()
@@ -348,7 +348,7 @@ class MyMainWindow(QMainWindow, MainWindow):
             )
 
 
-class MyIntroWindow(QDialog, IntroWindow):
+class MyAboutWindow(QDialog, AboutWindow):
     def __init__(self):
         super().__init__()
         self.setupUI(self)
@@ -374,13 +374,6 @@ class MyIntroWindow(QDialog, IntroWindow):
         self.openTimes.setText(self.config.get("Funny", "open_times"))
         self.renameTimes.setText(self.config.get("Funny", "rename_times"))
         self.renameNum.setText(self.config.get("Funny", "rename_num"))
-
-
-
-
-
-
-
 
 
 class MySettingWindow(QDialog, SettingWindow):
