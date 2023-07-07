@@ -41,7 +41,6 @@ jobs:
       if: ${{ runner.os == 'linux' }}
       run: |
         pyinstaller -wF main.py --add-data src/style:src/style --add-data src/font:src/font --add-data image/logo.png:image --name=SubtitleRenamer
-        
 
     - name: Upload (Windows)
       if: ${{ runner.os == 'windows' }}
