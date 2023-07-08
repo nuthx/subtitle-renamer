@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="image/logo.png" width=60%/ alt="SubtitleRenamer">
+    <img src="image/logo.png" width=60%/ alt="SubtitleRenamer" style="margin: 35px 0 20px 0">
     <br>
     <div align="center">
         <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-2BADE9" alt="Platform">

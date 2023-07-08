@@ -60,6 +60,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.setupUI(self)
         self.initUI()
         self.initList()
+        readConfig()  # 仅用于检查配置是否正确
 
     def initUI(self):
         addOpenTimes(readConfig(), configPath())
