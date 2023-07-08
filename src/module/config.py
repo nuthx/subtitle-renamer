@@ -29,6 +29,9 @@ def configPath():
 def initConfig(config_file):
     config = configparser.ConfigParser()
 
+    config.add_section("Application")
+    config.set("Application", "version", "1.2")
+
     config.add_section("Extension")
     config.set("Extension", "sc", "")
     config.set("Extension", "tc", "")
@@ -38,10 +41,10 @@ def initConfig(config_file):
     config.set("General", "remove_unused_sub", "true")
     config.set("General", "encode", "不转换")
 
-    config.add_section("Funny")
-    config.set("Funny", "open_times", "0")
-    config.set("Funny", "rename_times", "0")
-    config.set("Funny", "rename_num", "0")
+    config.add_section("Counter")
+    config.set("Counter", "open_times", "0")
+    config.set("Counter", "rename_times", "0")
+    config.set("Counter", "rename_num", "0")
 
     # 写入配置内容
     with open(config_file, "w") as content:
@@ -75,4 +78,10 @@ def readConfig():
 
     config.read(config_file)
     checkConfig(config, config_file)
+
+    # 版本过旧则删除重建
+    if not config.has_section("Application"):
+        os.remove(config_file)
+        initConfig(config_file)
+
     return config
