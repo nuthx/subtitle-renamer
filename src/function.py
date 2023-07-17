@@ -31,7 +31,6 @@ def formatRawFileList(raw_file_list, file_list):
 
 
 def splitList(file_name):
-    print(file_name)
     video_list = []
     sc_list = []
     tc_list = []
