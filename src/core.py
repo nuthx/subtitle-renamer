@@ -1,9 +1,10 @@
 import time
 import send2trash
 import subprocess
+import threading
 from joblib import Parallel, delayed
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
-from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
+from PySide6.QtCore import Qt, QPoint, QCoreApplication
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
@@ -12,35 +13,6 @@ from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
 from src.module.counter import *
-
-
-class SplitListThread(QObject):
-    finished = Signal()
-
-    def __init__(self, file_list, video_list, sc_list, tc_list, main_window):
-        super().__init__()
-        self.file_list = file_list
-        self.video_list = video_list
-        self.sc_list = sc_list
-        self.tc_list = tc_list
-        self.main_window = main_window
-
-    def split(self):
-        start_time = time.time()
-
-        # 排除已分析过的内容
-        split_list = [item for item in self.file_list if item not in self.video_list + self.sc_list + self.tc_list]
-
-        results = Parallel(n_jobs=-1)(delayed(splitList)(item) for item in split_list)
-
-        for result in results:
-            self.video_list.extend(result[0])
-            self.sc_list.extend(result[1])
-            self.tc_list.extend(result[2])
-
-        self.used_time = (time.time() - start_time) * 1000  # 计时结束
-        self.item_num = len(split_list)
-        self.finished.emit()
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -90,34 +62,47 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
 
         # 放入子线程
-        self.thread = QThread()
-        self.worker = SplitListThread(self.file_list, self.video_list, self.sc_list, self.tc_list, self)
-        self.worker.moveToThread(self.thread)
-
-        self.worker.finished.connect(self.dropFinish)
-        self.thread.started.connect(self.worker.split)
-
+        self.thread = threading.Thread(target=self.dropThread)
         self.thread.start()
 
-    def dropFinish(self):
-        # 等待线程完成
-        self.thread.quit()
-        self.thread.wait()
+        # 等待线程完成，不阻塞 UI 界面
+        while self.thread.is_alive():
+            QCoreApplication.processEvents()
 
-        self.video_list = sorted(self.worker.video_list)
-        self.sc_list = sorted(self.worker.sc_list)
-        self.tc_list = sorted(self.worker.tc_list)
+        self.dropFinish()
+
+    def dropThread(self):
+        start_time = time.time()
+
+        # 排除已分析过的内容
+        split_list = [item for item in self.file_list if item not in self.video_list + self.sc_list + self.tc_list]
+
+        # 多进程启动
+        results = Parallel(n_jobs=-1)(delayed(splitList)(item) for item in split_list)
+
+        for result in results:
+            self.video_list.extend(result[0])
+            self.sc_list.extend(result[1])
+            self.tc_list.extend(result[2])
+
+        self.used_time = (time.time() - start_time) * 1000  # 计时结束
+        self.item_num = len(split_list)
+
+    def dropFinish(self):
+        self.video_list = sorted(self.video_list)
+        self.sc_list = sorted(self.sc_list)
+        self.tc_list = sorted(self.tc_list)
 
         self.showInTable()
 
-        if self.worker.item_num == 0:
+        if self.item_num == 0:
             self.showInfo("warning", "", "没有新增文件")
-        elif self.worker.used_time > 1000:
-            used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
-            self.showInfo("success", f"已添加{self.worker.item_num}个文件", f"耗时{used_time_s}s")
+        elif self.used_time > 1000:
+            used_time_s = "{:.2f}".format(self.used_time / 1000)  # 取 2 位小数
+            self.showInfo("success", f"已添加{self.item_num}个文件", f"耗时{used_time_s}s")
         else:
-            used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
-            self.showInfo("success", f"已添加{self.worker.item_num}个文件", f"耗时{used_time_ms}ms")
+            used_time_ms = "{:.0f}".format(self.used_time)  # 舍弃小数
+            self.showInfo("success", f"已添加{self.item_num}个文件", f"耗时{used_time_ms}ms")
 
     def showInTable(self):
         # 计算列表行数
