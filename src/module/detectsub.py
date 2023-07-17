@@ -5,8 +5,6 @@ import ass
 
 
 def detectSubLanguage(file_name):
-    subtitle = []
-
     # 检测文本编码
     with open(file_name, "rb") as file:
         sub_data = file.read()
@@ -14,7 +12,7 @@ def detectSubLanguage(file_name):
         encoding = result["encoding"]
         if encoding.lower() == "gb2312":  # 修正解码错误
             encoding = "gb18030"
-        print(encoding)
+        # print(encoding)
 
     # 判断字幕格式
     name_struct = file_name.split(".")
@@ -63,14 +61,10 @@ def detectSubLanguage(file_name):
             tc += 1
 
     # 打印数量
-    print(f"该字幕简繁比为{sc}:{tc}（{file_name}）")
+    # print(f"该字幕简繁比为{sc}:{tc}（{file_name}）")
 
     # 判断简繁，计算比例 0.8：1
     if sc * 0.8 > tc:
         return "sc"
     else:
         return "tc"
-
-
-# this_file = '../test/00.ass'
-# print(detectSubLanguage(this_file))

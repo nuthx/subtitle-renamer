@@ -2,8 +2,6 @@ import time
 import send2trash
 import subprocess
 import multiprocessing
-import cProfile
-import pstats
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
@@ -14,6 +12,9 @@ from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
 from src.module.counter import *
+
+# 继承父进程的所有内容
+multiprocessing.set_start_method("fork")
 
 
 class SplitListThread(QObject):
@@ -27,19 +28,10 @@ class SplitListThread(QObject):
     def split(self):
         start_time = time.time()
 
-        # 性能分析
-        # pr = cProfile.Profile()
-        # pr.enable()
-
         pool = multiprocessing.Pool()
         results = pool.map(splitList, self.file_list)
         pool.close()
         pool.join()
-
-        # 结束分析
-        # pr.disable()
-        # ps = pstats.Stats(pr).sort_stats('cumulative')
-        # ps.print_stats()
 
         self.video_list = []
         self.sc_list = []
