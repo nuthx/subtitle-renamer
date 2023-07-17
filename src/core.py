@@ -45,6 +45,7 @@ class SplitListThread(QObject):
             self.tc_list.extend(result[2])
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
+        self.item_num = len(split_list)
         self.finished.emit()
 
 
@@ -88,7 +89,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        self.showInfo("info", "添加中", "请等待识别完成")
+        self.showInfo("info", "", "请等待识别完成")
 
         # 获取并格式化本地路径
         self.raw_file_list = event.mimeData().urls()
@@ -115,12 +116,14 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         self.showInTable()
 
-        if self.worker.used_time > 1000:
+        if self.worker.item_num == 0:
+            self.showInfo("warning", "", "没有新增文件")
+        elif self.worker.used_time > 1000:
             used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
-            self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
+            self.showInfo("success", f"已添加{self.worker.item_num}个文件", f"耗时{used_time_s}s")
         else:
             used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
-            self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
+            self.showInfo("success", f"已添加{self.worker.item_num}个文件", f"耗时{used_time_ms}ms")
 
     def showInTable(self):
         # 计算列表行数
