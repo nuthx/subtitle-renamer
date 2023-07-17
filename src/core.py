@@ -2,6 +2,7 @@ import time
 import send2trash
 import subprocess
 import threading
+import multiprocessing
 from joblib import Parallel, delayed
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QCoreApplication
@@ -78,7 +79,11 @@ class MyMainWindow(QMainWindow, MainWindow):
         split_list = [item for item in self.file_list if item not in self.video_list + self.sc_list + self.tc_list]
 
         # 多进程启动
-        results = Parallel(n_jobs=-1)(delayed(splitList)(item) for item in split_list)
+        # results = Parallel(n_jobs=-1)(delayed(splitList)(item) for item in split_list)
+        pool = multiprocessing.Pool()
+        results = pool.map(splitList, split_list)
+        pool.close()
+        pool.join()
 
         for result in results:
             self.video_list.extend(result[0])
