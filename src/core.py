@@ -1,7 +1,7 @@
 import time
 import send2trash
 import subprocess
-import multiprocessing
+from joblib import Parallel, delayed
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
@@ -12,9 +12,6 @@ from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
 from src.module.counter import *
-
-# 继承父进程的所有内容
-multiprocessing.set_start_method("fork")
 
 
 class SplitListThread(QObject):
@@ -34,10 +31,7 @@ class SplitListThread(QObject):
         # 排除已分析过的内容
         split_list = [item for item in self.file_list if item not in self.video_list + self.sc_list + self.tc_list]
 
-        pool = multiprocessing.Pool()
-        results = pool.map(splitList, split_list)
-        pool.close()
-        pool.join()
+        results = Parallel(n_jobs=-1)(delayed(splitList)(item) for item in split_list)
 
         for result in results:
             self.video_list.extend(result[0])
