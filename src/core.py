@@ -20,22 +20,24 @@ multiprocessing.set_start_method("fork")
 class SplitListThread(QObject):
     finished = Signal()
 
-    def __init__(self, file_list, main_window):
+    def __init__(self, file_list, video_list, sc_list, tc_list, main_window):
         super().__init__()
         self.file_list = file_list
+        self.video_list = video_list
+        self.sc_list = sc_list
+        self.tc_list = tc_list
         self.main_window = main_window
 
     def split(self):
         start_time = time.time()
 
+        # 排除已分析过的内容
+        split_list = [item for item in self.file_list if item not in self.video_list + self.sc_list + self.tc_list]
+
         pool = multiprocessing.Pool()
-        results = pool.map(splitList, self.file_list)
+        results = pool.map(splitList, split_list)
         pool.close()
         pool.join()
-
-        self.video_list = []
-        self.sc_list = []
-        self.tc_list = []
 
         for result in results:
             self.video_list.extend(result[0])
@@ -94,7 +96,7 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         # 放入子线程
         self.thread = QThread()
-        self.worker = SplitListThread(self.file_list, self)
+        self.worker = SplitListThread(self.file_list, self.video_list, self.sc_list, self.tc_list, self)
         self.worker.moveToThread(self.thread)
 
         self.worker.finished.connect(self.dropFinish)
