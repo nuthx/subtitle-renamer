@@ -61,7 +61,7 @@ def detectSubLanguage(file_name):
             tc += 1
 
     # 打印数量
-    # print(f"该字幕简繁比为{sc}:{tc}（{file_name}）")
+    print(f"简繁比 {sc}:{tc}")
 
     # 判断简繁，计算比例 0.8：1
     if sc * 0.8 > tc:

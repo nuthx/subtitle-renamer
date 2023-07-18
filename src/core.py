@@ -1,9 +1,10 @@
 import time
 import send2trash
 import subprocess
+import threading
 import multiprocessing
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
-from PySide6.QtCore import Qt, QPoint, QThread, QObject, Signal
+from PySide6.QtCore import Qt, QPoint, QCoreApplication
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
@@ -13,38 +14,6 @@ from src.function import *
 from src.module.config import *
 from src.module.counter import *
 
-# 继承父进程的所有内容
-multiprocessing.set_start_method("fork")
-
-
-class SplitListThread(QObject):
-    finished = Signal()
-
-    def __init__(self, file_list, main_window):
-        super().__init__()
-        self.file_list = file_list
-        self.main_window = main_window
-
-    def split(self):
-        start_time = time.time()
-
-        pool = multiprocessing.Pool()
-        results = pool.map(splitList, self.file_list)
-        pool.close()
-        pool.join()
-
-        self.video_list = []
-        self.sc_list = []
-        self.tc_list = []
-
-        for result in results:
-            self.video_list.extend(result[0])
-            self.sc_list.extend(result[1])
-            self.tc_list.extend(result[2])
-
-        self.used_time = (time.time() - start_time) * 1000  # 计时结束
-        self.finished.emit()
-
 
 class MyMainWindow(QMainWindow, MainWindow):
     def __init__(self):
@@ -52,7 +21,13 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.setupUI(self)
         self.initUI()
         self.initList()
+        self.pool = multiprocessing.Pool()  # 创建常驻进程池
         readConfig()  # 仅用于检查配置是否正确
+
+    # 软件关闭时销毁进程池
+    def __del__(self):
+        self.pool.close()
+        self.pool.join()
 
     def initUI(self):
         addOpenTimes(readConfig(), configPath())
@@ -86,39 +61,54 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        self.showInfo("info", "添加中", "请等待识别完成")
+        self.showInfo("info", "", "请等待识别完成")
 
         # 获取并格式化本地路径
         self.raw_file_list = event.mimeData().urls()
         self.file_list = formatRawFileList(self.raw_file_list, self.file_list)
 
         # 放入子线程
-        self.thread = QThread()
-        self.worker = SplitListThread(self.file_list, self)
-        self.worker.moveToThread(self.thread)
-
-        self.worker.finished.connect(self.dropFinish)
-        self.thread.started.connect(self.worker.split)
-
+        self.thread = threading.Thread(target=self.dropThread)
         self.thread.start()
 
-    def dropFinish(self):
-        # 等待线程完成
-        self.thread.quit()
-        self.thread.wait()
+        # 等待线程完成，不阻塞 UI 界面
+        while self.thread.is_alive():
+            QCoreApplication.processEvents()
 
-        self.video_list = sorted(self.worker.video_list)
-        self.sc_list = sorted(self.worker.sc_list)
-        self.tc_list = sorted(self.worker.tc_list)
+        self.dropFinish()
+
+    def dropThread(self):
+        start_time = time.time()
+
+        # 排除已分析过的内容
+        split_list = [item for item in self.file_list if item not in self.video_list + self.sc_list + self.tc_list]
+
+        # 多进程启动
+        results = self.pool.map(splitList, split_list)
+
+        for result in results:
+            self.video_list.extend(result[0])
+            self.sc_list.extend(result[1])
+            self.tc_list.extend(result[2])
+
+        self.used_time = (time.time() - start_time) * 1000  # 计时结束
+        self.item_num = len(split_list)
+
+    def dropFinish(self):
+        self.video_list = sorted(self.video_list)
+        self.sc_list = sorted(self.sc_list)
+        self.tc_list = sorted(self.tc_list)
 
         self.showInTable()
 
-        if self.worker.used_time > 1000:
-            used_time_s = "{:.2f}".format(self.worker.used_time / 1000)  # 取 2 位小数
-            self.showInfo("success", "添加成功", f"耗时{used_time_s}s")
+        if self.item_num == 0:
+            self.showInfo("warning", "", "没有新增文件")
+        elif self.used_time > 1000:
+            used_time_s = "{:.2f}".format(self.used_time / 1000)  # 取 2 位小数
+            self.showInfo("success", f"已添加{self.item_num}个文件", f"耗时{used_time_s}s")
         else:
-            used_time_ms = "{:.0f}".format(self.worker.used_time)  # 舍弃小数
-            self.showInfo("success", "添加成功", f"耗时{used_time_ms}ms")
+            used_time_ms = "{:.0f}".format(self.used_time)  # 舍弃小数
+            self.showInfo("success", f"已添加{self.item_num}个文件", f"耗时{used_time_ms}ms")
 
     def showInTable(self):
         # 计算列表行数
@@ -300,8 +290,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         delete_list_lonely = []
         for item in delete_list:
             item_lonely = os.path.basename(item)
-            if len(item_lonely) > 70:  # 截取最后 70 位
-                item_lonely = "..." + item_lonely[-70:]
+            if len(item_lonely) > 60:  # 截取最后 60 位
+                item_lonely = "..." + item_lonely[-60:]
             delete_list_lonely.append(item_lonely)
 
         # 弹窗提醒待删除文件
