@@ -3,7 +3,6 @@ import send2trash
 import subprocess
 import threading
 import multiprocessing
-from joblib import Parallel, delayed
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QCoreApplication
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
@@ -22,7 +21,13 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.setupUI(self)
         self.initUI()
         self.initList()
+        self.pool = multiprocessing.Pool()  # 创建常驻进程池
         readConfig()  # 仅用于检查配置是否正确
+
+    # 软件关闭时销毁进程池
+    def __del__(self):
+        self.pool.close()
+        self.pool.join()
 
     def initUI(self):
         addOpenTimes(readConfig(), configPath())
@@ -79,11 +84,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         split_list = [item for item in self.file_list if item not in self.video_list + self.sc_list + self.tc_list]
 
         # 多进程启动
-        # results = Parallel(n_jobs=-1)(delayed(splitList)(item) for item in split_list)
-        pool = multiprocessing.Pool()
-        results = pool.map(splitList, split_list)
-        pool.close()
-        pool.join()
+        results = self.pool.map(splitList, split_list)
 
         for result in results:
             self.video_list.extend(result[0])
