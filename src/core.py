@@ -61,7 +61,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        self.showInfo("info", "", "请等待识别完成")
+        # self.showInfo("info", "", "请等待识别完成")
 
         # 获取并格式化本地路径
         self.raw_file_list = event.mimeData().urls()
