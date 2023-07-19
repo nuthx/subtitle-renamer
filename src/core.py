@@ -393,7 +393,7 @@ class MySettingWindow(QDialog, SettingWindow):
         self.config.set("General", "remove_unused_sub", str(self.removeSubSwitch.isChecked()).lower())
         self.config.set("General", "encode", self.encodeType.currentText())
 
-        with open(configPath()[1], "w") as content:
+        with open(configPath()[1], "w", encoding="utf-8") as content:
             self.config.write(content)
 
         self.close()

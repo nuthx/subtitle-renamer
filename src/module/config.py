@@ -47,7 +47,7 @@ def initConfig(config_file):
     config.set("Counter", "rename_num", "0")
 
     # 写入配置内容
-    with open(config_file, "w") as content:
+    with open(config_file, "w", encoding="utf-8") as content:
         config.write(content)
 
 
@@ -63,7 +63,7 @@ def checkConfig(config, config_file):
         config.set("General", "encode", "None")
 
     # 写入配置内容
-    with open(config_file, "w") as content:
+    with open(config_file, "w", encoding="utf-8") as content:
         config.write(content)
 
 
