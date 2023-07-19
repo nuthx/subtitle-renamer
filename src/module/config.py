@@ -70,13 +70,12 @@ def checkConfig(config, config_file):
 # 更新配置文件
 def updateConfigFile(config_file):
     config = configparser.ConfigParser()
+    config.read(config_file)
 
     # 1.2 之前则删除重建
     if not config.has_section("Application"):
         os.remove(config_file)
         initConfig(config_file)
-
-    config.read(config_file)
 
     #  更新 1.3
     if config.get("Application", "version") == "1.2":
