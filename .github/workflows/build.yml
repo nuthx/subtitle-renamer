@@ -2,8 +2,6 @@ name: Build
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 1.*
 
@@ -33,18 +31,18 @@ jobs:
     - name: Build (Windows)
       if: ${{ runner.os == 'windows' }}
       run: |
-        pyinstaller -wF main.py --icon='image/icon.ico' --add-data 'src/style/style_light.qss;src/style' --add-data 'src/style/table.qss;src/style' --add-data 'src/font/Study-Bold.otf;src/font' --add-data 'image/icon.png;image' --add-data 'image/logo.png;image' --version-file 'version.txt' --name=SubtitleRenamer
+        pyinstaller build.spec
 
     - name: Build (macOS)
       if: ${{ runner.os == 'macos' }}
       run: |
-        pyinstaller -wF main.py -i image/icon.icns --add-data src/style:src/style --add-data src/font:src/font --add-data image/logo.png:image --name=SubtitleRenamer
-
+        pyinstaller build.spec
+        
     - name: Build (Linux)
       if: ${{ runner.os == 'linux' }}
       run: |
-        pyinstaller -wF main.py --add-data src/style:src/style --add-data src/font:src/font --add-data image/logo.png:image --name=SubtitleRenamer
-
+        pyinstaller build.spec
+        
     - name: Upload (Windows)
       if: ${{ runner.os == 'windows' }}
       uses: actions/upload-artifact@v3
