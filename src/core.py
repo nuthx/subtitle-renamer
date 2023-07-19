@@ -61,7 +61,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        self.showInfo("info", "", "请等待识别完成")
+        # self.showInfo("info", "", "请等待识别完成")
+
+        self.spinner.setVisible(True)
 
         # 获取并格式化本地路径
         self.raw_file_list = event.mimeData().urls()
@@ -100,6 +102,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.tc_list = sorted(self.tc_list)
 
         self.showInTable()
+        self.spinner.setVisible(False)
 
         if self.item_num == 0:
             self.showInfo("warning", "", "没有新增文件")
