@@ -39,7 +39,7 @@ def initConfig(config_file):
     config.add_section("General")
     config.set("General", "move_to_anime_folder", "true")
     config.set("General", "remove_unused_sub", "true")
-    config.set("General", "encode", "不转换")
+    config.set("General", "encode", "Never")
 
     config.add_section("Counter")
     config.set("Counter", "open_times", "0")
@@ -59,8 +59,31 @@ def checkConfig(config, config_file):
     if config.get("General", "remove_unused_sub") not in ["true", "false"]:
         config.set("General", "remove_unused_sub", "true")
 
-    if config.get("General", "encode") not in ["不转换", "UTF-8", "UTF-8-SIG"]:
-        config.set("General", "encode", "None")
+    if config.get("General", "encode") not in ["Never", "UTF-8", "UTF-8-SIG"]:
+        config.set("General", "encode", "Never")
+
+    # 写入配置内容
+    with open(config_file, "w", encoding="utf-8") as content:
+        config.write(content)
+
+
+# 更新配置文件
+def updateConfigFile(config_file):
+    config = configparser.ConfigParser()
+
+    # 1.2 之前则删除重建
+    if not config.has_section("Application"):
+        os.remove(config_file)
+        initConfig(config_file)
+
+    config.read(config_file)
+
+    #  更新 1.3
+    if config.get("Application", "version") == "1.2":
+        config.set("Application", "version", "1.3")
+
+        if config.get("General", "encode") not in ["UTF-8", "UTF-8-SIG"]:
+            config.set("General", "encode", "Never")
 
     # 写入配置内容
     with open(config_file, "w", encoding="utf-8") as content:
@@ -79,9 +102,7 @@ def readConfig():
     config.read(config_file)
     checkConfig(config, config_file)
 
-    # 版本过旧则删除重建
-    if not config.has_section("Application"):
-        os.remove(config_file)
-        initConfig(config_file)
+    # 更新配置
+    updateConfigFile(config_file)
 
     return config
