@@ -34,7 +34,7 @@ class AboutWindow(object):
 
         # 版本
 
-        self.versionLabel = QLabel("版本 1.3.2")
+        self.versionLabel = QLabel("版本 1.4")
         self.versionLabel.setObjectName("versionLabel")
         self.versionLabel.setAlignment(Qt.AlignCenter)
 
