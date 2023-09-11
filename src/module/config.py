@@ -30,7 +30,9 @@ def initConfig(config_file):
     config = configparser.ConfigParser()
 
     config.add_section("Application")
-    config.set("Application", "version", "1.2")
+    config.set("Application", "version", "1.4")
+    config.set("Application", "sc", "true")
+    config.set("Application", "tc", "false")
 
     config.add_section("Extension")
     config.set("Extension", "sc", "")
@@ -53,6 +55,12 @@ def initConfig(config_file):
 
 # 检测配置文件合法性
 def checkConfig(config, config_file):
+    if config.get("Application", "sc") not in ["true", "false"]:
+        config.set("Application", "sc", "true")
+
+    if config.get("Application", "tc") not in ["true", "false"]:
+        config.set("Application", "tc", "false")
+
     if config.get("General", "move_to_anime_folder") not in ["true", "false"]:
         config.set("General", "move_to_anime_folder", "true")
 
@@ -72,21 +80,28 @@ def updateConfigFile(config_file):
     config = configparser.ConfigParser()
     config.read(config_file)
 
-    # 1.2 之前则删除重建
-    if not config.has_section("Application"):
+    # 记录计数器
+    open_times = config.get("Counter", "open_times")
+    rename_times = config.get("Counter", "rename_times")
+    rename_num = config.get("Counter", "rename_num")
+
+    # 版本不符则重建配置文件
+    if not config.has_section("Application") or config.get("Application", "version") != "1.4":
         os.remove(config_file)
         initConfig(config_file)
 
-    #  更新 1.3
-    if config.get("Application", "version") == "1.2":
-        config.set("Application", "version", "1.3")
+        # 重新读取配置文件
+        config = configparser.ConfigParser()
+        config.read(config_file)
 
-        if config.get("General", "encode") not in ["UTF-8", "UTF-8-SIG"]:
-            config.set("General", "encode", "Never")
+        # 更新计数器
+        config.set("Counter", "open_times", open_times)
+        config.set("Counter", "rename_times", rename_times)
+        config.set("Counter", "rename_num", rename_num)
 
-    # 写入配置内容
-    with open(config_file, "w", encoding="utf-8") as content:
-        config.write(content)
+        # 写入配置内容
+        with open(config_file, "w", encoding="utf-8") as content:
+            config.write(content)
 
 
 # 读取配置
@@ -98,10 +113,12 @@ def readConfig():
     if not os.path.exists(config_file):
         initConfig(config_file)
 
+    # 更新配置
+    config.read(config_file)
+    updateConfigFile(config_file)
+
+    # 检测合法性（再次读取获得新配置内容）
     config.read(config_file)
     checkConfig(config, config_file)
-
-    # 更新配置
-    updateConfigFile(config_file)
 
     return config
