@@ -22,7 +22,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.initUI()
         self.initList()
         self.pool = multiprocessing.Pool()  # 创建常驻进程池
-        readConfig()  # 仅用于检查配置是否正确
+        self.config = readConfig()
+        self.loadConfig()
 
     # 软件关闭时销毁进程池
     def __del__(self):
@@ -34,6 +35,9 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self.showMenu)
+
+        self.allowSc.stateChanged.connect(self.saveCheckBox)
+        self.allowTc.stateChanged.connect(self.saveCheckBox)
 
         self.aboutButton.clicked.connect(self.openAbout)
         self.settingButton.clicked.connect(self.openSetting)
@@ -49,6 +53,13 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.table.clearContents()
         self.table.setRowCount(0)
 
+    def saveCheckBox(self):
+        self.config.set("Application", "sc", str(self.allowSc.isChecked()).lower())
+        self.config.set("Application", "tc", str(self.allowTc.isChecked()).lower())
+
+        with open(configPath()[1], "w", encoding="utf-8") as content:
+            self.config.write(content)
+
     def openAbout(self):
         about = MyAboutWindow()
         about.exec()
@@ -61,8 +72,6 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        # self.showInfo("info", "", "请等待识别完成")
-
         self.spinner.setVisible(True)
 
         # 获取并格式化本地路径
@@ -241,6 +250,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.showInfo("success", "", "重命名成功")
 
     def loadConfig(self):
+        self.allowSc.setChecked(self.config.getboolean("Application", "sc"))
+        self.allowTc.setChecked(self.config.getboolean("Application", "tc"))
+
         self.sc_extension = self.config.get("Extension", "sc")
         self.tc_extension = self.config.get("Extension", "tc")
 

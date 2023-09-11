@@ -87,10 +87,10 @@ class MainWindow(object):
         # 执行区域
 
         self.allowSc = CheckBox("简体", self)
-        self.allowSc.setChecked(True)
+        # self.allowSc.setChecked(True)
 
         self.allowTc = CheckBox("繁体", self)
-        self.allowTc.setChecked(False)
+        # self.allowTc.setChecked(False)
 
         self.removeButton = PushButton("删除选中字幕", self)
         self.removeButton.setFixedWidth(120)
