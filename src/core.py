@@ -149,14 +149,15 @@ class MyMainWindow(QMainWindow, MainWindow):
 
     def showMenu(self, pos):
         menu = RoundMenu(parent=self)
-        delete_this_file = Action(FluentIcon.CLOSE, "移除此文件")
+        delete_this_video = Action(FluentIcon.CLOSE, "移除此视频")
+        delete_this_subtitle = Action(FluentIcon.CLOSE, "移除此字幕")
         delete_this_line = Action(FluentIcon.DELETE, "移除整行内容")
-        menu.addAction(delete_this_file)
-        menu.addAction(delete_this_line)
+        set_to_sc = Action(FluentIcon.FONT, "更正为简体字幕")
+        set_to_tc = Action(FluentIcon.FONT, "更正为繁体字幕")
 
         # 必须选中单元格才会显示
         if self.table.itemAt(pos) is not None:
-            # 在微调后的位置显示
+            # 微调菜单位置
             menu.exec(self.table.mapToGlobal(pos) + QPoint(0, 30), ani=True)
 
             # 计算单元格坐标
@@ -164,8 +165,27 @@ class MyMainWindow(QMainWindow, MainWindow):
             row = self.table.row(clicked_item)
             column = self.table.column(clicked_item)
 
-            delete_this_file.triggered.connect(lambda: self.deleteThisFile(row, column))
+            # 配置不同的右键菜单
+            if column == 0:
+                menu.addAction(delete_this_video)
+                menu.addAction(delete_this_line)
+            elif column == 1:
+                menu.addAction(delete_this_subtitle)
+                menu.addAction(delete_this_line)
+                menu.addSeparator()
+                menu.addAction(set_to_tc)
+            elif column == 2:
+                menu.addAction(delete_this_subtitle)
+                menu.addAction(delete_this_line)
+                menu.addSeparator()
+                menu.addAction(set_to_sc)
+
+            # 绑定函数
+            delete_this_video.triggered.connect(lambda: self.deleteThisFile(row, column))
+            delete_this_subtitle.triggered.connect(lambda: self.deleteThisFile(row, column))
             delete_this_line.triggered.connect(lambda: self.deleteThisLine(row))
+            set_to_sc.triggered.connect(lambda: self.setToSc(row))
+            set_to_tc.triggered.connect(lambda: self.setToTc(row))
 
     def deleteThisFile(self, row, column):
         if column == 0:
@@ -185,6 +205,28 @@ class MyMainWindow(QMainWindow, MainWindow):
             del self.sc_list[row]
         if row < len(self.tc_list):
             del self.tc_list[row]
+        self.table.clearContents()
+        self.table.setRowCount(0)
+        self.showInTable()
+
+    def setToSc(self, row):
+        pop = self.tc_list.pop(row)
+        self.sc_list.append(pop)
+
+        self.sc_list = sorted(self.sc_list)
+        self.tc_list = sorted(self.tc_list)
+
+        self.table.clearContents()
+        self.table.setRowCount(0)
+        self.showInTable()
+
+    def setToTc(self, row):
+        pop = self.sc_list.pop(row)
+        self.tc_list.append(pop)
+
+        self.sc_list = sorted(self.sc_list)
+        self.tc_list = sorted(self.tc_list)
+
         self.table.clearContents()
         self.table.setRowCount(0)
         self.showInTable()
