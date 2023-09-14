@@ -24,6 +24,6 @@ def newVersion():
     latest_version = latestVersion()
 
     if current_version != latest_version:
-        return True, latest_version
+        return True
     else:
-        return False, latest_version
+        return False

@@ -60,12 +60,10 @@ class MyMainWindow(QMainWindow, MainWindow):
     def checkVersion(self):
         thread = threading.Thread(target=self.checkVersionThread)
         thread.start()
+        thread.join()
 
     def checkVersionThread(self):
-        newnew = newVersion()
-
-        if newnew[0]:
-            latest_version = newnew[1]
+        if newVersion():
             self.newVersionButton.setVisible(True)
 
     def saveCheckBox(self):
