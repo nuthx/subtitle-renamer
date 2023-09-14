@@ -149,8 +149,8 @@ class MyMainWindow(QMainWindow, MainWindow):
 
     def showMenu(self, pos):
         menu = RoundMenu(parent=self)
-        delete_this_file = Action(FluentIcon.CLOSE, "删除此文件")
-        delete_this_line = Action(FluentIcon.DELETE, "删除整行内容")
+        delete_this_file = Action(FluentIcon.CLOSE, "移除此文件")
+        delete_this_line = Action(FluentIcon.DELETE, "移除整行内容")
         menu.addAction(delete_this_file)
         menu.addAction(delete_this_line)
 
