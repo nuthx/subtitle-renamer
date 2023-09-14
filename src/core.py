@@ -4,7 +4,8 @@ import subprocess
 import threading
 import multiprocessing
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
-from PySide6.QtCore import Qt, QPoint, QCoreApplication
+from PySide6.QtCore import Qt, QPoint, QCoreApplication, QUrl
+from PySide6.QtGui import QDesktopServices
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
@@ -41,6 +42,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.allowSc.stateChanged.connect(self.saveCheckBox)
         self.allowTc.stateChanged.connect(self.saveCheckBox)
 
+        self.newVersionButton.clicked.connect(self.openRelease)
         self.aboutButton.clicked.connect(self.openAbout)
         self.settingButton.clicked.connect(self.openSetting)
         self.removeButton.clicked.connect(self.justRemoveSub)
@@ -72,6 +74,10 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         with open(configPath()[1], "w", encoding="utf-8") as content:
             self.config.write(content)
+
+    def openRelease(self):
+        url = QUrl("https://github.com/nuthx/subtitle-renamer/releases/latest")
+        QDesktopServices.openUrl(url)
 
     def openAbout(self):
         about = MyAboutWindow()
