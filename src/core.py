@@ -4,7 +4,8 @@ import subprocess
 import threading
 import multiprocessing
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
-from PySide6.QtCore import Qt, QPoint, QCoreApplication
+from PySide6.QtCore import Qt, QPoint, QCoreApplication, QUrl
+from PySide6.QtGui import QDesktopServices
 from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
@@ -13,6 +14,7 @@ from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
 from src.module.counter import *
+from src.module.version import newVersion
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -22,7 +24,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.initUI()
         self.initList()
         self.pool = multiprocessing.Pool()  # 创建常驻进程池
-        readConfig()  # 仅用于检查配置是否正确
+        self.checkVersion()
+        self.config = readConfig()
+        self.loadConfig()
 
     # 软件关闭时销毁进程池
     def __del__(self):
@@ -35,6 +39,10 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self.showMenu)
 
+        self.allowSc.stateChanged.connect(self.saveCheckBox)
+        self.allowTc.stateChanged.connect(self.saveCheckBox)
+
+        self.newVersionButton.clicked.connect(self.openRelease)
         self.aboutButton.clicked.connect(self.openAbout)
         self.settingButton.clicked.connect(self.openSetting)
         self.removeButton.clicked.connect(self.justRemoveSub)
@@ -49,6 +57,26 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.table.clearContents()
         self.table.setRowCount(0)
 
+    def checkVersion(self):
+        thread = threading.Thread(target=self.checkVersionThread)
+        thread.start()
+        thread.join()
+
+    def checkVersionThread(self):
+        if newVersion():
+            self.newVersionButton.setVisible(True)
+
+    def saveCheckBox(self):
+        self.config.set("Application", "sc", str(self.allowSc.isChecked()).lower())
+        self.config.set("Application", "tc", str(self.allowTc.isChecked()).lower())
+
+        with open(configPath()[1], "w", encoding="utf-8") as content:
+            self.config.write(content)
+
+    def openRelease(self):
+        url = QUrl("https://github.com/nuthx/subtitle-renamer/releases/latest")
+        QDesktopServices.openUrl(url)
+
     def openAbout(self):
         about = MyAboutWindow()
         about.exec()
@@ -61,8 +89,6 @@ class MyMainWindow(QMainWindow, MainWindow):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        # self.showInfo("info", "", "请等待识别完成")
-
         self.spinner.setVisible(True)
 
         # 获取并格式化本地路径
@@ -140,14 +166,15 @@ class MyMainWindow(QMainWindow, MainWindow):
 
     def showMenu(self, pos):
         menu = RoundMenu(parent=self)
-        delete_this_file = Action(FluentIcon.CLOSE, "删除此文件")
-        delete_this_line = Action(FluentIcon.DELETE, "删除整行内容")
-        menu.addAction(delete_this_file)
-        menu.addAction(delete_this_line)
+        delete_this_video = Action(FluentIcon.CLOSE, "移除此视频")
+        delete_this_subtitle = Action(FluentIcon.CLOSE, "移除此字幕")
+        delete_this_line = Action(FluentIcon.DELETE, "移除整行内容")
+        set_to_sc = Action(FluentIcon.FONT, "更正为简体字幕")
+        set_to_tc = Action(FluentIcon.FONT, "更正为繁体字幕")
 
         # 必须选中单元格才会显示
         if self.table.itemAt(pos) is not None:
-            # 在微调后的位置显示
+            # 微调菜单位置
             menu.exec(self.table.mapToGlobal(pos) + QPoint(0, 30), ani=True)
 
             # 计算单元格坐标
@@ -155,8 +182,27 @@ class MyMainWindow(QMainWindow, MainWindow):
             row = self.table.row(clicked_item)
             column = self.table.column(clicked_item)
 
-            delete_this_file.triggered.connect(lambda: self.deleteThisFile(row, column))
+            # 配置不同的右键菜单
+            if column == 0:
+                menu.addAction(delete_this_video)
+                menu.addAction(delete_this_line)
+            elif column == 1:
+                menu.addAction(delete_this_subtitle)
+                menu.addAction(delete_this_line)
+                menu.addSeparator()
+                menu.addAction(set_to_tc)
+            elif column == 2:
+                menu.addAction(delete_this_subtitle)
+                menu.addAction(delete_this_line)
+                menu.addSeparator()
+                menu.addAction(set_to_sc)
+
+            # 绑定函数
+            delete_this_video.triggered.connect(lambda: self.deleteThisFile(row, column))
+            delete_this_subtitle.triggered.connect(lambda: self.deleteThisFile(row, column))
             delete_this_line.triggered.connect(lambda: self.deleteThisLine(row))
+            set_to_sc.triggered.connect(lambda: self.setToSc(row))
+            set_to_tc.triggered.connect(lambda: self.setToTc(row))
 
     def deleteThisFile(self, row, column):
         if column == 0:
@@ -176,6 +222,28 @@ class MyMainWindow(QMainWindow, MainWindow):
             del self.sc_list[row]
         if row < len(self.tc_list):
             del self.tc_list[row]
+        self.table.clearContents()
+        self.table.setRowCount(0)
+        self.showInTable()
+
+    def setToSc(self, row):
+        pop = self.tc_list.pop(row)
+        self.sc_list.append(pop)
+
+        self.sc_list = sorted(self.sc_list)
+        self.tc_list = sorted(self.tc_list)
+
+        self.table.clearContents()
+        self.table.setRowCount(0)
+        self.showInTable()
+
+    def setToTc(self, row):
+        pop = self.sc_list.pop(row)
+        self.tc_list.append(pop)
+
+        self.sc_list = sorted(self.sc_list)
+        self.tc_list = sorted(self.tc_list)
+
         self.table.clearContents()
         self.table.setRowCount(0)
         self.showInTable()
@@ -241,6 +309,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.showInfo("success", "", "重命名成功")
 
     def loadConfig(self):
+        self.allowSc.setChecked(self.config.getboolean("Application", "sc"))
+        self.allowTc.setChecked(self.config.getboolean("Application", "tc"))
+
         self.sc_extension = self.config.get("Extension", "sc")
         self.tc_extension = self.config.get("Extension", "tc")
 

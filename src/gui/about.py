@@ -5,6 +5,7 @@ from qfluentwidgets import FluentIcon, ToolButton
 
 from src.module.resource import getResource
 from src.module.config import configPath
+from src.module.version import currentVersion
 
 
 class AboutWindow(object):
@@ -34,7 +35,7 @@ class AboutWindow(object):
 
         # 版本
 
-        self.versionLabel = QLabel("版本 1.3.2")
+        self.versionLabel = QLabel(f"版本 {currentVersion()}")
         self.versionLabel.setObjectName("versionLabel")
         self.versionLabel.setAlignment(Qt.AlignCenter)
 
