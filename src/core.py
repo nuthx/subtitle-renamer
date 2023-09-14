@@ -13,6 +13,7 @@ from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
 from src.module.counter import *
+from src.module.version import newVersion
 
 
 class MyMainWindow(QMainWindow, MainWindow):
@@ -22,6 +23,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.initUI()
         self.initList()
         self.pool = multiprocessing.Pool()  # 创建常驻进程池
+        self.checkVersion()
         self.config = readConfig()
         self.loadConfig()
 
@@ -52,6 +54,17 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.tc_list = []
         self.table.clearContents()
         self.table.setRowCount(0)
+
+    def checkVersion(self):
+        thread = threading.Thread(target=self.checkVersionThread)
+        thread.start()
+
+    def checkVersionThread(self):
+        newnew = newVersion()
+
+        if newnew[0]:
+            latest_version = newnew[1]
+            self.newVersionButton.setVisible(True)
 
     def saveCheckBox(self):
         self.config.set("Application", "sc", str(self.allowSc.isChecked()).lower())

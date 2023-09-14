@@ -6,6 +6,7 @@ from qfluentwidgets import (setThemeColor, PushButton, TableWidget, PrimaryPushB
 from qfluentwidgets.common.style_sheet import styleSheetManager
 
 from src.module.resource import getResource
+from src.module.version import currentVersion
 
 
 class MainWindow(object):
@@ -20,7 +21,7 @@ class MainWindow(object):
             style_sheet = file.read()
         this_window.setStyleSheet(style_sheet)
 
-        this_window.setWindowTitle("SubtitleRenamer 1.4")
+        this_window.setWindowTitle(f"SubtitleRenamer {currentVersion()}")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
         this_window.resize(1200, 660)
         this_window.setAcceptDrops(True)
@@ -44,6 +45,9 @@ class MainWindow(object):
         self.spinner.setStrokeWidth(3)
         self.spinner.setVisible(False)
 
+        self.newVersionButton = PrimaryPushButton("有新版本", self, FluentIcon.LINK)
+        self.newVersionButton.setVisible(False)
+
         self.aboutButton = ToolButton(FluentIcon.INFO, self)
         self.settingButton = PushButton("设置", self, FluentIcon.SETTING)
 
@@ -53,6 +57,8 @@ class MainWindow(object):
         self.headerLayout.addStretch(0)
         self.headerLayout.addWidget(self.spinner, 0)
         self.headerLayout.addSpacing(16)
+        self.headerLayout.addWidget(self.newVersionButton, 0)
+        self.headerLayout.addSpacing(12)
         self.headerLayout.addWidget(self.aboutButton, 0)
         self.headerLayout.addSpacing(12)
         self.headerLayout.addWidget(self.settingButton, 0)

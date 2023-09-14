@@ -2,6 +2,7 @@ import re
 
 ver = "1.4"
 ver_sp = [num for num in str(ver).split(".")]
+
 if len(ver) == 3:
     ver_alt = f"{ver_sp[0]}, {ver_sp[1]}, 0, 0"
 elif len(ver) == 5:
@@ -36,28 +37,17 @@ def macVersion():
 
 
 def appVersion():
-    with open("src/gui/about.py", "r") as file:
+    with open("src/module/version.py", "r") as file:
         lines = file.readlines()
 
-    re1 = re.findall(r'\"(.*?)\"', lines[36])
-    lines[36] = lines[36].replace(re1[0], f"版本 {ver}")
+    re1 = re.findall(r'\"(.*?)\"', lines[4])
+    lines[4] = lines[4].replace(re1[0], ver)
 
-    with open("src/gui/about.py", "w") as file:
-        file.writelines(lines)
-
-
-def titleVersion():
-    with open("src/gui/mainwindow.py", "r") as file:
-        lines = file.readlines()
-
-    re1 = re.findall(r'\"(.*?)\"', lines[22])
-    lines[22] = lines[22].replace(re1[0], f"SubtitleRenamer {ver}")
-
-    with open("src/gui/mainwindow.py", "w") as file:
+    with open("src/module/version.py", "w") as file:
         file.writelines(lines)
 
 
 windowsVersion()
 macVersion()
 appVersion()
-titleVersion()
+print(f"版本已更改至{ver}")
