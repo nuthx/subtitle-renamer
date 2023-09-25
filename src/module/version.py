@@ -8,7 +8,7 @@ def currentVersion():
 
 
 def latestVersion():
-    url = "https://cdn.jsdelivr.net/gh/nuthx/subtitle-renamer/build.spec"
+    url = "https://raw.githubusercontent.com/nuthx/subtitle-renamer/main/build.spec"
     response = requests.get(url)
     response_text = response.text.split('\n')
 
