@@ -113,27 +113,28 @@ class MyMainWindow(QMainWindow, MainWindow):
         more_extension = self.config.get("Video", "more_extension")
 
         # 排除已分析过的内容
-        split_list = []
+        self.split_list = []
         for item in self.file_list:
             if item not in self.video_list + self.sc_list + self.tc_list:
-                split_list.append([item, more_extension])
+                self.split_list.append([item, more_extension])
 
         # 多进程启动
-        results = self.pool.map(splitList, split_list)
+        results = self.pool.map(splitList, self.split_list)
 
         # 合并视频和字幕列表
+        self.error_list = []
         for result in results:
-            self.video_list.extend(result[0])
-            self.sc_list.extend(result[1])
-            self.tc_list.extend(result[2])
-
-        # 重要：排序
-        self.video_list.sort()
-        self.sc_list.sort()
-        self.tc_list.sort()
+            if result[1] == "video":
+                self.video_list.append(result[0])
+            elif result[1] == "sc":
+                self.sc_list.append(result[0])
+            elif result[1] == "tc":
+                self.tc_list.append(result[0])
+            elif result[1] == "error":
+                self.error_list.append(result[0])
+                self.file_list.remove(result[0])
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
-        self.item_num = len(split_list)
 
     def dropFinish(self):
         self.video_list = sorted(self.video_list)
@@ -143,14 +144,17 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.showInTable()
         self.spinner.setVisible(False)
 
-        if self.item_num == 0:
+        if len(self.split_list) == 0:
             self.showInfo("warning", "", "没有新增文件")
         elif self.used_time > 1000:
             used_time_s = "{:.2f}".format(self.used_time / 1000)  # 取 2 位小数
-            self.showInfo("success", f"已添加{self.item_num}个文件", f"耗时{used_time_s}s")
+            self.showInfo("success", f"已添加{len(self.split_list)}个文件", f"耗时{used_time_s}s")
         else:
             used_time_ms = "{:.0f}".format(self.used_time)  # 舍弃小数
-            self.showInfo("success", f"已添加{self.item_num}个文件", f"耗时{used_time_ms}ms")
+            self.showInfo("success", f"已添加{len(self.split_list)}个文件", f"耗时{used_time_ms}ms")
+
+        if len(self.error_list) != 0:
+            self.showInfo("error", "", f"有{len(self.error_list)}个字幕无法识别")
 
     def showInTable(self):
         # 计算列表行数

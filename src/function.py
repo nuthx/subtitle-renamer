@@ -41,23 +41,19 @@ def splitList(comb_list):
 
     subtitle_extension = ["ass", "ssa", "srt"]
 
-    video_list = []
-    sc_list = []
-    tc_list = []
-
     # 视频文件
     if file_extension in video_extension:
-        video_list.append(file_name)
+        return file_name, "video"
 
     # 字幕文件
     elif file_extension in subtitle_extension:
-        sub_language = detectSubLanguage(file_name)
-        if sub_language == "sc":
-            sc_list.append(file_name)
-        elif sub_language == "tc":
-            tc_list.append(file_name)
+        try:
+            sub_language = detectSubLanguage(file_name)
+        except Exception as e:
+            print(e)
+            sub_language = "error"
 
-    return video_list, sc_list, tc_list
+        return file_name, sub_language
 
 
 def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
