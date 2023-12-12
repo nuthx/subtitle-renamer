@@ -30,7 +30,7 @@ def initConfig(config_file):
     config = configparser.ConfigParser()
 
     config.add_section("Application")
-    config.set("Application", "version", "1.4")
+    config.set("Application", "version", "1.5")
     config.set("Application", "sc", "true")
     config.set("Application", "tc", "false")
 
@@ -47,6 +47,9 @@ def initConfig(config_file):
     config.set("Counter", "open_times", "0")
     config.set("Counter", "rename_times", "0")
     config.set("Counter", "rename_num", "0")
+
+    config.add_section("Video")
+    config.set("Video", "more_extension", "")
 
     # 写入配置内容
     with open(config_file, "w", encoding="utf-8") as content:
@@ -86,7 +89,7 @@ def updateConfigFile(config_file):
     rename_num = config.get("Counter", "rename_num")
 
     # 版本不符则重建配置文件
-    if not config.has_section("Application") or config.get("Application", "version") != "1.4":
+    if not config.has_section("Application") or config.get("Application", "version") != "1.5":
         os.remove(config_file)
         initConfig(config_file)
 
