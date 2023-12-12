@@ -4,6 +4,7 @@ import shutil
 import codecs
 import chardet
 
+from src.module.config import readConfig
 from src.module.detectsub import detectSubLanguage
 
 
@@ -30,35 +31,32 @@ def formatRawFileList(raw_file_list, file_list):
     return file_list
 
 
-def splitList(file_name):
+def splitList(comb_list):
+    file_name = comb_list[0]
+    file_struct = file_name.split(".")
+    file_extension = file_struct[-1].lower()
+
+    video_extension = ["mkv", "mp4", "avi", "flv", "webm", "m4v", "mov", "rm", "rmvb"]
+    video_extension.extend([item.strip() for item in comb_list[1].split(",")])
+
+    subtitle_extension = ["ass", "ssa", "srt"]
+
     video_list = []
     sc_list = []
     tc_list = []
 
-    video_extension = ["mkv", "mp4", "avi", "flv", "webm", "m4v", "mov", "3gp", "rm", "rmvb"]
-    subtitle_extension = ["ass", "ssa", "srt"]
-    # sc_part = ["sc.", "chs.", "[sc]", "[chs]", "sc_", "chs_", "track3", "Subtitles03"]
-    # tc_part = ["tc.", "cht.", "[tc]", "[cht]", "tc_", "cht_", "track4", "Subtitles04"]
-
-    name_struct = file_name.split(".")
-    extension = name_struct[-1].lower()
-
     # 视频文件
-    if extension in video_extension:
+    if file_extension in video_extension:
         video_list.append(file_name)
 
     # 字幕文件
-    elif extension in subtitle_extension:
+    elif file_extension in subtitle_extension:
         sub_language = detectSubLanguage(file_name)
         if sub_language == "sc":
             sc_list.append(file_name)
         elif sub_language == "tc":
             tc_list.append(file_name)
 
-    # 重要：排序
-    video_list.sort()
-    sc_list.sort()
-    tc_list.sort()
     return video_list, sc_list, tc_list
 
 

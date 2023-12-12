@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PySide6.QtGui import QIcon
-from qfluentwidgets import PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox
+from qfluentwidgets import PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox, LineEdit
 
 from src.module.resource import getResource
 
@@ -19,6 +19,24 @@ class SettingWindow(object):
 
         # 标题
 
+        self.videoTypeTitle = QLabel("视频格式设置")
+        self.videoTypeTitle.setObjectName("settingTitle")
+        self.videoTypeTitle.setIndent(22)
+
+        # 简体扩展名
+
+        self.videoTitle = QLabel("简体字幕扩展名")
+        self.videoInfo = QLabel("用于支持更多视频格式，扩展名使用英文逗号分隔，如 rm, rmvb")
+
+        self.videoFormat = LineEdit(self)
+        self.videoFormat.setMinimumWidth(240)
+        self.videoFormat.setMaximumWidth(240)
+        self.videoFormat.setPlaceholderText("默认已支持常见视频文件")
+
+        self.videoCard = self.settingCard(self.videoTitle, self.videoInfo, self.videoFormat)
+
+        # 标题
+
         self.extensionTitle = QLabel("扩展名设置")
         self.extensionTitle.setObjectName("settingTitle")
         self.extensionTitle.setIndent(22)
@@ -29,8 +47,8 @@ class SettingWindow(object):
         self.scInfo = QLabel("默认为空，设置后会显示在字幕扩展名之前")
 
         self.scFormat = EditableComboBox(self)
-        self.scFormat.setMinimumWidth(200)
-        self.scFormat.setMaximumWidth(200)
+        self.scFormat.setMinimumWidth(240)
+        self.scFormat.setMaximumWidth(240)
         self.scFormat.addItems([".sc", ".chs", ".zh-Hans"])
         self.scFormat.setPlaceholderText("不添加简体扩展名")
 
@@ -42,8 +60,8 @@ class SettingWindow(object):
         self.tcInfo = QLabel("默认为空，设置后会显示在字幕扩展名之前")
 
         self.tcFormat = EditableComboBox(self)
-        self.tcFormat.setMinimumWidth(200)
-        self.tcFormat.setMaximumWidth(200)
+        self.tcFormat.setMinimumWidth(240)
+        self.tcFormat.setMaximumWidth(240)
         self.tcFormat.addItems([".tc", ".cht", ".zh-Hant"])
         self.tcFormat.setPlaceholderText("不添加繁体扩展名")
 
@@ -83,8 +101,8 @@ class SettingWindow(object):
         self.encodeInfo = QLabel("重命名后将字幕编码转换为指定格式")
 
         self.encodeType = ComboBox(self)
-        self.encodeType.setMinimumWidth(200)
-        self.encodeType.setMaximumWidth(200)
+        self.encodeType.setMinimumWidth(240)
+        self.encodeType.setMaximumWidth(240)
         self.encodeType.addItems(["Never", "UTF-8", "UTF-8-SIG"])
         self.encodeType.setCurrentIndex(0)  # 默认第一个
         self.encodeCard = self.settingCard(self.encodeTitle, self.encodeInfo, self.encodeType)
@@ -108,6 +126,9 @@ class SettingWindow(object):
         layout = QVBoxLayout(this_window)
         layout.setSpacing(12)
         layout.setContentsMargins(24, 24, 24, 24)
+        layout.addWidget(self.videoTypeTitle)
+        layout.addWidget(self.videoCard)
+        layout.addSpacing(20)
         layout.addWidget(self.extensionTitle)
         layout.addWidget(self.scCard)
         layout.addWidget(self.tcCard)

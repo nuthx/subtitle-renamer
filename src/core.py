@@ -108,16 +108,29 @@ class MyMainWindow(QMainWindow, MainWindow):
     def dropThread(self):
         start_time = time.time()
 
+        # 拉取用户增加的视频格式
+        self.config = readConfig()
+        more_extension = self.config.get("Video", "more_extension")
+
         # 排除已分析过的内容
-        split_list = [item for item in self.file_list if item not in self.video_list + self.sc_list + self.tc_list]
+        split_list = []
+        for item in self.file_list:
+            if item not in self.video_list + self.sc_list + self.tc_list:
+                split_list.append([item, more_extension])
 
         # 多进程启动
         results = self.pool.map(splitList, split_list)
 
+        # 合并视频和字幕列表
         for result in results:
             self.video_list.extend(result[0])
             self.sc_list.extend(result[1])
             self.tc_list.extend(result[2])
+
+        # 重要：排序
+        self.video_list.sort()
+        self.sc_list.sort()
+        self.tc_list.sort()
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
         self.item_num = len(split_list)
@@ -451,6 +464,7 @@ class MySettingWindow(QDialog, SettingWindow):
         self.cancelButton.clicked.connect(lambda: self.close())  # 关闭窗口
 
     def loadConfig(self):
+        self.videoFormat.setText(self.config.get("Video", "more_extension"))
         self.scFormat.setText(self.config.get("Extension", "sc"))
         self.tcFormat.setText(self.config.get("Extension", "tc"))
         self.moveSubSwitch.setChecked(self.config.getboolean("General", "move_to_anime_folder"))
@@ -458,6 +472,7 @@ class MySettingWindow(QDialog, SettingWindow):
         self.encodeType.setCurrentText(self.config.get("General", "encode"))
 
     def saveConfig(self):
+        self.config.set("Video", "more_extension", self.videoFormat.text())
         self.config.set("Extension", "sc", self.scFormat.currentText())
         self.config.set("Extension", "tc", self.tcFormat.currentText())
         self.config.set("General", "move_to_anime_folder", str(self.moveSubSwitch.isChecked()).lower())
