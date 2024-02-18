@@ -73,17 +73,6 @@ class SettingWindow(object):
         self.otherTitle.setObjectName("settingTitle")
         self.otherTitle.setIndent(22)
 
-        # 移动字幕到视频文件夹
-
-        self.moveSubTitle = QLabel("移动字幕到视频文件夹")
-        self.moveSubInfo = QLabel("当前操作：重命名成功后移动字幕到视频文件夹")
-
-        self.moveSubSwitch = SwitchButton()
-        self.moveSubSwitch.setChecked(True)  # 默认开启
-        self.moveSubSwitch.checkedChanged.connect(self.moveSubFunction)
-
-        self.moveSubCard = self.settingCard(self.moveSubTitle, self.moveSubInfo, self.moveSubSwitch)
-
         # 删除没有重命名的字幕文件
 
         self.removeSubTitle = QLabel("删除多余字幕")
@@ -94,6 +83,20 @@ class SettingWindow(object):
         self.removeSubSwitch.checkedChanged.connect(self.removeSubFunction)
 
         self.removeSubCard = self.settingCard(self.removeSubTitle, self.removeSubInfo, self.removeSubSwitch)
+
+        # 移动字幕到视频文件夹
+
+        self.moveSubTitle = QLabel("移动字幕文件")
+        self.moveSubInfo = QLabel("当前操作：重命名成功后，移动字幕到视频文件夹")
+
+        self.moveSubSwitch = ComboBox(self)
+        self.moveSubSwitch.setMinimumWidth(240)
+        self.moveSubSwitch.setMaximumWidth(240)
+        self.moveSubSwitch.addItems(["不移动", "复制字幕", "剪切字幕"])
+        self.moveSubSwitch.setCurrentIndex(0)  # 默认第一个
+        self.moveSubSwitch.currentIndexChanged.connect(self.moveSubFunction)
+
+        self.moveSubCard = self.settingCard(self.moveSubTitle, self.moveSubInfo, self.moveSubSwitch)
 
         # 转换字幕编码至UTF-8
 
@@ -134,8 +137,8 @@ class SettingWindow(object):
         layout.addWidget(self.tcCard)
         layout.addSpacing(20)
         layout.addWidget(self.otherTitle)
-        layout.addWidget(self.moveSubCard)
         layout.addWidget(self.removeSubCard)
+        layout.addWidget(self.moveSubCard)
         layout.addWidget(self.encodeCard)
         layout.addSpacing(12)
         layout.addLayout(self.buttonLayout)
@@ -162,14 +165,16 @@ class SettingWindow(object):
 
         return self.cardFrame
 
-    def moveSubFunction(self, state):
-        if state:
-            self.moveSubInfo.setText("当前操作：重命名成功后移动字幕到视频文件夹")
-        else:
-            self.moveSubInfo.setText("当前操作：仅重命名字幕，不移动文件位置")
-
     def removeSubFunction(self, state):
         if state:
             self.removeSubInfo.setText("当前操作：没有选择的字幕语言将在重命名后被删除")
         else:
             self.removeSubInfo.setText("当前操作：仅重命名字幕，不删除任何文件")
+
+    def moveSubFunction(self):
+        if self.moveSubSwitch.currentIndex() == 0:
+            self.moveSubInfo.setText("当前操作：仅重命名字幕，不移动文件位置")
+        elif self.moveSubSwitch.currentIndex() == 1:
+            self.moveSubInfo.setText("当前操作：重命名成功后，复制字幕到视频文件夹")
+        elif self.moveSubSwitch.currentIndex() == 2:
+            self.moveSubInfo.setText("当前操作：重命名成功后,剪切字幕到视频文件夹")
