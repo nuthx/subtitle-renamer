@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     tags:
-      - 1.*
+      - '*'
 
 jobs:
   build:
@@ -28,41 +28,67 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
 
-    - name: Build (Windows)
-      if: ${{ runner.os == 'windows' }}
-      run: |
-        pyinstaller build.spec
-
-    - name: Build (macOS)
-      if: ${{ runner.os == 'macos' }}
-      run: |
-        pyinstaller build.spec
-        
-    - name: Build (Linux)
-      if: ${{ runner.os == 'linux' }}
-      run: |
-        pyinstaller build.spec
+    - name: Build
+      run: pyinstaller build.spec
         
     - name: Upload (Windows)
       if: ${{ runner.os == 'windows' }}
       uses: actions/upload-artifact@v3
       with:
         name: SubtitleRenamer_windows
-        path: |
-          dist/*.exe
+        path: dist/*.exe
 
     - name: Upload (macOS)
       if: ${{ runner.os == 'macos' }}
       uses: actions/upload-artifact@v3
       with:
         name: SubtitleRenamer_mac_x86
-        path: |
-          dist/*.app
+        path: dist/*.app
 
     - name: Upload (Linux)
       if: ${{ runner.os == 'linux' }}
       uses: actions/upload-artifact@v3
       with:
         name: SubtitleRenamer_linux
-        path: |
-          dist/*
+        path: dist/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v3
+
+      - name: Display files
+        run: ls -R
+
+      - name: Move files
+        run: |
+          cp -r SubtitleRenamer_mac_x86/SubtitleRenamer.app .
+          cp SubtitleRenamer_windows/SubtitleRenamer.exe .
+          cp SubtitleRenamer_linux/SubtitleRenamer .
+
+      - name: ZIP
+        run: |
+          zip -r SubtitleRenamer_mac_x86.zip SubtitleRenamer.app
+          zip SubtitleRenamer_windows.zip SubtitleRenamer.exe
+          zip SubtitleRenamer_linux.zip SubtitleRenamer
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: tag
+          draft: true
+          files: |
+            SubtitleRenamer_windows.zip
+            SubtitleRenamer_mac_x86.zip
+            SubtitleRenamer_linux.zip
+          name: 🎉
+          body: |
+            ## 新增
+            - 新增内容
+            
+            ## 优化
+            - 优化内容
