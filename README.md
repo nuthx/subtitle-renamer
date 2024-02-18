@@ -25,8 +25,8 @@
 - 优雅的 GUI 界面（使用 [PyQt-Fluent-Widgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets) 主题组件）
 - 自动识别简繁字幕文件
 - 自定义简繁后缀 ( `.sc` or `.tc` )
-- （可选）重命名完成后移动字幕至视频目录
 - （可选）删除未命名的字幕
+- （可选）复制或剪切字幕至视频目录
 - （可选）转换字幕编码至 UTF-8 或 UTF-8-SIG
 
 ## 格式支持
