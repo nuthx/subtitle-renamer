@@ -123,6 +123,7 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         # 合并视频和字幕列表
         self.error_list = []
+        self.other_list = []
         for result in results:
             if result[1] == "video":
                 self.video_list.append(result[0])
@@ -132,6 +133,9 @@ class MyMainWindow(QMainWindow, MainWindow):
                 self.tc_list.append(result[0])
             elif result[1] == "error":
                 self.error_list.append(result[0])
+                self.file_list.remove(result[0])
+            elif result[1] == "other":
+                self.other_list.append(result[0])
                 self.file_list.remove(result[0])
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
@@ -155,6 +159,9 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         if len(self.error_list) != 0:
             self.showInfo("error", "", f"有{len(self.error_list)}个字幕无法识别")
+
+        if len(self.other_list) != 0:
+            self.showInfo("warning", "", f"已过滤{len(self.other_list)}个文件")
 
     def showInTable(self):
         # 计算列表行数
