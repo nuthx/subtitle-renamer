@@ -55,6 +55,10 @@ def splitList(comb_list):
 
         return file_name, sub_language
 
+    # 其他文件
+    else:
+        return file_name, "other"
+
 
 def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
     new_sub_list = []
