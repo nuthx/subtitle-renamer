@@ -30,7 +30,7 @@ def initConfig(config_file):
     config = configparser.ConfigParser()
 
     config.add_section("Application")
-    config.set("Application", "version", "1.5")
+    config.set("Application", "version", "1.6")
     config.set("Application", "sc", "true")
     config.set("Application", "tc", "false")
 
@@ -39,8 +39,8 @@ def initConfig(config_file):
     config.set("Extension", "tc", "")
 
     config.add_section("General")
-    config.set("General", "move_to_anime_folder", "true")
     config.set("General", "remove_unused_sub", "true")
+    config.set("General", "move_renamed_sub", "0")
     config.set("General", "encode", "Never")
 
     config.add_section("Counter")
@@ -64,11 +64,11 @@ def checkConfig(config, config_file):
     if config.get("Application", "tc") not in ["true", "false"]:
         config.set("Application", "tc", "false")
 
-    if config.get("General", "move_to_anime_folder") not in ["true", "false"]:
-        config.set("General", "move_to_anime_folder", "true")
-
     if config.get("General", "remove_unused_sub") not in ["true", "false"]:
         config.set("General", "remove_unused_sub", "true")
+
+    if config.get("General", "move_renamed_sub") not in ["0", "1", "2"]:
+        config.set("General", "move_renamed_sub", "0")
 
     if config.get("General", "encode") not in ["Never", "UTF-8", "UTF-8-SIG"]:
         config.set("General", "encode", "Never")
@@ -89,7 +89,7 @@ def updateConfigFile(config_file):
     rename_num = config.get("Counter", "rename_num")
 
     # 版本不符则重建配置文件
-    if not config.has_section("Application") or config.get("Application", "version") != "1.5":
+    if not config.has_section("Application") or config.get("Application", "version") != "1.6":
         os.remove(config_file)
         initConfig(config_file)
 
