@@ -112,7 +112,7 @@ def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
         shutil.copy(this_sub, new_sub)
 
         # 若设置剪切，则删除源路径的字幕
-        if move_to_folder == 2:
+        if move_to_folder != 1:
             os.remove(this_sub)
 
         sub_id_b += 1
