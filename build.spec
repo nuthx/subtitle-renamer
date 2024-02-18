@@ -49,5 +49,5 @@ app = BUNDLE(
     name='SubtitleRenamer.app',
     icon='image/icon.icns',
     bundle_identifier=None,
-    version='1.5',
+    version='1.6',
 )

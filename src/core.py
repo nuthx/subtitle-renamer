@@ -123,6 +123,7 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         # 合并视频和字幕列表
         self.error_list = []
+        self.other_list = []
         for result in results:
             if result[1] == "video":
                 self.video_list.append(result[0])
@@ -132,6 +133,9 @@ class MyMainWindow(QMainWindow, MainWindow):
                 self.tc_list.append(result[0])
             elif result[1] == "error":
                 self.error_list.append(result[0])
+                self.file_list.remove(result[0])
+            elif result[1] == "other":
+                self.other_list.append(result[0])
                 self.file_list.remove(result[0])
 
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
@@ -155,6 +159,9 @@ class MyMainWindow(QMainWindow, MainWindow):
 
         if len(self.error_list) != 0:
             self.showInfo("error", "", f"有{len(self.error_list)}个字幕无法识别")
+
+        if len(self.other_list) != 0:
+            self.showInfo("warning", "", f"已过滤{len(self.other_list)}个文件")
 
     def showInTable(self):
         # 计算列表行数
@@ -332,8 +339,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.sc_extension = self.config.get("Extension", "sc")
         self.tc_extension = self.config.get("Extension", "tc")
 
-        self.move_to_folder = self.config.getboolean("General", "move_to_anime_folder")
         self.remove_unused = self.config.getboolean("General", "remove_unused_sub")
+        self.move_to_folder = self.config.getint("General", "move_renamed_sub")
         self.encode = self.config.get("General", "encode")
 
     def renameCheck(self):
@@ -471,16 +478,16 @@ class MySettingWindow(QDialog, SettingWindow):
         self.videoFormat.setText(self.config.get("Video", "more_extension"))
         self.scFormat.setText(self.config.get("Extension", "sc"))
         self.tcFormat.setText(self.config.get("Extension", "tc"))
-        self.moveSubSwitch.setChecked(self.config.getboolean("General", "move_to_anime_folder"))
         self.removeSubSwitch.setChecked(self.config.getboolean("General", "remove_unused_sub"))
+        self.moveSubSwitch.setCurrentIndex(self.config.getint("General", "move_renamed_sub"))
         self.encodeType.setCurrentText(self.config.get("General", "encode"))
 
     def saveConfig(self):
         self.config.set("Video", "more_extension", self.videoFormat.text())
         self.config.set("Extension", "sc", self.scFormat.currentText())
         self.config.set("Extension", "tc", self.tcFormat.currentText())
-        self.config.set("General", "move_to_anime_folder", str(self.moveSubSwitch.isChecked()).lower())
         self.config.set("General", "remove_unused_sub", str(self.removeSubSwitch.isChecked()).lower())
+        self.config.set("General", "move_renamed_sub", str(self.moveSubSwitch.currentIndex()))
         self.config.set("General", "encode", self.encodeType.currentText())
 
         with open(configPath()[1], "w", encoding="utf-8") as content:

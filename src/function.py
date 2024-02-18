@@ -55,6 +55,10 @@ def splitList(comb_list):
 
         return file_name, sub_language
 
+    # 其他文件
+    else:
+        return file_name, "other"
+
 
 def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
     new_sub_list = []
@@ -71,10 +75,10 @@ def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
         separator = os.sep  # 系统路径分隔符
 
         # 是否要移动至视频文件夹
-        if move_to_folder:
-            new_sub = this_video_path + separator + this_video_name + lang_format + this_sub_extension
-        else:
+        if move_to_folder == 0:
             new_sub = this_sub_path + separator + this_video_name + lang_format + this_sub_extension
+        else:
+            new_sub = this_video_path + separator + this_video_name + lang_format + this_sub_extension
 
         new_sub_list.append(new_sub)
         new_sub_list.sort()
@@ -106,5 +110,9 @@ def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
     for this_sub in sub_list:
         new_sub = new_sub_list[sub_id_b]
         shutil.copy(this_sub, new_sub)
-        os.remove(this_sub)
+
+        # 若设置剪切，则删除源路径的字幕
+        if move_to_folder == 2:
+            os.remove(this_sub)
+
         sub_id_b += 1
