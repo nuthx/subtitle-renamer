@@ -19,6 +19,26 @@ class SettingWindow(object):
 
         # 标题
 
+        self.themeTitle = QLabel("主题设置")
+        self.themeTitle.setObjectName("settingTitle")
+        self.themeTitle.setIndent(22)
+
+        # 设置主题模式
+
+        self.themeSelectTitle = QLabel("主题模式")
+        self.themeSelectInfo = QLabel("当前主题：跟随系统")
+
+        self.themeSelectSwitch = ComboBox(self)
+        self.themeSelectSwitch.setMinimumWidth(240)
+        self.themeSelectSwitch.setMaximumWidth(240)
+        self.themeSelectSwitch.addItems(["跟随系统", "浅色模式", "深色模式"])
+        self.themeSelectSwitch.setCurrentIndex(0)  # 默认第一个
+        self.themeSelectSwitch.currentIndexChanged.connect(self.themeSelectFunction)
+
+        self.themeSelectCard = self.settingCard(self.themeSelectTitle, self.themeSelectInfo, self.themeSelectSwitch)
+
+        # 标题
+
         self.videoTypeTitle = QLabel("视频格式设置")
         self.videoTypeTitle.setObjectName("settingTitle")
         self.videoTypeTitle.setIndent(22)
@@ -129,6 +149,9 @@ class SettingWindow(object):
         layout = QVBoxLayout(this_window)
         layout.setSpacing(12)
         layout.setContentsMargins(24, 24, 24, 24)
+        layout.addWidget(self.themeTitle)
+        layout.addWidget(self.themeSelectCard)
+        layout.addSpacing(20)
         layout.addWidget(self.videoTypeTitle)
         layout.addWidget(self.videoCard)
         layout.addSpacing(20)
@@ -178,3 +201,12 @@ class SettingWindow(object):
             self.moveSubInfo.setText("当前操作：重命名成功后，复制字幕到视频文件夹")
         elif self.moveSubSwitch.currentIndex() == 2:
             self.moveSubInfo.setText("当前操作：重命名成功后,剪切字幕到视频文件夹")
+
+    def themeSelectFunction(self):
+        if self.themeSelectSwitch.currentIndex() == 0:
+            self.themeSelectInfo.setText("当前主题：跟随系统")
+        elif self.themeSelectSwitch.currentIndex() == 1:
+            self.themeSelectInfo.setText("当前主题：浅色模式")
+        elif self.themeSelectSwitch.currentIndex() == 2:
+            self.themeSelectInfo.setText("当前主题：深色模式")
+
