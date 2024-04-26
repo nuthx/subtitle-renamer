@@ -7,7 +7,7 @@ from natsort import natsorted
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QCoreApplication, QUrl
 from PySide6.QtGui import QDesktopServices
-from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
+from qfluentwidgets import Theme, setTheme, MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
 
 from src.gui.mainwindow import MainWindow
 from src.gui.about import AboutWindow
@@ -334,6 +334,14 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.showInfo("success", "", "重命名成功")
 
     def loadConfig(self):
+        theme = self.config.get("Application", "theme")
+        if theme == "0":
+            setTheme(Theme.AUTO)
+        elif theme == "1":
+            setTheme(Theme.LIGHT)
+        elif theme == "2":
+            setTheme(Theme.DARK)
+
         self.allowSc.setChecked(self.config.getboolean("Application", "sc"))
         self.allowTc.setChecked(self.config.getboolean("Application", "tc"))
 
@@ -476,6 +484,7 @@ class MySettingWindow(QDialog, SettingWindow):
         self.cancelButton.clicked.connect(lambda: self.close())  # 关闭窗口
 
     def loadConfig(self):
+        self.themeSelectSwitch.setCurrentIndex(self.config.getint("Application", "theme"))
         self.videoFormat.setText(self.config.get("Video", "more_extension"))
         self.scFormat.setText(self.config.get("Extension", "sc"))
         self.tcFormat.setText(self.config.get("Extension", "tc"))
@@ -484,6 +493,7 @@ class MySettingWindow(QDialog, SettingWindow):
         self.encodeType.setCurrentText(self.config.get("General", "encode"))
 
     def saveConfig(self):
+        self.config.set("Application", "theme", str(self.themeSelectSwitch.currentIndex()))
         self.config.set("Video", "more_extension", self.videoFormat.text())
         self.config.set("Extension", "sc", self.scFormat.currentText())
         self.config.set("Extension", "tc", self.tcFormat.currentText())

@@ -30,7 +30,8 @@ def initConfig(config_file):
     config = configparser.ConfigParser()
 
     config.add_section("Application")
-    config.set("Application", "version", "1.6")
+    config.set("Application", "version", "1.7")
+    config.set("Application", "theme", "0")
     config.set("Application", "sc", "true")
     config.set("Application", "tc", "false")
 
@@ -58,6 +59,9 @@ def initConfig(config_file):
 
 # 检测配置文件合法性
 def checkConfig(config, config_file):
+    if config.get("Application", "theme") not in ["0", "1", "2"]:
+        config.set("Application", "theme", "0")
+
     if config.get("Application", "sc") not in ["true", "false"]:
         config.set("Application", "sc", "true")
 
@@ -89,7 +93,7 @@ def updateConfigFile(config_file):
     rename_num = config.get("Counter", "rename_num")
 
     # 版本不符则重建配置文件
-    if not config.has_section("Application") or config.get("Application", "version") != "1.6":
+    if not config.has_section("Application") or config.get("Application", "version") != "1.7":
         os.remove(config_file)
         initConfig(config_file)
 
