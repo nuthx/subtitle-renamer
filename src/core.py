@@ -3,6 +3,7 @@ import send2trash
 import subprocess
 import threading
 import multiprocessing
+from natsort import natsorted
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QCoreApplication, QUrl
 from PySide6.QtGui import QDesktopServices
@@ -141,9 +142,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
 
     def dropFinish(self):
-        self.video_list = sorted(self.video_list)
-        self.sc_list = sorted(self.sc_list)
-        self.tc_list = sorted(self.tc_list)
+        self.video_list = natsorted(self.video_list)
+        self.sc_list = natsorted(self.sc_list)
+        self.tc_list = natsorted(self.tc_list)
 
         self.showInTable()
         self.spinner.setVisible(False)
@@ -254,8 +255,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         pop = self.tc_list.pop(row)
         self.sc_list.append(pop)
 
-        self.sc_list = sorted(self.sc_list)
-        self.tc_list = sorted(self.tc_list)
+        self.sc_list = natsorted(self.sc_list)
+        self.tc_list = natsorted(self.tc_list)
 
         self.table.clearContents()
         self.table.setRowCount(0)
@@ -265,8 +266,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         pop = self.sc_list.pop(row)
         self.tc_list.append(pop)
 
-        self.sc_list = sorted(self.sc_list)
-        self.tc_list = sorted(self.tc_list)
+        self.sc_list = natsorted(self.sc_list)
+        self.tc_list = natsorted(self.tc_list)
 
         self.table.clearContents()
         self.table.setRowCount(0)

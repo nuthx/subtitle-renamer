@@ -6,3 +6,4 @@ hanzidentifier~=1.1.0
 Send2Trash~=1.8.2
 joblib~=1.2.0
 requests
+natsort~=8.4.0
