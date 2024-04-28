@@ -4,7 +4,6 @@ import shutil
 import codecs
 import chardet
 
-from src.module.config import readConfig
 from src.module.detectsub import detectSubLanguage
 
 
@@ -60,36 +59,34 @@ def splitList(comb_list):
         return file_name, "other"
 
 
+# 重命名动作，简繁体会分别执行一次renameAction，因此不需要区分运行时是简体还是繁体
+# - lang_format: 用户定义的简繁体后缀
+# - video_list: 视频文件列表
+# - sub_list: 字幕文件列表
+# - move_to_folder: 是否要移动至视频文件夹
+# - encode: 是否要编码转换
 def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
+    # 1 => 根据规则输出改名后的完整字幕路径列表
     new_sub_list = []
-    sub_id_a = 0
-    sub_id_b = 0
+    for i in range(len(video_list)):
+        this_video_path = os.path.dirname(video_list[i])  # 视频路径
+        this_video_name = os.path.splitext(os.path.basename(video_list[i]))[0]  # 视频文件名（不含扩展名）
+        this_sub_path = os.path.dirname(sub_list[i])  # 字幕路径
+        this_sub_extension = os.path.splitext(os.path.basename(sub_list[i]))[-1]  # 字幕扩展名
 
-    # 新字幕名存入 new_sub_list
-    for this_video in video_list:
-        this_sub = sub_list[sub_id_a]
-        this_video_name = os.path.splitext(os.path.basename(this_video))[0]  # 视频文件名（无扩展名）
-        this_video_path = os.path.dirname(this_video)  # 视频路径
-        this_sub_path = os.path.dirname(this_sub)  # 字幕路径
-        this_sub_extension = os.path.splitext(os.path.basename(this_sub))[-1]  # 字幕扩展名
-        separator = os.sep  # 系统路径分隔符
-
-        # 是否要移动至视频文件夹
         if move_to_folder == 0:
-            new_sub = this_sub_path + separator + this_video_name + lang_format + this_sub_extension
+            # 保持原位(append自动添加到末尾)
+            new_sub_list.append(os.path.join(this_sub_path, this_video_name + lang_format + this_sub_extension))
         else:
-            new_sub = this_video_path + separator + this_video_name + lang_format + this_sub_extension
+            # 移动至视频文件夹
+            new_sub_list.append(os.path.join(this_video_path, this_video_name + lang_format + this_sub_extension))
 
-        new_sub_list.append(new_sub)
-        new_sub_list.sort()
-        sub_id_a += 1
-
-    # 目标目录是否存在同名文件
+    # 2 => 检查目标目录是否存在同名文件
     for new_sub in new_sub_list:
         if os.path.exists(new_sub):
             return 516
 
-    # 1 => 修改编码
+    # 3 => 修改编码
     if encode == "UTF-8" or encode == "UTF-8-SIG":
         for this_sub in sub_list:
             # 识别
@@ -106,13 +103,12 @@ def renameAction(lang_format, video_list, sub_list, move_to_folder, encode):
             with codecs.open(this_sub, "w", encoding=encode, errors="ignore") as file:
                 file.write(content)
 
-    # 2 => 重命名
-    for this_sub in sub_list:
-        new_sub = new_sub_list[sub_id_b]
-        shutil.copy(this_sub, new_sub)
+    # 4 => 重命名
+    for i in range(len(new_sub_list)):
+        # 重命名
+        # noinspection PyTypeChecker
+        shutil.copy(sub_list[i], new_sub_list[i])
 
         # 若设置剪切，则删除源路径的字幕
         if move_to_folder != 1:
-            os.remove(this_sub)
-
-        sub_id_b += 1
+            os.remove(sub_list[i])

@@ -1,21 +1,37 @@
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PySide6.QtGui import QIcon
-from qfluentwidgets import PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox, LineEdit
+from qfluentwidgets import (Theme, setTheme, PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox,
+                            LineEdit, setThemeColor, qconfig)
 
 from src.module.resource import getResource
 
 
 class SettingWindow(object):
     def setupUI(self, this_window):
-        # 加载 QSS
-        with open(getResource("src/style/style_light.qss"), "r", encoding="UTF-8") as file:
-            style_sheet = file.read()
-        this_window.setStyleSheet(style_sheet)
-
         this_window.setWindowTitle("设置")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
         this_window.resize(800, -1)
         this_window.setFixedSize(self.size())  # 禁止拉伸窗口
+
+        # 标题
+
+        self.themeTitle = QLabel("主题设置")
+        self.themeTitle.setObjectName("settingTitle")
+        self.themeTitle.setIndent(22)
+
+        # 设置主题模式
+
+        self.themeSelectTitle = QLabel("主题模式")
+        self.themeSelectInfo = QLabel("当前主题：跟随系统")
+
+        self.themeSelectSwitch = ComboBox(self)
+        self.themeSelectSwitch.setMinimumWidth(240)
+        self.themeSelectSwitch.setMaximumWidth(240)
+        self.themeSelectSwitch.addItems(["跟随系统", "浅色模式", "深色模式"])
+        self.themeSelectSwitch.setCurrentIndex(0)  # 默认第一个
+        self.themeSelectSwitch.currentIndexChanged.connect(self.themeSelectFunction)
+
+        self.themeSelectCard = self.settingCard(self.themeSelectTitle, self.themeSelectInfo, self.themeSelectSwitch)
 
         # 标题
 
@@ -129,6 +145,9 @@ class SettingWindow(object):
         layout = QVBoxLayout(this_window)
         layout.setSpacing(12)
         layout.setContentsMargins(24, 24, 24, 24)
+        layout.addWidget(self.themeTitle)
+        layout.addWidget(self.themeSelectCard)
+        layout.addSpacing(20)
         layout.addWidget(self.videoTypeTitle)
         layout.addWidget(self.videoCard)
         layout.addSpacing(20)
@@ -178,3 +197,20 @@ class SettingWindow(object):
             self.moveSubInfo.setText("当前操作：重命名成功后，复制字幕到视频文件夹")
         elif self.moveSubSwitch.currentIndex() == 2:
             self.moveSubInfo.setText("当前操作：重命名成功后,剪切字幕到视频文件夹")
+
+    def themeSelectFunction(self):
+        if self.themeSelectSwitch.currentIndex() == 0:
+            self.themeSelectInfo.setText("当前主题：跟随系统")
+            setTheme(Theme.AUTO)
+            if qconfig.theme == Theme.LIGHT:
+                setThemeColor("#1B96DE")
+            elif qconfig.theme == Theme.DARK:
+                setThemeColor("#4EC8FA")
+        elif self.themeSelectSwitch.currentIndex() == 1:
+            self.themeSelectInfo.setText("当前主题：浅色模式")
+            setTheme(Theme.LIGHT)
+            setThemeColor("#1B96DE")
+        elif self.themeSelectSwitch.currentIndex() == 2:
+            self.themeSelectInfo.setText("当前主题：深色模式")
+            setTheme(Theme.DARK)
+            setThemeColor("#4EC8FA")

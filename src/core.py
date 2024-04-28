@@ -3,10 +3,12 @@ import send2trash
 import subprocess
 import threading
 import multiprocessing
+from natsort import natsorted
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QCoreApplication, QUrl
 from PySide6.QtGui import QDesktopServices
-from qfluentwidgets import MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
+from qfluentwidgets import (Theme, setTheme, MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon,
+                            setThemeColor, qconfig)
 
 from src.gui.mainwindow import MainWindow
 from src.gui.about import AboutWindow
@@ -14,6 +16,7 @@ from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
 from src.module.counter import *
+from src.module.theme import StyleSheet
 from src.module.version import newVersion
 
 
@@ -27,6 +30,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.checkVersion()
         self.config = readConfig()
         self.loadConfig()
+        self.setTheme()
 
     # 软件关闭时销毁进程池
     def __del__(self):
@@ -34,6 +38,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.pool.join()
 
     def initUI(self):
+        StyleSheet.WINDOW.apply(self)  # 应用主题样式表
+
         addOpenTimes(readConfig(), configPath())
 
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -65,6 +71,22 @@ class MyMainWindow(QMainWindow, MainWindow):
     def checkVersionThread(self):
         if newVersion():
             self.newVersionButton.setVisible(True)
+
+    def setTheme(self):
+        # 从配置中读取主题样式
+        theme = self.config.get("Application", "theme")
+        if theme == "0":
+            setTheme(Theme.AUTO)
+            if qconfig.theme == Theme.LIGHT:
+                setThemeColor("#1B96DE")
+            elif qconfig.theme == Theme.DARK:
+                setThemeColor("#4EC8FA")
+        elif theme == "1":
+            setTheme(Theme.LIGHT)
+            setThemeColor("#1B96DE")
+        elif theme == "2":
+            setTheme(Theme.DARK)
+            setThemeColor("#4EC8FA")
 
     def saveCheckBox(self):
         self.config.set("Application", "sc", str(self.allowSc.isChecked()).lower())
@@ -141,9 +163,9 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.used_time = (time.time() - start_time) * 1000  # 计时结束
 
     def dropFinish(self):
-        self.video_list = sorted(self.video_list)
-        self.sc_list = sorted(self.sc_list)
-        self.tc_list = sorted(self.tc_list)
+        self.video_list = natsorted(self.video_list)
+        self.sc_list = natsorted(self.sc_list)
+        self.tc_list = natsorted(self.tc_list)
 
         self.showInTable()
         self.spinner.setVisible(False)
@@ -254,8 +276,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         pop = self.tc_list.pop(row)
         self.sc_list.append(pop)
 
-        self.sc_list = sorted(self.sc_list)
-        self.tc_list = sorted(self.tc_list)
+        self.sc_list = natsorted(self.sc_list)
+        self.tc_list = natsorted(self.tc_list)
 
         self.table.clearContents()
         self.table.setRowCount(0)
@@ -265,8 +287,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         pop = self.sc_list.pop(row)
         self.tc_list.append(pop)
 
-        self.sc_list = sorted(self.sc_list)
-        self.tc_list = sorted(self.tc_list)
+        self.sc_list = natsorted(self.sc_list)
+        self.tc_list = natsorted(self.tc_list)
 
         self.table.clearContents()
         self.table.setRowCount(0)
@@ -443,6 +465,7 @@ class MyAboutWindow(QDialog, AboutWindow):
         self.loadConfig()
 
     def initUI(self):
+        StyleSheet.WINDOW.apply(self)  # 应用主题样式表
         self.configPathButton.clicked.connect(self.openConfigPath)
 
     @staticmethod
@@ -471,10 +494,12 @@ class MySettingWindow(QDialog, SettingWindow):
         self.loadConfig()
 
     def initUI(self):
+        StyleSheet.WINDOW.apply(self)  # 应用主题样式表
         self.applyButton.clicked.connect(self.saveConfig)  # 保存配置
         self.cancelButton.clicked.connect(lambda: self.close())  # 关闭窗口
 
     def loadConfig(self):
+        self.themeSelectSwitch.setCurrentIndex(self.config.getint("Application", "theme"))
         self.videoFormat.setText(self.config.get("Video", "more_extension"))
         self.scFormat.setText(self.config.get("Extension", "sc"))
         self.tcFormat.setText(self.config.get("Extension", "tc"))
@@ -483,6 +508,7 @@ class MySettingWindow(QDialog, SettingWindow):
         self.encodeType.setCurrentText(self.config.get("General", "encode"))
 
     def saveConfig(self):
+        self.config.set("Application", "theme", str(self.themeSelectSwitch.currentIndex()))
         self.config.set("Video", "more_extension", self.videoFormat.text())
         self.config.set("Extension", "sc", self.scFormat.currentText())
         self.config.set("Extension", "tc", self.tcFormat.currentText())

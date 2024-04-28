@@ -1,9 +1,9 @@
 from PySide6.QtCore import Qt, QMetaObject
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QAbstractItemView, QHeaderView
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
-from qfluentwidgets import (setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon,
-                            ToolButton, IndeterminateProgressRing)
-from qfluentwidgets.common.style_sheet import styleSheetManager
+from qfluentwidgets import (PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon, ToolButton,
+                            IndeterminateProgressRing)
+from qfluentwidgets.common.style_sheet import setCustomStyleSheet
 
 from src.module.resource import getResource
 from src.module.version import currentVersion
@@ -11,15 +11,9 @@ from src.module.version import currentVersion
 
 class MainWindow(object):
     def setupUI(self, this_window):
-        # 配置主题色与字体
-        setThemeColor("#1B96DE")
+        # 配置字体
         font_id = QFontDatabase.addApplicationFont(getResource("src/font/Study-Bold.otf"))
         font_family = QFontDatabase.applicationFontFamilies(font_id)
-
-        # 加载 QSS
-        with open(getResource("src/style/style_light.qss"), "r", encoding="UTF-8") as file:
-            style_sheet = file.read()
-        this_window.setStyleSheet(style_sheet)
 
         this_window.setWindowTitle(f"SubtitleRenamer {currentVersion()}")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
@@ -75,9 +69,14 @@ class MainWindow(object):
         # self.table.setColumnWidth(0, 376)  # 1126
         # self.table.setColumnWidth(1, 375)
         # self.table.setColumnWidth(2, 375)
-        styleSheetManager.deregister(self.table)  # 禁用皮肤，启用自定义 QSS
-        with open(getResource("src/style/table.qss"), encoding="utf-8") as file:
-            self.table.setStyleSheet(file.read())
+
+        # 自定义表格 QSS
+        # styleSheetManager.deregister(self.table)  # 禁用皮肤
+        with open(getResource("src/style/table_light.qss"), encoding="utf-8") as file:
+            table_style_light = file.read()
+        with open(getResource("src/style/table_dark.qss"), encoding="utf-8") as file:
+            table_style_dark = file.read()
+        setCustomStyleSheet(self.table, table_style_light, table_style_dark)
 
         self.header = self.table.horizontalHeader()
         self.header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)  # 列宽平均分配
