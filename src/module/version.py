@@ -3,7 +3,7 @@ import requests
 
 
 def currentVersion():
-    current_version = "1.6"
+    current_version = "1.7"
     return current_version
 
 
