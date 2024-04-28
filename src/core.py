@@ -7,7 +7,8 @@ from natsort import natsorted
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QDialog
 from PySide6.QtCore import Qt, QPoint, QCoreApplication, QUrl
 from PySide6.QtGui import QDesktopServices
-from qfluentwidgets import Theme, setTheme, MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon
+from qfluentwidgets import (Theme, setTheme, MessageBox, InfoBar, InfoBarPosition, RoundMenu, Action, FluentIcon,
+                            setThemeColor, qconfig)
 
 from src.gui.mainwindow import MainWindow
 from src.gui.about import AboutWindow
@@ -76,10 +77,16 @@ class MyMainWindow(QMainWindow, MainWindow):
         theme = self.config.get("Application", "theme")
         if theme == "0":
             setTheme(Theme.AUTO)
+            if qconfig.theme == Theme.LIGHT:
+                setThemeColor("#1B96DE")
+            elif qconfig.theme == Theme.DARK:
+                setThemeColor("#4EC8FA")
         elif theme == "1":
             setTheme(Theme.LIGHT)
+            setThemeColor("#1B96DE")
         elif theme == "2":
             setTheme(Theme.DARK)
+            setThemeColor("#4EC8FA")
 
     def saveCheckBox(self):
         self.config.set("Application", "sc", str(self.allowSc.isChecked()).lower())

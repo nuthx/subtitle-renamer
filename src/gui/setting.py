@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PySide6.QtGui import QIcon
 from qfluentwidgets import (Theme, setTheme, PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox,
-                            LineEdit)
+                            LineEdit, setThemeColor, qconfig)
 
 from src.module.resource import getResource
 
@@ -202,9 +202,15 @@ class SettingWindow(object):
         if self.themeSelectSwitch.currentIndex() == 0:
             self.themeSelectInfo.setText("当前主题：跟随系统")
             setTheme(Theme.AUTO)
+            if qconfig.theme == Theme.LIGHT:
+                setThemeColor("#1B96DE")
+            elif qconfig.theme == Theme.DARK:
+                setThemeColor("#4EC8FA")
         elif self.themeSelectSwitch.currentIndex() == 1:
             self.themeSelectInfo.setText("当前主题：浅色模式")
             setTheme(Theme.LIGHT)
+            setThemeColor("#1B96DE")
         elif self.themeSelectSwitch.currentIndex() == 2:
             self.themeSelectInfo.setText("当前主题：深色模式")
             setTheme(Theme.DARK)
+            setThemeColor("#4EC8FA")

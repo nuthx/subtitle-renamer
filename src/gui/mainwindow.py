@@ -1,8 +1,8 @@
 from PySide6.QtCore import Qt, QMetaObject
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QAbstractItemView, QHeaderView
 from PySide6.QtGui import QFontDatabase, QFont, QIcon
-from qfluentwidgets import (setThemeColor, PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon,
-                            ToolButton, IndeterminateProgressRing)
+from qfluentwidgets import (PushButton, TableWidget, PrimaryPushButton, CheckBox, FluentIcon, ToolButton,
+                            IndeterminateProgressRing)
 from qfluentwidgets.common.style_sheet import setCustomStyleSheet
 
 from src.module.resource import getResource
@@ -11,8 +11,7 @@ from src.module.version import currentVersion
 
 class MainWindow(object):
     def setupUI(self, this_window):
-        # 配置主题色与字体
-        setThemeColor("#1B96DE")
+        # 配置字体
         font_id = QFontDatabase.addApplicationFont(getResource("src/font/Study-Bold.otf"))
         font_family = QFontDatabase.applicationFontFamilies(font_id)
 
