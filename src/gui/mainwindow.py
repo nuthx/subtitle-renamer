@@ -73,7 +73,7 @@ class MainWindow(object):
 
         # 自定义表格 QSS
         # styleSheetManager.deregister(self.table)  # 禁用皮肤
-        with open(getResource("src/style/table.qss"), encoding="utf-8") as file:
+        with open(getResource("src/style/table_light.qss"), encoding="utf-8") as file:
             table_style_light = file.read()
         with open(getResource("src/style/table_dark.qss"), encoding="utf-8") as file:
             table_style_dark = file.read()

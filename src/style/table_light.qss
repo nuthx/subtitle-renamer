@@ -1,9 +1,10 @@
 QTableView {
-    background: transparent;
+    background: #FFF;
     outline: none;
-    border: none;
+    border: 1px solid #EDEDED;
     selection-background-color: transparent;
     alternate-background-color: transparent;
+    border-radius: 8px;
 }
 
 QTableView::item {
@@ -20,7 +21,7 @@ QHeaderView {
 
 QHeaderView::section {
     background-color: transparent;
-    color: black;
+    color: #000;
     padding-left: 4px;
     padding-right: 4px;
     border: 1px solid #EDEDED;
