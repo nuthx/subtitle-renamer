@@ -15,6 +15,7 @@ from src.gui.setting import SettingWindow
 from src.function import *
 from src.module.config import *
 from src.module.counter import *
+from src.module.theme import StyleSheet
 from src.module.version import newVersion
 
 
@@ -28,6 +29,7 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.checkVersion()
         self.config = readConfig()
         self.loadConfig()
+        self.setTheme()
 
     # 软件关闭时销毁进程池
     def __del__(self):
@@ -35,6 +37,8 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.pool.join()
 
     def initUI(self):
+        StyleSheet.WINDOW.apply(self)  # 应用主题样式表
+
         addOpenTimes(readConfig(), configPath())
 
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -66,6 +70,16 @@ class MyMainWindow(QMainWindow, MainWindow):
     def checkVersionThread(self):
         if newVersion():
             self.newVersionButton.setVisible(True)
+
+    def setTheme(self):
+        # 从配置中读取主题样式
+        theme = self.config.get("Application", "theme")
+        if theme == "0":
+            setTheme(Theme.AUTO)
+        elif theme == "1":
+            setTheme(Theme.LIGHT)
+        elif theme == "2":
+            setTheme(Theme.DARK)
 
     def saveCheckBox(self):
         self.config.set("Application", "sc", str(self.allowSc.isChecked()).lower())
@@ -334,14 +348,6 @@ class MyMainWindow(QMainWindow, MainWindow):
         self.showInfo("success", "", "重命名成功")
 
     def loadConfig(self):
-        theme = self.config.get("Application", "theme")
-        if theme == "0":
-            setTheme(Theme.AUTO)
-        elif theme == "1":
-            setTheme(Theme.LIGHT)
-        elif theme == "2":
-            setTheme(Theme.DARK)
-
         self.allowSc.setChecked(self.config.getboolean("Application", "sc"))
         self.allowTc.setChecked(self.config.getboolean("Application", "tc"))
 
@@ -452,6 +458,7 @@ class MyAboutWindow(QDialog, AboutWindow):
         self.loadConfig()
 
     def initUI(self):
+        StyleSheet.WINDOW.apply(self)  # 应用主题样式表
         self.configPathButton.clicked.connect(self.openConfigPath)
 
     @staticmethod
@@ -480,6 +487,7 @@ class MySettingWindow(QDialog, SettingWindow):
         self.loadConfig()
 
     def initUI(self):
+        StyleSheet.WINDOW.apply(self)  # 应用主题样式表
         self.applyButton.clicked.connect(self.saveConfig)  # 保存配置
         self.cancelButton.clicked.connect(lambda: self.close())  # 关闭窗口
 

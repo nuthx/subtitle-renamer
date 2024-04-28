@@ -8,11 +8,6 @@ from src.module.resource import getResource
 
 class SettingWindow(object):
     def setupUI(self, this_window):
-        # 加载 QSS
-        with open(getResource("src/style/style_light.qss"), "r", encoding="UTF-8") as file:
-            style_sheet = file.read()
-        this_window.setStyleSheet(style_sheet)
-
         this_window.setWindowTitle("设置")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
         this_window.resize(800, -1)
