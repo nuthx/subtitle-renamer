@@ -42,13 +42,13 @@ jobs:
       if: matrix.os == 'macos-13'
       run: |
         cd dist
-        zip -9 -r SubtitleRenamer_macos_x64.zip ./*
+        zip -9 -r SubtitleRenamer_macos_x64.zip ./SubtitleRenamer.app
 
     - name: Zip (macOS-arm64)
       if: matrix.os == 'macos-14'
       run: |
         cd dist
-        zip -9 -r SubtitleRenamer_macos_arm64.zip ./*
+        zip -9 -r SubtitleRenamer_macos_arm64.zip ./SubtitleRenamer.app
 
     - name: Zip (Linux)
       if: matrix.os == 'ubuntu-latest'
