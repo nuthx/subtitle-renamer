@@ -85,7 +85,7 @@ def checkConfig(config, config_file):
 # 更新配置文件
 def updateConfigFile(config_file):
     config = configparser.ConfigParser()
-    config.read(config_file)
+    config.read(config_file, encoding="utf-8")
 
     # 记录计数器
     open_times = config.get("Counter", "open_times")
@@ -99,7 +99,7 @@ def updateConfigFile(config_file):
 
         # 重新读取配置文件
         config = configparser.ConfigParser()
-        config.read(config_file)
+        config.read(config_file, encoding="utf-8")
 
         # 更新计数器
         config.set("Counter", "open_times", open_times)
@@ -121,11 +121,11 @@ def readConfig():
         initConfig(config_file)
 
     # 更新配置
-    config.read(config_file)
+    config.read(config_file, encoding="utf-8")
     updateConfigFile(config_file)
 
     # 检测合法性（再次读取获得新配置内容）
-    config.read(config_file)
+    config.read(config_file, encoding="utf-8")
     checkConfig(config, config_file)
 
     return config
