@@ -74,8 +74,13 @@ def detectSubLanguage(file_name):
     # 提取纯字幕到列表
     if file_extension == "srt":
         subtitle = srtSubtitle(file_name)
-    else:
+    elif file_extension == "ass" or file_extension == "ssa":
         subtitle = assSubtitle(file_name)
+    elif file_extension == "mks":
+        subtitle = ["简体"]
+    else:
+        subtitle = ["简体"]
+
 
     # 字幕去重
     subtitle = list(set(subtitle))
