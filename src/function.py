@@ -38,7 +38,7 @@ def splitList(comb_list):
     video_extension = ["mkv", "mp4", "avi", "flv", "webm", "m4v", "mov", "rm", "rmvb"]
     video_extension.extend([item.strip() for item in comb_list[1].split(",")])
 
-    subtitle_extension = ["ass", "ssa", "srt"]
+    subtitle_extension = ["ass", "ssa", "srt", "mks"]
 
     # 视频文件
     if file_extension in video_extension:
