@@ -10,115 +10,95 @@ class SettingWindow(object):
     def setupUI(self, this_window):
         this_window.setWindowTitle("设置")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
-        this_window.resize(800, -1)
+        this_window.resize(800, 600)
         this_window.setFixedSize(self.size())  # 禁止拉伸窗口
 
-        # 标题
-
+        # =================================================
+        # 主题设置
         self.themeTitle = QLabel("主题设置")
         self.themeTitle.setObjectName("settingTitle")
         self.themeTitle.setIndent(22)
 
-        # 设置主题模式
-
+        # 主题模式
         self.themeSelectTitle = QLabel("主题模式")
         self.themeSelectInfo = QLabel("当前主题：跟随系统")
-
         self.themeSelectSwitch = ComboBox(self)
         self.themeSelectSwitch.setMinimumWidth(240)
         self.themeSelectSwitch.setMaximumWidth(240)
         self.themeSelectSwitch.addItems(["跟随系统", "浅色模式", "深色模式"])
         self.themeSelectSwitch.setCurrentIndex(0)  # 默认第一个
         self.themeSelectSwitch.currentIndexChanged.connect(self.themeSelectFunction)
-
         self.themeSelectCard = self.settingCard(self.themeSelectTitle, self.themeSelectInfo, self.themeSelectSwitch)
 
-        # 标题
-
+        # =================================================
+        # 视频格式设置
         self.videoTypeTitle = QLabel("视频格式设置")
         self.videoTypeTitle.setObjectName("settingTitle")
         self.videoTypeTitle.setIndent(22)
 
-        # 简体扩展名
-
+        # 简体字幕扩展名
         self.videoTitle = QLabel("简体字幕扩展名")
         self.videoInfo = QLabel("用于支持更多视频格式，扩展名使用英文逗号分隔，如 rm, rmvb")
-
         self.videoFormat = LineEdit(self)
         self.videoFormat.setMinimumWidth(240)
         self.videoFormat.setMaximumWidth(240)
         self.videoFormat.setPlaceholderText("默认已支持常见视频文件")
-
         self.videoCard = self.settingCard(self.videoTitle, self.videoInfo, self.videoFormat)
 
-        # 标题
-
+        # =================================================
+        # 扩展名设置
         self.extensionTitle = QLabel("扩展名设置")
         self.extensionTitle.setObjectName("settingTitle")
         self.extensionTitle.setIndent(22)
 
-        # 简体扩展名
-
+        # 简体字幕扩展名
         self.scTitle = QLabel("简体字幕扩展名")
         self.scInfo = QLabel("默认为空，设置后会显示在字幕扩展名之前")
-
         self.scFormat = EditableComboBox(self)
         self.scFormat.setMinimumWidth(240)
         self.scFormat.setMaximumWidth(240)
         self.scFormat.addItems([".sc", ".chs", ".zh-Hans"])
         self.scFormat.setPlaceholderText("不添加简体扩展名")
-
         self.scCard = self.settingCard(self.scTitle, self.scInfo, self.scFormat)
 
-        # 繁体扩展名
-
+        # 繁体字幕扩展名
         self.tcTitle = QLabel("繁体字幕扩展名")
         self.tcInfo = QLabel("默认为空，设置后会显示在字幕扩展名之前")
-
         self.tcFormat = EditableComboBox(self)
         self.tcFormat.setMinimumWidth(240)
         self.tcFormat.setMaximumWidth(240)
         self.tcFormat.addItems([".tc", ".cht", ".zh-Hant"])
         self.tcFormat.setPlaceholderText("不添加繁体扩展名")
-
         self.tcCard = self.settingCard(self.tcTitle, self.tcInfo, self.tcFormat)
 
-        # 标题
-
+        # =================================================
+        # 其他设置
         self.otherTitle = QLabel("其他设置")
         self.otherTitle.setObjectName("settingTitle")
         self.otherTitle.setIndent(22)
 
-        # 删除没有重命名的字幕文件
-
+        # 删除多余字幕
         self.removeSubTitle = QLabel("删除多余字幕")
         self.removeSubInfo = QLabel("当前操作：没有选择的字幕语言将在重命名后被删除")
-
         self.removeSubSwitch = SwitchButton()
         self.removeSubSwitch.setChecked(True)  # 默认开启
         self.removeSubSwitch.checkedChanged.connect(self.removeSubFunction)
-
         self.removeSubCard = self.settingCard(self.removeSubTitle, self.removeSubInfo, self.removeSubSwitch)
 
-        # 移动字幕到视频文件夹
-
+        # 移动字幕文件
         self.moveSubTitle = QLabel("移动字幕文件")
         self.moveSubInfo = QLabel("当前操作：重命名成功后，移动字幕到视频文件夹")
-
         self.moveSubSwitch = ComboBox(self)
         self.moveSubSwitch.setMinimumWidth(240)
         self.moveSubSwitch.setMaximumWidth(240)
         self.moveSubSwitch.addItems(["不移动", "复制字幕", "剪切字幕"])
         self.moveSubSwitch.setCurrentIndex(0)  # 默认第一个
         self.moveSubSwitch.currentIndexChanged.connect(self.moveSubFunction)
-
         self.moveSubCard = self.settingCard(self.moveSubTitle, self.moveSubInfo, self.moveSubSwitch)
 
-        # 转换字幕编码至UTF-8
-
+        # 转换字幕编码
         self.encodeTitle = QLabel("转换字幕编码")
         self.encodeInfo = QLabel("重命名后将字幕编码转换为指定格式")
-
         self.encodeType = ComboBox(self)
         self.encodeType.setMinimumWidth(240)
         self.encodeType.setMaximumWidth(240)
@@ -126,10 +106,11 @@ class SettingWindow(object):
         self.encodeType.setCurrentIndex(0)  # 默认第一个
         self.encodeCard = self.settingCard(self.encodeTitle, self.encodeInfo, self.encodeType)
 
+        # =================================================
         # 按钮
-
         self.cancelButton = PushButton("取消", self)
         self.cancelButton.setFixedWidth(120)
+
         self.applyButton = PrimaryPushButton("保存", self)
         self.applyButton.setFixedWidth(120)
 
