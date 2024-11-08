@@ -1,7 +1,8 @@
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QFrame, QWidget
 from qfluentwidgets import (Theme, setTheme, PushButton, SwitchButton, ComboBox, PrimaryPushButton, EditableComboBox,
-                            LineEdit, setThemeColor, qconfig)
+                            LineEdit, setThemeColor, qconfig, SingleDirectionScrollArea, SmoothMode)
 
 from src.module.resource import getResource
 
@@ -10,7 +11,7 @@ class SettingWindow(object):
     def setupUI(self, this_window):
         this_window.setWindowTitle("设置")
         this_window.setWindowIcon(QIcon(getResource("image/icon.png")))
-        this_window.resize(800, 600)
+        this_window.resize(800, 580)
         this_window.setFixedSize(self.size())  # 禁止拉伸窗口
 
         # =================================================
@@ -121,26 +122,40 @@ class SettingWindow(object):
         self.buttonLayout.addWidget(self.applyButton)
         self.buttonLayout.addStretch(0)
 
-        # 叠叠乐
+        # =================================================
+        # 嵌套滚动区域到settingLayout中
+        scrollWidget = QWidget()
+        scrollWidget.setObjectName("scrollWidget")
 
+        # 滚动区域
+        scrollArea = SingleDirectionScrollArea(orient=Qt.Vertical)
+        scrollArea.setWidgetResizable(True)
+        scrollArea.setSmoothMode(SmoothMode.NO_SMOOTH)  # 取消平滑滚动
+        scrollArea.setWidget(scrollWidget)
+
+        # 设置布局
+        settingLayout = QVBoxLayout(scrollWidget)
+        settingLayout.setSpacing(8)
+        settingLayout.setContentsMargins(20, 20, 20, 0)  # 上左右下
+        settingLayout.addWidget(self.themeTitle)
+        settingLayout.addWidget(self.themeSelectCard)
+        settingLayout.addSpacing(12)
+        settingLayout.addWidget(self.videoTypeTitle)
+        settingLayout.addWidget(self.videoCard)
+        settingLayout.addSpacing(12)
+        settingLayout.addWidget(self.extensionTitle)
+        settingLayout.addWidget(self.scCard)
+        settingLayout.addWidget(self.tcCard)
+        settingLayout.addSpacing(12)
+        settingLayout.addWidget(self.otherTitle)
+        settingLayout.addWidget(self.removeSubCard)
+        settingLayout.addWidget(self.moveSubCard)
+        settingLayout.addWidget(self.encodeCard)
+
+        # 添加到窗口
         layout = QVBoxLayout(this_window)
-        layout.setSpacing(12)
-        layout.setContentsMargins(24, 24, 24, 24)
-        layout.addWidget(self.themeTitle)
-        layout.addWidget(self.themeSelectCard)
-        layout.addSpacing(20)
-        layout.addWidget(self.videoTypeTitle)
-        layout.addWidget(self.videoCard)
-        layout.addSpacing(20)
-        layout.addWidget(self.extensionTitle)
-        layout.addWidget(self.scCard)
-        layout.addWidget(self.tcCard)
-        layout.addSpacing(20)
-        layout.addWidget(self.otherTitle)
-        layout.addWidget(self.removeSubCard)
-        layout.addWidget(self.moveSubCard)
-        layout.addWidget(self.encodeCard)
-        layout.addSpacing(12)
+        layout.setContentsMargins(0, 0, 0, 16)
+        layout.addWidget(scrollArea)
         layout.addLayout(self.buttonLayout)
 
     def settingCard(self, card_title, card_info, card_func):

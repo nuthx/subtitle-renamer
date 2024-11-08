@@ -42,6 +42,12 @@ MySettingWindow {
     border-radius: 8px;
 }
 
+QScrollArea,
+#scrollWidget {
+    background: transparent;
+    border: none;
+}
+
 /* Info */
 
 #versionLabel {
