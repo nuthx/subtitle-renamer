@@ -8,13 +8,9 @@ def currentVersion():
 
 
 def latestVersion():
-    url = "https://raw.githubusercontent.com/nuthx/subtitle-renamer/main/build.spec"
-    response = requests.get(url)
-    response_text = response.text.split('\n')
-
-    version_raw = response_text[-3].strip()
-    re1 = re.findall(r'\'(.*?)\'', version_raw)
-    latest_version = re1[0]
+    url = "https://api.github.com/repos/nuthx/subtitle-renamer/releases/latest"
+    response = requests.get(url).json()
+    latest_version = response["tag_name"]
 
     return latest_version
 
