@@ -40,31 +40,78 @@ def assSubtitle(file_name):
     # 检测文本编码
     encoding = subEncoding(file_name)
 
-    with open(file_name, "r", encoding=encoding) as file:
-        result = ass.parse(file).events
+    # 首先尝试用ass库解析
+    try:
+        with open(file_name, "r", encoding=encoding) as file:
+            result = ass.parse(file).events
 
-    # 提取正文内容
-    subtitle = []
-    for item in result:
-        # 转义样式中的斜杠
-        new_item = item.text.replace("\\", "\\\\")
+        subtitle = []
+        for item in result:
+            # 转义样式中的斜杠
+            new_item = item.text.replace("\\", "\\\\")
 
-        # 匹配 {} 之外内容
-        ass_pattern = r'\{[^{}]*\}'
-        matches = re.sub(ass_pattern, '', new_item)
+            # 匹配 {} 之外内容
+            ass_pattern = r'\{[^{}]*\}'
+            matches = re.sub(ass_pattern, '', new_item)
 
-        # 排除单字的特效字幕
-        if len(matches) == 1:
-            continue
+            # 排除单字的特效字幕
+            if len(matches) == 1:
+                continue
 
-        # 排除空内容
-        if not matches:
-            continue
+            # 排除空内容
+            if not matches:
+                continue
 
-        subtitle.append(matches)
+            subtitle.append(matches)
 
-    return subtitle
+        return subtitle
 
+    # 如果ass.parse失败，使用正则表达式解析
+    except Exception as e:
+        print(f"ass.parse解析失败，使用正则表达式解析: {e}")
+
+        subtitle = []
+        try:
+            with open(file_name, "r", encoding=encoding) as file:
+                in_events_section = False
+
+                for line in file:
+                    line = line.strip()
+
+                    # 检查是否进入了[Events]部分
+                    if line == "[Events]":
+                        in_events_section = True
+                        continue
+
+                    # 检查是否进入了其他部分
+                    if in_events_section and line.startswith("["):
+                        in_events_section = False
+
+                    # 只处理Events部分的Dialogue行
+                    if in_events_section and line.startswith("Dialogue:"):
+                        # 分割并获取最后一个部分(对话内容)
+                        parts = line.split(',', 9)  # 最多分割9次，确保最后一个元素包含全部对话内容
+
+                        if len(parts) >= 10:
+                            text = parts[9]
+
+                            # 转义样式中的斜杠
+                            text = text.replace("\\", "\\\\")
+
+                            # 移除花括号内的ASS样式代码
+                            clean_text = re.sub(r'\{[^{}]*\}', '', text)
+
+                            # 移除多余空白
+                            clean_text = clean_text.strip()
+
+                            # 排除单字和空内容
+                            if len(clean_text) > 1 and clean_text:
+                                subtitle.append(clean_text)
+                return subtitle
+
+        except Exception as e:
+            print(f"正则解析失败: {e}")
+            raise e
 
 def detectSubLanguage(file_name):
     # 提取扩展名
