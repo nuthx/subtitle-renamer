@@ -74,8 +74,8 @@ jobs:
 
       - name: dist
         run: |
-          mkdir dist
-          cp -r asset/artifact/* dist
+          mkdir -p dist
+          cp -r asset/* dist/
           cd dist && ls
 
       - name: Release
