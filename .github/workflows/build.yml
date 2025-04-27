@@ -59,6 +59,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
+        name: ${{ matrix.os }}-build
         path: dist/*.zip
 
   release:
@@ -68,12 +69,13 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v4
         with:
+          merge-multiple: true
           path: asset
 
       - name: dist
         run: |
-          mkdir dist
-          cp -r asset/artifact/* dist
+          mkdir -p dist
+          cp -r asset/* dist/
           cd dist && ls
 
       - name: Release
