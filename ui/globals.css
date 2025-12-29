@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: light-dark(#1DA0E2, #1DA0E2);
+
+  --color-primary: light-dark(hsl(0 0 20), hsl(0 0 100));
+  --color-secondary: light-dark(hsl(0 0 20 / 0.6), hsl(0 0 1 / 0.6));
+  --color-muted: light-dark(hsl(0 0 20 / 0.24), hsl(0 0 1 / 0.6));
+
+  --color-border: light-dark(hsl(0 0 0 / 0.1), hsl(0 0 100 / 0.1));
+  --color-background: light-dark(hsl(0 0 100), hsl(0 0 0));
+  --color-background-dark: light-dark(hsl(0 0 96), hsl(0 0 4));
+
+  --color-error: light-dark(#FB2C37, #FF6467);
+}
+
+@layer base {
+  * {
+    @apply border-border box-border focus:outline-none;
+  }
+
+  body {
+    @apply text-sm text-primary antialiased select-none overflow-hidden scheme-light-dark;
+  }
+
+  h1, h2, h3, h4, h5, h6, span, p, img {
+    @apply cursor-default;
+  }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+}

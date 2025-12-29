@@ -1,14 +1,38 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+mod extract;
+mod theme;
+
+use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, Window};
+
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn set_theme(window: Window, theme: String) -> Result<(), String> {
+    theme::set_theme_inner(window, theme).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn extract_archive(app: AppHandle, archive_path: String) -> Result<Vec<String>, String> {
+    extract::extract_archive_inner(app, archive_path).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn move_to_trash(paths: Vec<String>) -> Result<(), String> {
+    trash::delete_all(&paths).map_err(|e| e.to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
-        .run(tauri::generate_context!())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(generate_handler![set_theme, extract_archive, move_to_trash])
+        .setup(|app| {
+            let window = app.get_webview_window("main").unwrap();
+            theme::apply_window_effect(&window);
+            Ok(())
+        })
+        .run(generate_context!())
         .expect("error while running tauri application");
 }
