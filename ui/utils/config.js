@@ -6,8 +6,11 @@ const DEFAULT_CONFIG = {
   },
   subtitle: {
     union_extension: "",
+    union_extension_options: [],
     sc_extension: "",
+    sc_extension_options: [".sc", ".chs", ".zh-Hans"],
     tc_extension: ".tc",
+    tc_extension_options: [".tc", ".cht", ".zh-Hant"],
     lowercase_extension: true,
     move_sub: "cut",
     remove_sub: "none",
