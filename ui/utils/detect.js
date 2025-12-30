@@ -27,7 +27,9 @@ const VIDEO_EXTENSIONS = new Set([
 const SUBTITLE_EXTENSIONS = new Set([
   "ass", "ssa",
   "srt", "vtt",
-  "mks", "sub"
+  "sub", "idx",
+  "sup",
+  "mks"
 ])
 
 // 压缩包格式
@@ -124,7 +126,7 @@ async function detectLanguage(path) {
     }
   }
 
-  // 无法解码的归类为简体
+  // 无法解码的、和非文本字幕的都归类为简体
   if (!content) return "sc"
 
   // 只获取基本汉字区的文字，并移除连续重复超过4次的字符
