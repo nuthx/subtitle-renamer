@@ -1,5 +1,6 @@
+import packageJson from "#/package.json"
 import { openUrl } from "@tauri-apps/plugin-opener"
-import { cloneElement } from "react"
+import { useState, useEffect, cloneElement } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/utils/cn"
 import { Button } from "@/components/button"
@@ -40,6 +41,26 @@ export function NavButton({ path, title, icon, disabled }) {
 }
 
 export function NavUpgrade() {
+  const [hasUpdate, setHasUpdate] = useState(false)
+
+  useEffect(() => {
+    fetch("https://api.github.com/repos/nuthx/subtitle-renamer/releases/latest", {
+      headers: {
+        "User-Agent": "subtitle-renamer"
+      }
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const latestVersion = data.tag_name
+        if (latestVersion && latestVersion !== packageJson.version) {
+          setHasUpdate(true)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  if (!hasUpdate) return null
+
   return (
     <Button
       variant="primary"
