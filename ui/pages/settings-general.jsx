@@ -30,6 +30,17 @@ export function GeneralSetting() {
         </SettingsItem>
       </SettingsCard>
 
+      <SettingsTitle title="字幕检测" />
+
+      <SettingsCard>
+        <SettingsItem title="简繁识别" subtitle="拖入文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<FileArchiveIcon />}>
+          <Switch
+            checked={config?.subtitle?.detect_language}
+            onChange={(checked) => saveConfig("subtitle", "detect_language", checked)}
+          />
+        </SettingsItem>
+      </SettingsCard>
+
       <SettingsTitle title="后缀设置" />
 
       <SettingsCard>

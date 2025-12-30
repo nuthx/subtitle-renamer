@@ -5,6 +5,7 @@ const DEFAULT_CONFIG = {
     theme: "system"
   },
   subtitle: {
+    detect_language: true,
     union_extension: "",
     union_extension_options: [],
     sc_extension: "",

@@ -1,6 +1,7 @@
 import { readFile } from "@tauri-apps/plugin-fs"
 import { invoke } from "@tauri-apps/api/core"
 import { extname, basename } from "@tauri-apps/api/path"
+import { getConfig } from "@/utils/config"
 import { sortFiles } from "@/utils/sort"
 import { toast } from "@/components/toast"
 
@@ -38,6 +39,7 @@ const ARCHIVE_EXTENSIONS = new Set([
 ])
 
 export async function detectFiles(paths, fileList, archiveList) {
+  const config = await getConfig()
   const newFiles = { video: [], sc: [], tc: [] }
   const allFiles = []
   const archives = []
@@ -88,7 +90,7 @@ export async function detectFiles(paths, fileList, archiveList) {
     if (VIDEO_EXTENSIONS.has(ext)) {
       newFiles.video.push(path)
     } else if (SUBTITLE_EXTENSIONS.has(ext)) {
-      const lang = await detectLanguage(path)
+      const lang = config?.subtitle?.detect_language ? await detectSubtitleLanguage(path) : "sc"
       newFiles[lang].push(path)
     } else {
       filteredCount++
@@ -112,7 +114,7 @@ export async function detectFiles(paths, fileList, archiveList) {
   }
 }
 
-async function detectLanguage(path) {
+async function detectSubtitleLanguage(path) {
   const bytes = await readFile(path)
 
   // 猜测字幕编码，并解码为可读文本
