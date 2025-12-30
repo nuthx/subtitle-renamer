@@ -1,0 +1,92 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Subtitle Renamer",
+  "version": "../package.json",
+  "identifier": "com.nuthx.subtitle-renamer",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "windows": [
+      {
+        "title": "Subtitle Renamer",
+        "width": 1200,
+        "height": 720,
+        "minWidth": 1080,
+        "minHeight": 640,
+        "dragDropEnabled": true,
+        "transparent": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
+      }
+    ],
+    "security": {
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "default",
+          "windows": ["main"],
+          "permissions": [
+            "core:default",
+            "core:window:allow-close",
+            "core:window:allow-minimize",
+            "core:window:allow-toggle-maximize",
+            "core:window:allow-start-dragging",
+            "opener:default",
+            "store:default",
+            "dialog:default",
+            "fs:default",
+            "shell:default",
+            {
+              "identifier": "fs:allow-read",
+              "allow": [{ "path": "**" }]
+            },
+            {
+              "identifier": "fs:allow-read-file",
+              "allow": [{ "path": "**" }]
+            },
+            {
+              "identifier": "fs:allow-write",
+              "allow": [{ "path": "**" }]
+            },
+            {
+              "identifier": "fs:allow-exists",
+              "allow": [{ "path": "**" }]
+            },
+            {
+              "identifier": "fs:allow-rename",
+              "allow": [{ "path": "**" }]
+            },
+            {
+              "identifier": "fs:allow-copy-file",
+              "allow": [{ "path": "**" }]
+            },
+            {
+              "identifier": "fs:allow-remove",
+              "allow": [{ "path": "**" }]
+            },
+            {
+              "identifier": "opener:allow-open-path",
+              "allow": [{ "path": "**" }]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "../icons/32x32.png",
+      "../icons/128x128.png",
+      "../icons/128x128@2x.png",
+      "../icons/icon.icns",
+      "../icons/icon.ico"
+    ]
+  }
+}
