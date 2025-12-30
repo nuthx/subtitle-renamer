@@ -22,7 +22,7 @@
 ## 特色
 
 - 基于 [Tauri](https://v2.tauri.app/zh-cn/) 构建，原生性能，轻量体积
-- 优雅的 Fluent UI 界面，支持 [Mica](https://learn.microsoft.com/zh-cn/windows/apps/design/style/mica) 与 [Varbint](https://developer.apple.com/cn/design/human-interface-guidelines/materials#Platform-considerations) 材质
+- 优雅的 Fluent UI 界面，支持 [Mica](https://learn.microsoft.com/zh-cn/windows/apps/design/style/mica) 与 [Vibrancy](https://developer.apple.com/cn/design/human-interface-guidelines/materials#Platform-considerations) 材质
 - 极速识别简体与繁体字幕，并为不同语言添加自定义后缀
 - 允许拖入字幕压缩包，并在重命名完成后自动删除
 - 支持扩展名转换、自动复制或删除字幕、转换 UTF-8 编码等
