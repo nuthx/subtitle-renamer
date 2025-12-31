@@ -4,6 +4,8 @@ mod menu;
 mod theme;
 
 use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, Window};
+use tauri_plugin_store::StoreExt;
+use tauri_plugin_window_state::{StateFlags, WindowExt};
 #[cfg(target_os = "windows")]
 use window_vibrancy::{apply_acrylic, apply_blur, apply_mica};
 #[cfg(target_os = "macos")]
@@ -27,6 +29,11 @@ fn move_to_trash(paths: Vec<String>) -> Result<(), String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     Builder::default()
+        .plugin(
+            tauri_plugin_window_state::Builder::default()
+                .skip_initial_state("main")
+                .build(),
+        )
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_store::Builder::default().build())
@@ -36,6 +43,18 @@ pub fn run() {
         .invoke_handler(generate_handler![set_theme, extract_archive, move_to_trash])
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
+
+            // 根据配置决定是否恢复窗口状态
+            if app
+                .store("config.json")
+                .ok()
+                .and_then(|store| store.get("general"))
+                .and_then(|general| general.get("remember_window").cloned())
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false)
+            {
+                let _ = window.restore_state(StateFlags::all());
+            }
 
             // 在 Windows 下依次尝试应用云母、亚克力、模糊材质
             #[cfg(target_os = "windows")]

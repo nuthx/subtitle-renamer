@@ -14,10 +14,10 @@
     "windows": [
       {
         "title": "Subtitle Renamer",
-        "width": 1280,
-        "height": 660,
+        "width": 1200,
+        "height": 680,
         "minWidth": 1000,
-        "minHeight": 620,
+        "minHeight": 640,
         "dragDropEnabled": true,
         "transparent": true,
         "titleBarStyle": "Overlay",
