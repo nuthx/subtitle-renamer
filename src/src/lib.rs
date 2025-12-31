@@ -1,8 +1,13 @@
 mod extract;
+#[cfg(target_os = "macos")]
 mod menu;
 mod theme;
 
 use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, Window};
+#[cfg(target_os = "windows")]
+use window_vibrancy::{apply_acrylic, apply_blur, apply_mica};
+#[cfg(target_os = "macos")]
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 #[tauri::command]
 fn set_theme(window: Window, theme: String) -> Result<(), String> {
@@ -30,9 +35,23 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(generate_handler![set_theme, extract_archive, move_to_trash])
         .setup(|app| {
-            // 应用系统的窗口材质
             let window = app.get_webview_window("main").unwrap();
-            theme::apply_window_effect(&window);
+
+            // 在 Windows 下依次尝试应用云母、亚克力、模糊材质
+            #[cfg(target_os = "windows")]
+            {
+                if apply_mica(&window, None).is_err() {
+                    if apply_acrylic(&window, None).is_err() {
+                        let _ = apply_blur(&window, None);
+                    }
+                }
+            }
+
+            // 应用 macOS 模糊材质
+            #[cfg(target_os = "macos")]
+            {
+                let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None);
+            }
 
             // 创建 macOS 菜单
             #[cfg(target_os = "macos")]
