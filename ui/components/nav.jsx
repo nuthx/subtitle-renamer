@@ -8,7 +8,7 @@ import { RocketIcon } from "@phosphor-icons/react"
 
 export function Nav({ children }) {
   return (
-    <nav className="flex flex-col gap-1 w-50 pb-2 shrink-0">
+    <nav className="flex flex-col gap-1 w-46 pb-2 shrink-0">
       {children}
     </nav>
   )
