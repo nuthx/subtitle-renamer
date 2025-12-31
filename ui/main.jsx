@@ -1,5 +1,6 @@
 import "@/globals.css"
 import { invoke } from "@tauri-apps/api/core"
+import { listen } from "@tauri-apps/api/event"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom"
@@ -18,6 +19,11 @@ import { SubtitlesIcon, GearSixIcon } from "@phosphor-icons/react"
 initConfig().then(async () => {
   const config = await getConfig()
   await invoke("set_theme", { theme: config.general.theme })
+})
+
+// 监听菜单跳转
+listen("navigate", (event) => {
+  window.location.hash = event.payload
 })
 
 createRoot(document.getElementById("root")).render(

@@ -1,4 +1,5 @@
 mod extract;
+mod menu;
 mod theme;
 
 use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, Window};
@@ -29,8 +30,16 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(generate_handler![set_theme, extract_archive, move_to_trash])
         .setup(|app| {
+            // 应用系统的窗口材质
             let window = app.get_webview_window("main").unwrap();
             theme::apply_window_effect(&window);
+
+            // 创建 macOS 菜单
+            #[cfg(target_os = "macos")]
+            if let Ok(menu) = menu::create_menu(app) {
+                let _ = app.set_menu(menu);
+            }
+
             Ok(())
         })
         .run(generate_context!())
