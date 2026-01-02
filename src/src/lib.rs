@@ -78,6 +78,9 @@ pub fn run() {
                 let _ = app.set_menu(menu);
             }
 
+            // 初始化完成后再显示窗口
+            let _ = window.show();
+
             Ok(())
         })
         .run(generate_context!())
