@@ -59,11 +59,9 @@ pub fn run() {
             // 在 Windows 下依次尝试应用云母、亚克力、模糊材质
             #[cfg(target_os = "windows")]
             {
-                if apply_mica(&window, None).is_err() {
-                    if apply_acrylic(&window, None).is_err() {
-                        let _ = apply_blur(&window, None);
-                    }
-                }
+                let _ = apply_mica(&window, None)
+                    .or_else(|_| apply_acrylic(&window, None))
+                    .or_else(|_| apply_blur(&window, None));
             }
 
             // 应用 macOS 模糊材质
