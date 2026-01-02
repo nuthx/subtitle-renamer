@@ -1,7 +1,7 @@
 {
   "name": "subtitle-renamer",
   "private": true,
-  "version": "2.0.1",
+  "version": "2.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -38,7 +38,7 @@
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "globals": "^16.5.0",
+    "globals": "^17.0.0",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.18",
     "vite": "^7.3.0"
