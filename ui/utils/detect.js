@@ -1,6 +1,7 @@
 import { readFile } from "@tauri-apps/plugin-fs"
 import { invoke } from "@tauri-apps/api/core"
 import { extname, basename } from "@tauri-apps/api/path"
+import { getConfig } from "@/utils/config"
 import { sortFiles } from "@/utils/sort"
 import { toast } from "@/components/toast"
 
@@ -27,7 +28,9 @@ const VIDEO_EXTENSIONS = new Set([
 const SUBTITLE_EXTENSIONS = new Set([
   "ass", "ssa",
   "srt", "vtt",
-  "mks", "sub"
+  "sub", "idx",
+  "sup",
+  "mks"
 ])
 
 // 压缩包格式
@@ -36,6 +39,7 @@ const ARCHIVE_EXTENSIONS = new Set([
 ])
 
 export async function detectFiles(paths, fileList, archiveList) {
+  const config = await getConfig()
   const newFiles = { video: [], sc: [], tc: [] }
   const allFiles = []
   const archives = []
@@ -86,7 +90,7 @@ export async function detectFiles(paths, fileList, archiveList) {
     if (VIDEO_EXTENSIONS.has(ext)) {
       newFiles.video.push(path)
     } else if (SUBTITLE_EXTENSIONS.has(ext)) {
-      const lang = await detectLanguage(path)
+      const lang = config?.subtitle?.detect_language ? await detectSubtitleLanguage(path) : "sc"
       newFiles[lang].push(path)
     } else {
       filteredCount++
@@ -110,7 +114,7 @@ export async function detectFiles(paths, fileList, archiveList) {
   }
 }
 
-async function detectLanguage(path) {
+async function detectSubtitleLanguage(path) {
   const bytes = await readFile(path)
 
   // 猜测字幕编码，并解码为可读文本
@@ -124,7 +128,7 @@ async function detectLanguage(path) {
     }
   }
 
-  // 无法解码的归类为简体
+  // 无法解码的、和非文本字幕的都归类为简体
   if (!content) return "sc"
 
   // 只获取基本汉字区的文字，并移除连续重复超过4次的字符

@@ -3,7 +3,7 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { SunIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
+import { SunIcon, FrameCornersIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
 
 export function GeneralSetting() {
   const { config, saveConfig } = useConfig()
@@ -26,6 +26,26 @@ export function GeneralSetting() {
             value={config?.general?.theme}
             onChange={(value) => saveConfig("general", "theme", value)}
             className="w-48"
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsCard>
+        <SettingsItem title="记住窗口尺寸" subtitle="程序启动时恢复上次关闭时的窗口大小和位置" icon={<FrameCornersIcon />}>
+          <Switch
+            checked={config?.general?.remember_window}
+            onChange={(checked) => saveConfig("general", "remember_window", checked)}
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsTitle title="字幕检测" />
+
+      <SettingsCard>
+        <SettingsItem title="简繁识别" subtitle="拖入文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<FileArchiveIcon />}>
+          <Switch
+            checked={config?.subtitle?.detect_language}
+            onChange={(checked) => saveConfig("subtitle", "detect_language", checked)}
           />
         </SettingsItem>
       </SettingsCard>

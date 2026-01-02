@@ -10,6 +10,7 @@ import { ContextMenu, ContextItem, ContextSeparator } from "@/components/context
 import { DropArea } from "@/components/drop"
 import { Table } from "@/components/table"
 import { Button } from "@/components/button"
+import { FileVideoIcon, FileTextIcon, FileArchiveIcon } from "@phosphor-icons/react"
 
 const colKeys = ["video", "sc", "tc"]
 
@@ -161,7 +162,14 @@ export function SubtitleRename() {
                 <Table columns={tableColumns} data={tableData} onContextMenu={setCell} />
               )
             : (
-                <div className="flex-1 flex-center text-secondary">请拖入视频、字幕或字幕压缩包</div>
+                <div className="flex-1 flex-center flex-col gap-3 text-secondary">
+                  <div className="flex-center gap-3">
+                    <FileVideoIcon className="size-7" weight="light" />
+                    <FileTextIcon className="size-7" weight="light" />
+                    <FileArchiveIcon className="size-7" weight="light" />
+                  </div>
+                  <span>请拖入视频、字幕或字幕压缩包</span>
+                </div>
               )}
         </DropArea>
       </PageBlock>

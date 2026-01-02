@@ -15,8 +15,8 @@
       {
         "title": "Subtitle Renamer",
         "width": 1200,
-        "height": 720,
-        "minWidth": 1080,
+        "height": 680,
+        "minWidth": 1000,
         "minHeight": 640,
         "dragDropEnabled": true,
         "transparent": true,

@@ -2,9 +2,11 @@ import { load } from "@tauri-apps/plugin-store"
 
 const DEFAULT_CONFIG = {
   general: {
-    theme: "system"
+    theme: "system",
+    remember_window: false
   },
   subtitle: {
+    detect_language: true,
     union_extension: "",
     union_extension_options: [],
     sc_extension: "",
