@@ -4,8 +4,12 @@ export const useSubtitleStore = create((set) => ({
   fileList: {},
   archiveList: [],
 
-  setFileList: (fileList) => set({ fileList }),
-  setArchiveList: (archiveList) => set({ archiveList }),
+  setFileList: (updater) => set((state) => ({
+    fileList: updater(state.fileList)
+  })),
+  setArchiveList: (updater) => set((state) => ({
+    archiveList: updater(state.archiveList)
+  })),
 
   clearAll: () => set({
     fileList: {},

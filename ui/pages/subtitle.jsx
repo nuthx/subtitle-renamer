@@ -67,8 +67,8 @@ export function SubtitleRename() {
       if (addedCount === 0) {
         throw new Error(`${filterText}，耗时 ${elapsedTime(startTime)}`)
       } else {
-        setFileList(files)
-        setArchiveList(archives)
+        setFileList(() => files)
+        setArchiveList(() => archives)
         return { message: `添加了 ${addedCount} 个文件${filterText && `，${filterText}`}，耗时 ${elapsedTime(startTime)}` }
       }
     })()
