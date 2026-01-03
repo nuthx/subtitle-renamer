@@ -61,15 +61,12 @@ export async function renameSubtitles(fileData, archiveList) {
     }
 
     for (const path of filePaths) {
-      // 重命名字幕
-      if (moveSub === "copy") {
-        await copyFile(path.old, path.new)
-        // 若在同一目录复制，需要删除目录下的原文件
-        if (await dirname(path.old) === await dirname(path.new)) {
-          pathsToTrash.push(path.old)
-        }
-      } else {
-        await rename(path.old, path.new)
+      // 使用复制操作来重命名
+      await copyFile(path.old, path.new)
+
+      // 非复制模式，或复制模式但字幕在同文件夹时，删除旧字幕
+      if (moveSub !== "copy" || dirname(path.old) === dirname(path.new)) {
+        pathsToTrash.push(path.old)
       }
 
       // 检测编码，非 UTF-8 则转换
