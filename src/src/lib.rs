@@ -2,6 +2,7 @@ mod extract;
 #[cfg(target_os = "macos")]
 mod menu;
 mod theme;
+mod trash;
 
 use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, Window};
 use tauri_plugin_store::StoreExt;
@@ -23,7 +24,7 @@ fn extract_archive(app: AppHandle, archive_path: String) -> Result<Vec<String>, 
 
 #[tauri::command]
 fn move_to_trash(paths: Vec<String>) -> Result<(), String> {
-    trash::delete_all(&paths).map_err(|e| e.to_string())
+    trash::move_to_trash_inner(paths)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -59,11 +60,9 @@ pub fn run() {
             // 在 Windows 下依次尝试应用云母、亚克力、模糊材质
             #[cfg(target_os = "windows")]
             {
-                if apply_mica(&window, None).is_err() {
-                    if apply_acrylic(&window, None).is_err() {
-                        let _ = apply_blur(&window, None);
-                    }
-                }
+                let _ = apply_mica(&window, None)
+                    .or_else(|_| apply_acrylic(&window, None))
+                    .or_else(|_| apply_blur(&window, None));
             }
 
             // 应用 macOS 模糊材质
@@ -77,6 +76,9 @@ pub fn run() {
             if let Ok(menu) = menu::create_menu(app) {
                 let _ = app.set_menu(menu);
             }
+
+            // 初始化完成后再显示窗口
+            let _ = window.show();
 
             Ok(())
         })

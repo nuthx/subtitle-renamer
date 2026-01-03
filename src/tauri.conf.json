@@ -18,6 +18,7 @@
         "height": 680,
         "minWidth": 1000,
         "minHeight": 640,
+        "visible": false,
         "dragDropEnabled": true,
         "transparent": true,
         "titleBarStyle": "Overlay",
