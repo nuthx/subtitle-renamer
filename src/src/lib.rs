@@ -2,6 +2,7 @@ mod extract;
 #[cfg(target_os = "macos")]
 mod menu;
 mod theme;
+mod trash;
 
 use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, Window};
 use tauri_plugin_store::StoreExt;
@@ -23,7 +24,7 @@ fn extract_archive(app: AppHandle, archive_path: String) -> Result<Vec<String>, 
 
 #[tauri::command]
 fn move_to_trash(paths: Vec<String>) -> Result<(), String> {
-    trash::delete_all(&paths).map_err(|e| e.to_string())
+    trash::move_to_trash_inner(paths)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
