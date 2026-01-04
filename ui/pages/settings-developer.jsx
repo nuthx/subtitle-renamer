@@ -4,7 +4,7 @@ import { resetConfig } from "@/utils/config"
 import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
 import { toast } from "@/components/toast"
 import { Button } from "@/components/button"
-import { FolderOpenIcon, ArrowClockwiseIcon } from "@phosphor-icons/react"
+import { FolderOpenIcon, ArrowClockwiseIcon, BellRingingIcon } from "@phosphor-icons/react"
 
 export function DeveloperSetting() {
   const handleOpenConfig = async () => {
@@ -46,7 +46,7 @@ export function DeveloperSetting() {
           <SettingsTitle title="通知测试" />
 
           <SettingsCard>
-            <SettingsItem title="重置配置文件" subtitle="点击后立即重置所有配置项，没有二次弹窗确认。部分配置需重启后生效" icon={<ArrowClockwiseIcon />}>
+            <SettingsItem title="发送通知" subtitle="点击后立即发送 Toast 通知" icon={<BellRingingIcon />}>
               <div className="flex gap-2">
                 <Button onClick={() => toast.success({ title: "单行标题" })}>成功</Button>
                 <Button onClick={() => toast.warning({ title: "单行标题" })}>警告</Button>
