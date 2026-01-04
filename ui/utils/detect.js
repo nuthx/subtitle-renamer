@@ -47,6 +47,7 @@ export async function detectFiles(paths, fileList, archiveList) {
   const existingArchives = new Set(archiveList)
   let filteredCount = 0
   let duplicateCount = 0
+  let excludedCount = 0
 
   // 跳过重复文件并展开压缩包
   for (const path of paths) {
@@ -80,6 +81,12 @@ export async function detectFiles(paths, fileList, archiveList) {
     }
   }
 
+  // 构建排除指定视频和字幕文件名的正则
+  // eslint-disable-next-line @stylistic/max-statements-per-line
+  const excludeVideoRegex = (() => { try { return new RegExp(config.subtitle.exclude_video, "i") } catch { return null } })()
+  // eslint-disable-next-line @stylistic/max-statements-per-line
+  const excludeSubtitleRegex = (() => { try { return new RegExp(config.subtitle.exclude_subtitle, "i") } catch { return null } })()
+
   // 分类文件
   await Promise.all(allFiles.map(async (path) => {
     // 跳过隐藏文件和 macOS 文件夹
@@ -88,8 +95,18 @@ export async function detectFiles(paths, fileList, archiveList) {
 
     const ext = (await extname(path).catch(() => "")).toLowerCase()
     if (VIDEO_EXTENSIONS.has(ext)) {
+      // 应用视频排除规则
+      if (excludeVideoRegex && excludeVideoRegex.test(base)) {
+        excludedCount++
+        return
+      }
       newFiles.video.push(path)
     } else if (SUBTITLE_EXTENSIONS.has(ext)) {
+      // 应用字幕排除规则
+      if (excludeSubtitleRegex && excludeSubtitleRegex.test(base)) {
+        excludedCount++
+        return
+      }
       const lang = config?.subtitle?.detect_language ? await detectSubtitleLanguage(path) : "sc"
       newFiles[lang].push(path)
     } else {
@@ -110,7 +127,8 @@ export async function detectFiles(paths, fileList, archiveList) {
     archives: [...archiveList, ...archives],
     addedCount: Object.values(newFiles).reduce((sum, arr) => sum + arr.length, 0),
     filteredCount,
-    duplicateCount
+    duplicateCount,
+    excludedCount
   }
 }
 

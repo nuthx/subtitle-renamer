@@ -7,6 +7,8 @@ const DEFAULT_CONFIG = {
   },
   subtitle: {
     detect_language: true,
+    exclude_video: "",
+    exclude_subtitle: "",
     union_extension: "",
     union_extension_options: [],
     sc_extension: "",
