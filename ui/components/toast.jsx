@@ -6,16 +6,16 @@ const DURATION_TIME = 2000
 
 export function toast({ title, description, type }, toastOptions) {
   const itemType = {
-    success: "bg-green-50 text-green-900",
-    warning: "bg-yellow-50 text-yellow-900",
-    error: "bg-red-50 text-red-900"
+    success: "!bg-[#DFF7DD] text-green-900 dark:!bg-[#2F3D1C] dark:text-primary",
+    warning: "!bg-[#FFF4CE] text-yellow-900 dark:!bg-[#433618] dark:text-primary",
+    error: "!bg-[#FDE7E9] text-red-900 dark:!bg-[#442724] dark:text-primary"
   }
 
   const itemIcon = {
     loading: <CircleNotchIcon className="size-5 animate-spin" />,
-    success: <CheckCircleIcon weight="fill" className="size-5 text-green-700" />,
-    warning: <WarningCircleIcon weight="fill" className="size-5 text-yellow-700" />,
-    error: <XCircleIcon weight="fill" className="size-5 text-red-700" />
+    success: <CheckCircleIcon weight="fill" className="size-5 text-green-700 dark:text-green-400" />,
+    warning: <WarningCircleIcon weight="fill" className="size-5 text-yellow-700 dark:text-yellow-400" />,
+    error: <XCircleIcon weight="fill" className="size-5 text-red-700 dark:text-red-400" />
   }
 
   return sonnerToast.custom((id) => (

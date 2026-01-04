@@ -19,7 +19,7 @@ export function Switch({ checked, onChange }) {
       <div
         className={cn(
           "size-3.5 shadow-sm rounded-full transition-all group-active:w-5 group-active:scale-y-95",
-          checked ? "bg-background shadow-primary/20" : "bg-secondary/70 shadow-transparent"
+          checked ? "bg-background dark:bg-white shadow-primary/20" : "bg-secondary/70 shadow-transparent"
         )}
       />
     </button>

@@ -57,11 +57,12 @@ export function SubtitleRename() {
 
     const dropPromise = (async () => {
       const startTime = Date.now()
-      const { files, archives, addedCount, filteredCount, duplicateCount } = await detectFiles(paths, fileList, archiveList)
+      const { files, archives, addedCount, filteredCount, duplicateCount, excludedCount } = await detectFiles(paths, fileList, archiveList)
 
       const reasons = []
       if (filteredCount > 0) reasons.push(`${filteredCount} 个无效文件`)
       if (duplicateCount > 0) reasons.push(`${duplicateCount} 个重复文件`)
+      if (excludedCount > 0) reasons.push(`${excludedCount} 个设置中排除的文件`)
       const filterText = reasons.length ? `过滤了 ${reasons.join("和 ")}` : ""
 
       if (addedCount === 0) {

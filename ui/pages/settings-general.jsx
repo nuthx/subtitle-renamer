@@ -3,7 +3,8 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { SunIcon, FrameCornersIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
+import { SunIcon, FrameCornersIcon, ArrowsClockwiseIcon, ProhibitIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
+import { Input } from "@/components/input"
 
 export function GeneralSetting() {
   const { config, saveConfig } = useConfig()
@@ -39,13 +40,35 @@ export function GeneralSetting() {
         </SettingsItem>
       </SettingsCard>
 
-      <SettingsTitle title="字幕检测" />
+      <SettingsTitle title="文件添加设置" />
 
       <SettingsCard>
-        <SettingsItem title="简繁识别" subtitle="拖入文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<FileArchiveIcon />}>
+        <SettingsItem title="简繁识别" subtitle="添加文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<ArrowsClockwiseIcon />}>
           <Switch
             checked={config?.subtitle?.detect_language}
             onChange={(checked) => saveConfig("subtitle", "detect_language", checked)}
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsCard>
+        <SettingsItem title="排除视频文件名" subtitle="是否排除文件名含特定内容的视频。使用 | 或正则表达式来匹配多个内容" icon={<ProhibitIcon />}>
+          <Input
+            value={config?.subtitle?.exclude_video}
+            onChange={(e) => saveConfig("subtitle", "exclude_video", e.target.value)}
+            placeholder="不排除视频"
+            className="w-72"
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsCard>
+        <SettingsItem title="排除字幕文件名" subtitle="是否排除文件名含特定内容的字幕(不对压缩包生效)。使用 | 或正则表达式来匹配多个内容" icon={<ProhibitIcon />}>
+          <Input
+            value={config?.subtitle?.exclude_subtitle}
+            onChange={(e) => saveConfig("subtitle", "exclude_subtitle", e.target.value)}
+            placeholder="不排除字幕"
+            className="w-72"
           />
         </SettingsItem>
       </SettingsCard>
@@ -132,7 +155,7 @@ export function GeneralSetting() {
         </SettingsItem>
       </SettingsCard>
 
-      <SettingsTitle title="压缩包" />
+      <SettingsTitle title="压缩包设置" />
 
       <SettingsCard>
         <SettingsItem title="删除字幕压缩包" subtitle="重命名完成后，是否删除字幕压缩包。仅当拖入字幕压缩包时生效" icon={<FileArchiveIcon />}>
