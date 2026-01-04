@@ -8,23 +8,30 @@ on:
 
 jobs:
   build:
-    permissions:
-      contents: write
-      actions: read
-
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          - name: macOS (Apple Silicon)
+            os: macos-latest
             target: aarch64-apple-darwin
+            args: --bundles dmg
+            artifact: subtitle-renamer_${{ github.ref_name }}_macos_aarch64.dmg
 
-          - os: macos-latest
+          - name: macOS (Intel)
+            os: macos-latest
             target: x86_64-apple-darwin
+            args: --bundles dmg
+            artifact: subtitle-renamer_${{ github.ref_name }}_macos_x64.dmg
 
-          - os: windows-latest
+          - name: Windows (x64)
+            os: windows-latest
             target: x86_64-pc-windows-msvc
+            args: --no-bundle
+            artifact: subtitle-renamer_${{ github.ref_name }}_windows_x64.zip
+            exeName: Subtitle Renamer.exe
 
+    name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -55,14 +62,48 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Build and release
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Tauri app
+        run: pnpm tauri build --target ${{ matrix.target }} ${{ matrix.args }}
+
+      - name: Prepare macOS artifact
+        if: matrix.os == 'macos-latest'
+        run: |
+          DMG=$(find src/target/${{ matrix.target }}/release/bundle/dmg -name "*.dmg" | head -1)
+          cp "$DMG" "${{ matrix.artifact }}"
+
+      - name: Prepare Windows artifact
+        if: matrix.os == 'windows-latest'
+        shell: powershell
+        run: |
+          $exe = Get-ChildItem src\target\${{ matrix.target }}\release\*.exe
+          Copy-Item $exe.FullName "${{ matrix.exeName }}"
+          Compress-Archive -Path "${{ matrix.exeName }}" -DestinationPath ${{ matrix.artifact }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: v${{ github.ref_name }}
-          releaseBody: |
+          name: ${{ matrix.target }}
+          path: ${{ matrix.artifact }}
+
+  release:
+    name: Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: 🎉 ${{ github.ref_name }}
+          body: |
             ## 新增
             - 新增内容
             
@@ -71,28 +112,7 @@ jobs:
 
             ## 修复
             - 修复内容
-          releaseDraft: true
-          assetNamePattern: >-
-            ${{ matrix.os == 'macos-latest'
-                && 'subtitle-renamer_[version]_macos_[arch][ext]'
-                || 'Subtitle Renamer' }}
-          args: >-
-            ${{ matrix.os == 'macos-latest'
-                && format('--target {0} --bundles dmg', matrix.target)
-                || format('--target {0} --no-bundle', matrix.target) }}
-          uploadPlainBinary: ${{ matrix.os == 'windows-latest' }}
-
-      - name: Zip Windows exe
-        if: matrix.os == 'windows-latest'
-        shell: powershell
-        run: |
-          $exe = Get-ChildItem src\target\${{ matrix.target }}\release\*.exe
-          Compress-Archive -Path $exe.FullName -DestinationPath subtitle-renamer_${{ github.ref_name }}_windows_x64.zip
-
-      - name: Upload Windows zip
-        if: matrix.os == 'windows-latest'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
           draft: true
-          files: subtitle-renamer_${{ github.ref_name }}_windows_x64.zip
+          files: |
+            *.dmg
+            *.zip
