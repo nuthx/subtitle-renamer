@@ -3,13 +3,13 @@
 @theme {
   --color-accent: light-dark(#1DA0E2, #1DA0E2);
 
-  --color-primary: light-dark(hsl(0 0 20), hsl(0 0 100));
-  --color-secondary: light-dark(hsl(0 0 20 / 0.6), hsl(0 0 1 / 0.6));
-  --color-muted: light-dark(hsl(0 0 20 / 0.24), hsl(0 0 1 / 0.6));
+  --color-primary: light-dark(hsl(0 0 20), hsl(0 0 90));
+  --color-secondary: light-dark(hsl(0 0 20 / 0.6), hsl(0 0 90 / 0.5));
+  --color-muted: light-dark(hsl(0 0 20 / 0.24), hsl(0 0 90 / 0.2));
 
   --color-border: light-dark(hsl(0 0 0 / 0.1), hsl(0 0 100 / 0.1));
-  --color-background: light-dark(hsl(0 0 100), hsl(0 0 0));
-  --color-background-dark: light-dark(hsl(0 0 96), hsl(0 0 4));
+  --color-background: light-dark(hsl(0 0 100), hsl(0 0 12));
+  --color-background-dark: light-dark(hsl(0 0 96), hsl(0 0 20));
 
   --color-error: light-dark(#FB2C37, #FF6467);
 }

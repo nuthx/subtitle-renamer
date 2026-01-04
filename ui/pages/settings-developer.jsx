@@ -40,6 +40,23 @@ export function DeveloperSetting() {
           <Button onClick={handleResetConfig}>重置</Button>
         </SettingsItem>
       </SettingsCard>
+
+      {import.meta.env.DEV && (
+        <>
+          <SettingsTitle title="通知测试" />
+
+          <SettingsCard>
+            <SettingsItem title="重置配置文件" subtitle="点击后立即重置所有配置项，没有二次弹窗确认。部分配置需重启后生效" icon={<ArrowClockwiseIcon />}>
+              <div className="flex gap-2">
+                <Button onClick={() => toast.success({ title: "单行标题" })}>成功</Button>
+                <Button onClick={() => toast.warning({ title: "单行标题" })}>警告</Button>
+                <Button onClick={() => toast.error({ title: "多行标题", description: "多行多行多行多行多行多行多行内容" })}>错误</Button>
+                <Button onClick={() => toast.promise(new Promise((r) => setTimeout(r, 1500)), { loading: { title: "加载中..." }, success: { title: "加载完成" } })}>加载</Button>
+              </div>
+            </SettingsItem>
+          </SettingsCard>
+        </>
+      )}
     </SettingsContent>
   )
 }
