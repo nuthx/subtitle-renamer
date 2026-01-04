@@ -64,6 +64,8 @@ jobs:
 
       - name: Build Tauri app
         run: pnpm tauri build --target ${{ matrix.target }} ${{ matrix.args }}
+        env:
+          CI: ${{ matrix.os == 'macos-latest' && 'false' || 'true' }}
 
       - name: Prepare macOS artifact
         if: matrix.os == 'macos-latest'
