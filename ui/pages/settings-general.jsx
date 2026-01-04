@@ -3,7 +3,7 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { SunIcon, FrameCornersIcon, ProhibitIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
+import { SunIcon, FrameCornersIcon, ArrowsClockwiseIcon, ProhibitIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
 
 export function GeneralSetting() {
@@ -43,7 +43,7 @@ export function GeneralSetting() {
       <SettingsTitle title="文件添加设置" />
 
       <SettingsCard>
-        <SettingsItem title="简繁识别" subtitle="添加文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<FileArchiveIcon />}>
+        <SettingsItem title="简繁识别" subtitle="添加文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<ArrowsClockwiseIcon />}>
           <Switch
             checked={config?.subtitle?.detect_language}
             onChange={(checked) => saveConfig("subtitle", "detect_language", checked)}
