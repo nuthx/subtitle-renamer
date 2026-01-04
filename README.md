@@ -3,11 +3,11 @@
 <br/>
 <br/>
 
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-2BADE9)
-![License](https://img.shields.io/github/license/nuthx/subtitle-renamer?color=2BADE9)
-![Stars](https://img.shields.io/github/stars/nuthx/subtitle-renamer?style=flat&color=2BADE9)
-![Downloads](https://img.shields.io/github/downloads/nuthx/subtitle-renamer/total?color=2BADE9)
-[![Release](https://img.shields.io/github/v/release/nuthx/subtitle-renamer?color=2BADE9&label=version)](https://github.com/nuthx/subtitle-renamer/releases/latest)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-35B9F6?labelColor=005982)
+![License](https://img.shields.io/github/license/nuthx/subtitle-renamer?labelColor=005982&color=35B9F6)
+![Stars](https://img.shields.io/github/stars/nuthx/subtitle-renamer?style=flat&labelColor=005982&color=35B9F6)
+![Downloads](https://img.shields.io/github/downloads/nuthx/subtitle-renamer/total?labelColor=005982&color=35B9F6)
+[![Release](https://img.shields.io/github/v/release/nuthx/subtitle-renamer?labelColor=005982&color=35B9F6&label=version)](https://github.com/nuthx/subtitle-renamer/releases/latest)
 
 </div>
 
