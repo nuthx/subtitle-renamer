@@ -83,9 +83,9 @@ export async function detectFiles(paths, fileList, archiveList) {
 
   // 构建排除指定视频和字幕文件名的正则
   // eslint-disable-next-line @stylistic/max-statements-per-line
-  const excludeVideoRegex = (() => { try { return new RegExp(config.subtitle.exclude_video, "i") } catch { return null } })()
+  const excludeVideoRegex = (() => { try { const pattern = config.subtitle.exclude_video?.trim(); return pattern ? new RegExp(pattern, "i") : null } catch { return null } })()
   // eslint-disable-next-line @stylistic/max-statements-per-line
-  const excludeSubtitleRegex = (() => { try { return new RegExp(config.subtitle.exclude_subtitle, "i") } catch { return null } })()
+  const excludeSubtitleRegex = (() => { try { const pattern = config.subtitle.exclude_subtitle?.trim(); return pattern ? new RegExp(pattern, "i") : null } catch { return null } })()
 
   // 分类文件
   await Promise.all(allFiles.map(async (path) => {

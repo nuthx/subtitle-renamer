@@ -3,7 +3,7 @@ import { load } from "@tauri-apps/plugin-store"
 const DEFAULT_CONFIG = {
   general: {
     theme: "system",
-    remember_window: false
+    remember_window: true
   },
   subtitle: {
     detect_language: true,
