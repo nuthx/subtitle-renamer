@@ -40,34 +40,32 @@
             "opener:default",
             "store:default",
             "dialog:default",
-            "fs:default",
             "shell:default",
+            "fs:default",
+            "fs:allow-read-file",
+            "fs:allow-read-dir",
+            "fs:allow-write-file",
+            "fs:allow-write-text-file",
+            "fs:allow-read-text-file",
+            "fs:allow-exists",
+            "fs:allow-create",
+            "fs:allow-copy-file",
+            "fs:allow-mkdir",
+            "fs:allow-remove",
+            "fs:allow-rename",
+            "fs:allow-truncate",
+            "fs:allow-ftruncate",
+            "fs:allow-stat",
+            "fs:allow-lstat",
+            "fs:allow-fstat",
+            "fs:allow-open",
+            "fs:allow-read",
+            "fs:allow-write",
+            "fs:allow-seek",
+            "fs:allow-watch",
+            "fs:allow-unwatch",
             {
-              "identifier": "fs:allow-read",
-              "allow": [{ "path": "**" }]
-            },
-            {
-              "identifier": "fs:allow-read-file",
-              "allow": [{ "path": "**" }]
-            },
-            {
-              "identifier": "fs:allow-write",
-              "allow": [{ "path": "**" }]
-            },
-            {
-              "identifier": "fs:allow-exists",
-              "allow": [{ "path": "**" }]
-            },
-            {
-              "identifier": "fs:allow-rename",
-              "allow": [{ "path": "**" }]
-            },
-            {
-              "identifier": "fs:allow-copy-file",
-              "allow": [{ "path": "**" }]
-            },
-            {
-              "identifier": "fs:allow-remove",
+              "identifier": "fs:scope",
               "allow": [{ "path": "**" }]
             },
             {
