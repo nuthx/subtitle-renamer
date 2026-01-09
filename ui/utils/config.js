@@ -6,6 +6,7 @@ const DEFAULT_CONFIG = {
     remember_window: true
   },
   subtitle: {
+    config_badge: true,
     detect_language: true,
     exclude_video: "",
     exclude_subtitle: "",
