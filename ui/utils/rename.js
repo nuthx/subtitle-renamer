@@ -65,7 +65,9 @@ export async function renameSubtitles(fileData, archiveList) {
       await copyFile(path.old, path.new)
 
       // 非复制模式，或复制模式但字幕在同文件夹时，删除旧字幕
-      if (moveSub !== "copy" || dirname(path.old) === dirname(path.new)) {
+      const oldDir = await dirname(path.old)
+      const newDir = await dirname(path.new)
+      if (moveSub !== "copy" || oldDir === newDir) {
         pathsToTrash.push(path.old)
       }
 

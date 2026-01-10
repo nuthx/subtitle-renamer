@@ -10,7 +10,9 @@ import { ContextMenu, ContextItem, ContextSeparator } from "@/components/context
 import { DropArea } from "@/components/drop"
 import { Table } from "@/components/table"
 import { Button } from "@/components/button"
+import { Badge } from "@/components/badge"
 import { FileVideoIcon, FileTextIcon, FileArchiveIcon } from "@phosphor-icons/react"
+import { useConfig } from "@/hooks/useConfig"
 import { useSubtitleStore } from "@/store/subtitle"
 
 const colKeys = ["video", "sc", "tc"]
@@ -20,6 +22,7 @@ export function SubtitleRename() {
   const [fileData, setFileData] = useState([]) // 展平为带路径的数组，用于重命名
   const [tableData, setTableData] = useState([]) // 上面数组的基础上移除了路径，只保留文件名
 
+  const { config } = useConfig()
   const { fileList, archiveList, setFileList, setArchiveList, clearAll } = useSubtitleStore()
 
   const tableColumns = [
@@ -77,7 +80,7 @@ export function SubtitleRename() {
     toast.promise(dropPromise, {
       loading: { title: "正在添加文件" },
       success: { title: (data) => data.message },
-      error: { type: "warning", title: (err) => err.message }
+      error: { type: "warning", title: (err) => err }
     })
   }, [fileList, archiveList, setFileList, setArchiveList])
 
@@ -171,6 +174,23 @@ export function SubtitleRename() {
       </PageBlock>
 
       <PageBlock className="items-center justify-end gap-3 p-4" last>
+        {config?.subtitle?.config_badge !== false && (
+          <div className="flex-1 flex items-center gap-2">
+            {config?.subtitle?.move_sub && (
+              <Badge variant="outline">
+                {config.subtitle.move_sub === "none" && "保持原位"}
+                {config.subtitle.move_sub === "copy" && "复制字幕"}
+                {config.subtitle.move_sub === "cut" && "剪切字幕"}
+              </Badge>
+            )}
+            {config?.subtitle?.remove_sub && config.subtitle.remove_sub !== "none" && (
+              <Badge variant="outline">
+                {config.subtitle.remove_sub === "sc" ? "删除简体" : "删除繁体"}
+              </Badge>
+            )}
+          </div>
+        )}
+
         <Button className="w-26" onClick={() => clearAll()}>清空列表</Button>
         <Button variant="primary" className="w-26" onClick={handleRename}>重命名</Button>
       </PageBlock>

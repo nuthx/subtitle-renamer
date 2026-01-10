@@ -1,7 +1,7 @@
 {
   "name": "subtitle-renamer",
   "private": true,
-  "version": "2.0.4",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,17 +14,17 @@
     "@headlessui/react": "^2.2.9",
     "@phosphor-icons/react": "^2.1.10",
     "@tauri-apps/api": "^2.9.1",
-    "@tauri-apps/plugin-dialog": "^2.4.2",
-    "@tauri-apps/plugin-fs": "^2.4.4",
-    "@tauri-apps/plugin-opener": "^2.5.2",
+    "@tauri-apps/plugin-dialog": "^2.5.0",
+    "@tauri-apps/plugin-fs": "^2.4.5",
+    "@tauri-apps/plugin-opener": "^2.5.3",
     "@tauri-apps/plugin-os": "^2.3.2",
-    "@tauri-apps/plugin-shell": "^2.3.3",
-    "@tauri-apps/plugin-store": "^2.4.1",
+    "@tauri-apps/plugin-shell": "^2.3.4",
+    "@tauri-apps/plugin-store": "^2.4.2",
     "chardet": "^2.1.1",
     "clsx": "^2.1.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-router-dom": "^7.11.0",
+    "react-router-dom": "^7.12.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "zustand": "^5.0.9"
@@ -41,6 +41,6 @@
     "globals": "^17.0.0",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.18",
-    "vite": "^7.3.0"
+    "vite": "^7.3.1"
   }
 }

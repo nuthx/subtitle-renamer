@@ -3,7 +3,7 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { SunIcon, FrameCornersIcon, ArrowsClockwiseIcon, ProhibitIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
+import { SunIcon, FrameCornersIcon, TagIcon, ArrowsClockwiseIcon, ProhibitIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
 
 export function GeneralSetting() {
@@ -36,6 +36,15 @@ export function GeneralSetting() {
           <Switch
             checked={config?.general?.remember_window}
             onChange={(checked) => saveConfig("general", "remember_window", checked)}
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsCard>
+        <SettingsItem title="显示配置标识" subtitle="在字幕重命名页面左下角显示主要的配置状态" icon={<TagIcon />}>
+          <Switch
+            checked={config?.subtitle?.config_badge ?? true}
+            onChange={(checked) => saveConfig("subtitle", "config_badge", checked)}
           />
         </SettingsItem>
       </SettingsCard>
