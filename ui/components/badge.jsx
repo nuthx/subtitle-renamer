@@ -8,7 +8,7 @@ export function Badge({ children, variant = "default", className, ...props }) {
 
   return (
     <span
-      className={cn("flex-center h-7 px-4 border rounded-full", variants[variant], className)}
+      className={cn("flex-center h-7 px-4 border text-[13px] rounded-full", variants[variant], className)}
       {...props}
     >
       {children}
