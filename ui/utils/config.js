@@ -3,6 +3,7 @@ import { load } from "@tauri-apps/plugin-store"
 const DEFAULT_CONFIG = {
   general: {
     theme: "system",
+    window_vibrancy: true,
     remember_window: true
   },
   subtitle: {
