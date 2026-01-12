@@ -3,7 +3,7 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { SunIcon, FrameCornersIcon, TagIcon, ArrowsClockwiseIcon, ProhibitIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
+import { SunIcon, AppWindowIcon, FrameCornersIcon, TagIcon, ArrowsClockwiseIcon, ProhibitIcon, FileDashedIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
 
 export function GeneralSetting() {
@@ -27,6 +27,15 @@ export function GeneralSetting() {
             value={config?.general?.theme}
             onChange={(value) => saveConfig("general", "theme", value)}
             className="w-48"
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsCard>
+        <SettingsItem title="启用窗口材质" subtitle="启用系统的 Mica 或 Vibrancy 等窗口效果。修改后需重启生效" icon={<AppWindowIcon />}>
+          <Switch
+            checked={config?.general?.window_vibrancy ?? true}
+            onChange={(checked) => saveConfig("general", "window_vibrancy", checked)}
           />
         </SettingsItem>
       </SettingsCard>

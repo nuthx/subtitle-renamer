@@ -45,30 +45,38 @@ pub fn run() {
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
 
-            // 根据配置决定是否恢复窗口状态
-            if app
-                .store("config.json")
-                .ok()
-                .and_then(|store| store.get("general"))
-                .and_then(|general| general.get("remember_window").cloned())
+            // 获取配置
+            let store = app.store("config.json").ok();
+            let general = store.as_ref().and_then(|s| s.get("general"));
+            let remember_window = general
+                .as_ref()
+                .and_then(|g| g.get("remember_window").cloned())
                 .and_then(|v| v.as_bool())
-                .unwrap_or(false)
-            {
+                .unwrap_or(false);
+            let enable_vibrancy = general
+                .as_ref()
+                .and_then(|g| g.get("window_vibrancy").cloned())
+                .and_then(|v| v.as_bool())
+                .unwrap_or(true);
+
+            // 恢复窗口状态
+            if remember_window {
                 let _ = window.restore_state(StateFlags::all());
             }
 
-            // 在 Windows 下依次尝试应用云母、亚克力、模糊材质
-            #[cfg(target_os = "windows")]
-            {
-                let _ = apply_mica(&window, None)
-                    .or_else(|_| apply_acrylic(&window, None))
-                    .or_else(|_| apply_blur(&window, None));
-            }
+            // 应用窗口材质
+            if enable_vibrancy {
+                #[cfg(target_os = "windows")]
+                {
+                    let _ = apply_mica(&window, None)
+                        .or_else(|_| apply_acrylic(&window, None))
+                        .or_else(|_| apply_blur(&window, None));
+                }
 
-            // 应用 macOS 模糊材质
-            #[cfg(target_os = "macos")]
-            {
-                let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None);
+                #[cfg(target_os = "macos")]
+                {
+                    let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None);
+                }
             }
 
             // 创建 macOS 菜单

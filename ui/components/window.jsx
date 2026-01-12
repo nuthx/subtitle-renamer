@@ -1,10 +1,14 @@
 import { type } from "@tauri-apps/plugin-os"
+import { useConfig } from "@/hooks/useConfig"
 import { cn } from "@/utils/cn"
 
 export function AppWindow({ children }) {
+  const { config } = useConfig()
+  const enableVibrancy = config?.general?.window_vibrancy ?? true
+
   const itemPlatform = {
-    windows: "",
-    macos: "bg-background-dark/80",
+    windows: enableVibrancy ? "" : "bg-background-dark",
+    macos: enableVibrancy ? "bg-background-dark/80" : "bg-background-dark",
     linux: "bg-background-dark"
   }
 
