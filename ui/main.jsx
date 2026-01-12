@@ -11,6 +11,7 @@ import { Nav, NavButton, NavSpace, NavUpgrade } from "@/components/nav.jsx"
 import { SubtitleRename } from "@/pages/subtitle"
 import { Settings } from "@/pages/settings"
 import { GeneralSetting } from "@/pages/settings-general"
+import { RenameSetting } from "@/pages/settings-rename"
 import { DeveloperSetting } from "@/pages/settings-developer"
 import { AboutSetting } from "@/pages/settings-about"
 import { SubtitlesIcon, GearSixIcon } from "@phosphor-icons/react"
@@ -52,6 +53,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/settings" element={<Settings />}>
               <Route index element={<Navigate to="general" replace />} />
               <Route path="general" element={<GeneralSetting />} />
+              <Route path="rename" element={<RenameSetting />} />
               <Route path="developer" element={<DeveloperSetting />} />
               <Route path="about" element={<AboutSetting />} />
             </Route>
