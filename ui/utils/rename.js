@@ -61,22 +61,24 @@ export async function renameSubtitles(fileData, archiveList) {
     }
 
     for (const path of filePaths) {
-      // 使用复制操作来重命名
-      await copyFile(path.old, path.new)
+      // 检测编码
+      const bytes = await readFile(path.old)
+      const encoding = chardet.detect(bytes)
+
+      // 不转换编码时：复制文件到新路径
+      // 转换编码时：读取后直接写入
+      if (encoding === "UTF-8" && bytes[0] !== 0xEF) {
+        await copyFile(path.old, path.new) // 使用复制方式来重命名避坑
+      } else {
+        const text = new TextDecoder(encoding).decode(bytes).replace(/^\uFEFF/, "") // 移除utf-8 bom
+        await writeFile(path.new, new TextEncoder().encode(text))
+      }
 
       // 非复制模式，或复制模式但字幕在同文件夹时，删除旧字幕
       const oldDir = await dirname(path.old)
       const newDir = await dirname(path.new)
       if (moveSub !== "copy" || oldDir === newDir) {
         pathsToTrash.push(path.old)
-      }
-
-      // 检测编码，非 UTF-8 则转换
-      const bytes = await readFile(path.new)
-      const encoding = chardet.detect(bytes)
-      if (encoding && encoding.toLowerCase() !== "utf-8") {
-        const text = new TextDecoder(encoding).decode(bytes)
-        await writeFile(path.new, new TextEncoder().encode(text))
       }
     }
 
