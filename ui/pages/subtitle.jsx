@@ -25,11 +25,16 @@ export function SubtitleRename() {
   const { config } = useConfig()
   const { fileList, archiveList, setFileList, setArchiveList, clearAll } = useSubtitleStore()
 
-  const tableColumns = [
-    { key: "video", title: "视频文件" },
-    { key: "sc", title: "简体字幕" },
-    { key: "tc", title: "繁体字幕" }
-  ]
+  const tableColumns = config?.subtitle?.detect_language
+    ? [
+        { key: "video", title: "视频文件" },
+        { key: "sc", title: "简体字幕" },
+        { key: "tc", title: "繁体字幕" }
+      ]
+    : [
+        { key: "video", title: "视频文件" },
+        { key: "sc", title: "字幕文件" }
+      ]
 
   useEffect(() => {
     const processData = async () => {
@@ -140,10 +145,11 @@ export function SubtitleRename() {
           const canMoveUp = hasContent && cell.row > 0
           const canMoveDown = hasContent && cell.row < colData.length - 1
           const isSubtitle = [1, 2].includes(cell.col)
+          const detectLanguage = config?.subtitle?.detect_language
           return (
             <>
-              {isSubtitle && hasContent && <ContextItem title={cell.col === 1 ? "更改为繁体字幕" : "更改为简体字幕"} onClick={handleChangeType} />}
-              {isSubtitle && hasContent && <ContextSeparator />}
+              {isSubtitle && hasContent && detectLanguage && <ContextItem title={cell.col === 1 ? "更改为繁体字幕" : "更改为简体字幕"} onClick={handleChangeType} />}
+              {isSubtitle && hasContent && detectLanguage && <ContextSeparator />}
               {canMoveUp && <ContextItem title="上移一行" onClick={() => handleMove(-1)} />}
               {canMoveDown && <ContextItem title="下移一行" onClick={() => handleMove(1)} />}
               {(canMoveUp || canMoveDown) && <ContextSeparator />}
