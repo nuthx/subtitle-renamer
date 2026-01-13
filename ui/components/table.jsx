@@ -1,121 +1,83 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react"
-import { cn } from "@/utils/cn"
+import { useState, useRef, useEffect, useMemo } from "react"
 
-export function Table({ columns, data, selectedIndex, onClick, onContextMenu }) {
+export function Table({ columns, data, onClick, onContextMenu }) {
+  const [columnWidths, setColumnWidths] = useState([])
   const containerRef = useRef(null)
   const headerRef = useRef(null)
   const bodyRef = useRef(null)
-  const [columnWidths, setColumnWidths] = useState([])
-  const [scrollbarWidth, setScrollbarWidth] = useState(0)
 
-  // 提取表头
   const header = columns.map((col) => col.title)
-
-  // 计算总宽度
   const totalWidth = useMemo(() => columnWidths.reduce((sum, width) => sum + width, 0), [columnWidths])
 
-  // 计算滚动条宽度
-  const calculateScrollbarWidth = () => {
-    if (!containerRef.current || !bodyRef.current) return 0
-    return containerRef.current.offsetWidth - bodyRef.current.clientWidth
-  }
+  // 初始化列宽和滚动条宽度
+  useEffect(() => {
+    if (columnWidths.length === 0 && header.length > 0 && containerRef.current && bodyRef.current) {
+      const scrollbar = containerRef.current.offsetWidth - bodyRef.current.clientWidth
+      const availableWidth = containerRef.current.clientWidth - scrollbar - 8
+      const defaultWidth = Math.floor(availableWidth / header.length)
+      const remainder = availableWidth - defaultWidth * header.length
 
-  // 优化：提取列宽计算逻辑
-  const calculateColumnWidths = useCallback((containerWidth, headerLength) => {
-    const systemScrollbarWidth = calculateScrollbarWidth()
-    const availableWidth = containerWidth - 8 - systemScrollbarWidth
-    const defaultWidth = Math.floor(availableWidth / headerLength)
-    return Array(headerLength).fill(Math.max(100, defaultWidth))
+      setColumnWidths(
+        Array(header.length).fill(defaultWidth).map((w, i) =>
+          i === header.length - 1 ? w + remainder : w
+        )
+      )
+    }
+  }, [header.length, columnWidths.length])
+
+  // 横向滚动同步
+  useEffect(() => {
+    const body = bodyRef.current
+    const header = headerRef.current
+
+    if (body && header) {
+      const handleScroll = () => header.scrollLeft = body.scrollLeft
+      body.addEventListener("scroll", handleScroll)
+      return () => body.removeEventListener("scroll", handleScroll)
+    }
   }, [])
 
-  // 初始化列宽
-  useEffect(() => {
-    if (columnWidths.length === 0 && header.length > 0 && containerRef.current) {
-      const newWidths = calculateColumnWidths(containerRef.current.clientWidth, header.length)
-      setColumnWidths(newWidths)
-    }
-  }, [header.length, columnWidths.length, calculateColumnWidths])
-
-  // 优化：拖拽处理函数
-  const handleResizeColumn = useCallback((index, event) => {
-    event.preventDefault()
-
+  // 拖拽调整列宽
+  const handleResizeColumn = (index, event) => {
+    const controller = new AbortController()
     const startX = event.clientX
     const startWidth = columnWidths[index]
 
-    const handleMouseMove = (moveEvent) => {
-      const newWidth = Math.max(50, startWidth + moveEvent.clientX - startX)
-      setColumnWidths((widths) => {
-        const newWidths = [...widths]
-        newWidths[index] = newWidth
-        return newWidths
-      })
+    const handleMouseMove = (e) => {
+      setColumnWidths((widths) =>
+        widths.map((w, i) => i === index ? Math.max(200, startWidth + e.clientX - startX) : w)
+      )
     }
 
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove)
-      document.removeEventListener("mouseup", handleMouseUp)
-      document.body.style.cursor = "default"
-    }
-
-    document.addEventListener("mousemove", handleMouseMove)
-    document.addEventListener("mouseup", handleMouseUp)
-    document.body.style.cursor = "col-resize"
-  }, [columnWidths])
-
-  // 优化：滚动条宽度检测和横向滚动同步
-  useEffect(() => {
-    const body = bodyRef.current
-    const headerEl = headerRef.current
-    if (!body || !headerEl) return
-
-    const updateScrollbarWidth = () => setScrollbarWidth(calculateScrollbarWidth())
-    const handleScroll = () => headerEl.scrollLeft = body.scrollLeft
-
-    updateScrollbarWidth()
-
-    const resizeObserver = new ResizeObserver(updateScrollbarWidth)
-    resizeObserver.observe(body)
-    body.addEventListener("scroll", handleScroll)
-
-    return () => {
-      body.removeEventListener("scroll", handleScroll)
-      resizeObserver.disconnect()
-    }
-  }, [data])
+    document.addEventListener("mousemove", handleMouseMove, { signal: controller.signal })
+    document.addEventListener("mouseup", () => controller.abort(), { signal: controller.signal })
+  }
 
   return (
     <div ref={containerRef} className="flex-1 flex flex-col overflow-hidden">
-      {/* 表头 */}
-      <div className="sticky top-0 z-10 border-b">
-        <div ref={headerRef} className="px-1 min-w-full overflow-hidden" style={{ paddingRight: `${scrollbarWidth + 4}px` }}>
-          <div className="flex h-9 select-none" style={{ width: `${totalWidth}px` }}>
-            {header.map((item, index) => (
-              <div key={index} className="relative flex items-center border-r" style={{ width: columnWidths[index] }}>
-                <p className="px-3 text-sm text-left">{item}</p>
-                <div className="absolute -right-px h-full w-1 rounded-full cursor-col-resize hover:bg-accent active:bg-accent transition-all" onMouseDown={(e) => handleResizeColumn(index, e)}></div>
-              </div>
-            ))}
-          </div>
+      <div ref={headerRef} className="sticky top-0 z-10 pl-1 border-b overflow-hidden">
+        <div className="flex h-9" style={{ width: totalWidth }}>
+          {header.map((item, index) => (
+            <div key={index} className="relative flex items-center border-r shrink-0" style={{ width: index === header.length - 1 ? columnWidths[index] + 5 : columnWidths[index] }}>
+              <p className="px-3 text-left">{item}</p>
+              <div
+                className="absolute right-0 h-full w-1 rounded-full cursor-col-resize hover:bg-accent active:bg-accent transition"
+                onMouseDown={(e) => handleResizeColumn(index, e)}
+              />
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* 表单 */}
       <div ref={bodyRef} className="flex-1 overflow-auto p-1">
-        <div className="flex flex-col gap-1" style={{ minWidth: `${totalWidth}px` }}>
+        <div className="flex flex-col gap-1" style={{ minWidth: totalWidth }}>
           {data.map((row, rowIndex) => (
-            <div
-              key={rowIndex}
-              className={cn(
-                "flex odd:bg-muted/20 hover:bg-muted/40 rounded-sm transition",
-                selectedIndex === rowIndex && "bg-muted/60!"
-              )}
-            >
+            <div key={rowIndex} className="flex odd:bg-muted/20 hover:bg-muted/40 rounded-sm transition">
               {columns.map((col, colIndex) => (
                 <div
                   key={colIndex}
                   className="flex items-center h-8 px-3"
-                  style={{ width: `${columnWidths[colIndex]}px` }}
+                  style={{ width: columnWidths[colIndex] }}
                   onClick={() => onClick?.({ row: rowIndex, col: colIndex })}
                   onContextMenu={(e) => {
                     e.preventDefault()
