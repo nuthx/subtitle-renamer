@@ -85,7 +85,7 @@ export function SubtitleRename() {
     toast.promise(dropPromise, {
       loading: { title: "正在添加文件" },
       success: { title: (data) => data.message },
-      error: { type: "warning", title: (err) => err }
+      error: { type: "warning", title: (err) => err.message || String(err) }
     })
   }, [fileList, archiveList, setFileList, setArchiveList])
 
