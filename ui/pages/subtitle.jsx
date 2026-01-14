@@ -1,5 +1,7 @@
 import { basename } from "@tauri-apps/api/path"
 import { useState, useCallback, useEffect } from "react"
+import { useConfig } from "@/hooks/useConfig"
+import { useSubtitleStore } from "@/store/subtitle"
 import { detectFiles } from "@/utils/detect"
 import { renameSubtitles } from "@/utils/rename"
 import { elapsedTime } from "@/utils/time"
@@ -11,9 +13,7 @@ import { DropArea } from "@/components/drop"
 import { Table } from "@/components/table"
 import { Button } from "@/components/button"
 import { Badge } from "@/components/badge"
-import { FileVideoIcon, FileTextIcon, FileArchiveIcon } from "@phosphor-icons/react"
-import { useConfig } from "@/hooks/useConfig"
-import { useSubtitleStore } from "@/store/subtitle"
+import { FileVideoIcon, FileTextIcon, FileArchiveIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon } from "@phosphor-icons/react"
 
 const colKeys = ["video", "sc", "tc"]
 
@@ -148,13 +148,13 @@ export function SubtitleRename() {
           const detectLanguage = config?.subtitle?.detect_language
           return (
             <>
-              {isSubtitle && hasContent && detectLanguage && <ContextItem title={cell.col === 1 ? "更改为繁体字幕" : "更改为简体字幕"} onClick={handleChangeType} />}
+              {isSubtitle && hasContent && detectLanguage && <ContextItem title={cell.col === 1 ? "更改为繁体字幕" : "更改为简体字幕"} icon={<ArrowsClockwiseIcon className="size-4" />} onClick={handleChangeType} />}
               {isSubtitle && hasContent && detectLanguage && <ContextSeparator />}
-              {canMoveUp && <ContextItem title="上移一行" onClick={() => handleMove(-1)} />}
-              {canMoveDown && <ContextItem title="下移一行" onClick={() => handleMove(1)} />}
+              {canMoveUp && <ContextItem title="上移一行" icon={<ArrowFatUpIcon className="size-4" />} onClick={() => handleMove(-1)} />}
+              {canMoveDown && <ContextItem title="下移一行" icon={<ArrowFatUpIcon className="size-4 rotate-180" />} onClick={() => handleMove(1)} />}
               {(canMoveUp || canMoveDown) && <ContextSeparator />}
-              {hasContent && <ContextItem title={cell.col === 0 ? "删除该视频" : "删除该字幕"} onClick={handleDeleteItem} danger />}
-              <ContextItem title="删除此行" onClick={handleDeleteRow} danger />
+              {hasContent && <ContextItem title={cell.col === 0 ? "删除该视频" : "删除该字幕"} icon={<FileMinusIcon className="size-4" />} onClick={handleDeleteItem} danger />}
+              <ContextItem title="删除此行" icon={<StackMinusIcon className="size-4" />} onClick={handleDeleteRow} danger />
             </>
           )
         })()}

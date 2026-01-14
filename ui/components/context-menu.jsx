@@ -31,7 +31,7 @@ export function ContextMenu({ cell, onClose, children, className }) {
         ref={menuRef}
         style={{ left: cell?.x, top: cell?.y }}
         className={cn(
-          "fixed z-50 min-w-52 p-1 bg-background-dark border shadow-lg/10 rounded-md transition",
+          "fixed z-50 min-w-44 p-1 bg-background/90 backdrop-blur-sm border shadow-lg/15 rounded-lg transition",
           cell ? "opacity-100" : "opacity-0 pointer-events-none",
           className
         )}
@@ -54,7 +54,7 @@ export function ContextItem({ title, icon, onClick, danger }) {
   return (
     <button
       className={cn(
-        "flex items-center gap-2 w-full px-3 h-8 hover:bg-muted/40 rounded-sm cursor-pointer transition",
+        "flex items-center gap-2.5 w-full px-3 h-8 hover:bg-background-dark rounded-sm cursor-pointer transition",
         danger && "hover:text-error"
       )}
       onClick={handleClick}
