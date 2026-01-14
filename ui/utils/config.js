@@ -8,6 +8,9 @@ const DEFAULT_CONFIG = {
   },
   subtitle: {
     config_badge: true,
+    highlight_diff: true,
+    highlight_ignore_case: false,
+    highlight_numbers_only: false,
     detect_language: true,
     exclude_video: "",
     exclude_subtitle: "",

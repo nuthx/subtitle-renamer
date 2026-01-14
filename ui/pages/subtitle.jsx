@@ -6,6 +6,7 @@ import { detectFiles } from "@/utils/detect"
 import { renameSubtitles } from "@/utils/rename"
 import { elapsedTime } from "@/utils/time"
 import { sortFiles } from "@/utils/sort"
+import { highlightDiff } from "@/utils/highlight"
 import { toast } from "@/components/toast"
 import { Page, PageBlock } from "@/components/page"
 import { ContextMenu, ContextItem, ContextSeparator } from "@/components/context-menu"
@@ -53,11 +54,16 @@ export function SubtitleRename() {
         )
       )
 
-      setFileData(data)
-      setTableData(result)
+      if (config?.subtitle?.highlight_diff) {
+        setFileData(data)
+        setTableData(highlightDiff(result, config.subtitle.highlight_ignore_case, config.subtitle.highlight_numbers_only))
+      } else {
+        setFileData(data)
+        setTableData(result)
+      }
     }
     processData()
-  }, [fileList])
+  }, [fileList, config])
 
   // 拖拽添加文件
   const handleFileDrop = useCallback(async (paths) => {

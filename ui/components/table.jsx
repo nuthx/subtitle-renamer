@@ -84,7 +84,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
                     onContextMenu?.({ x: e.clientX, y: e.clientY, row: rowIndex, col: colIndex })
                   }}
                 >
-                  <p className="truncate">{row[col.key] || ""}</p>
+                  <p className="truncate" dangerouslySetInnerHTML={{ __html: row[col.key] || "" }} />
                 </div>
               ))}
             </div>

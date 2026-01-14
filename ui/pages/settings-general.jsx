@@ -2,7 +2,7 @@ import { useConfig } from "@/hooks/useConfig"
 import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
 import { Select } from "@/components/select"
 import { Switch } from "@/components/switch"
-import { SunIcon, BrowserIcon, FrameCornersIcon, TagIcon } from "@phosphor-icons/react"
+import { SunIcon, BrowserIcon, FrameCornersIcon } from "@phosphor-icons/react"
 
 export function GeneralSetting() {
   const { config, saveConfig } = useConfig()
@@ -45,17 +45,6 @@ export function GeneralSetting() {
           <Switch
             checked={config?.general?.remember_window}
             onChange={(checked) => saveConfig("general", "remember_window", checked)}
-          />
-        </SettingsItem>
-      </SettingsCard>
-
-      <SettingsTitle title="界面" />
-
-      <SettingsCard>
-        <SettingsItem title="显示配置标识" subtitle="在字幕命名页面的左下角，显示主要的配置状态" icon={<TagIcon />}>
-          <Switch
-            checked={config?.subtitle?.config_badge ?? true}
-            onChange={(checked) => saveConfig("subtitle", "config_badge", checked)}
           />
         </SettingsItem>
       </SettingsCard>
