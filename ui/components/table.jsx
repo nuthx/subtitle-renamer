@@ -11,7 +11,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
 
   // 初始化列宽和滚动条宽度
   useEffect(() => {
-    if (columnWidths.length === 0 && header.length > 0 && containerRef.current && bodyRef.current) {
+    if (data.length > 0 && header.length > 0 && containerRef.current && bodyRef.current) {
       const scrollbar = containerRef.current.offsetWidth - bodyRef.current.clientWidth
       const availableWidth = containerRef.current.clientWidth - scrollbar - 8
       const defaultWidth = Math.floor(availableWidth / header.length)
@@ -23,7 +23,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
         )
       )
     }
-  }, [header.length, columnWidths.length])
+  }, [header.length, data.length])
 
   // 横向滚动同步
   useEffect(() => {
