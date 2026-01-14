@@ -92,7 +92,7 @@ export function SubtitleRename() {
 
     toast.promise(dropPromise, {
       loading: { title: "正在添加文件" },
-      success: { title: (data) => data.message },
+      success: { title: (data) => data.message, duration: 1000 },
       error: { type: "warning", title: (error) => error.message || String(error) }
     })
   }, [fileList, archiveList, setFileList, setArchiveList])
@@ -112,7 +112,7 @@ export function SubtitleRename() {
     try {
       const fileName = await basename(fileData[cell.row]?.[colKeys[cell.col]])
       await writeText(fileName)
-      toast.success({ title: "已复制文件名" })
+      toast.success({ title: "已复制文件名" }, { duration: 800 })
     } catch (error) {
       toast.error({ title: "复制失败", description: error.message || String(error) })
     }
@@ -122,7 +122,7 @@ export function SubtitleRename() {
   const handleCopyFilePath = useCallback(async () => {
     try {
       await writeText(fileData[cell.row]?.[colKeys[cell.col]])
-      toast.success({ title: "已复制文件路径" })
+      toast.success({ title: "已复制文件路径" }, { duration: 800 })
     } catch (error) {
       toast.error({ title: "复制失败", description: error.message || String(error) })
     }

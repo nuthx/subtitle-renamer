@@ -2,7 +2,7 @@ import { toast as sonnerToast } from "sonner"
 import { cn } from "@/utils/cn"
 import { CircleNotchIcon, CheckCircleIcon, WarningCircleIcon, XCircleIcon, XIcon } from "@phosphor-icons/react"
 
-const DURATION_TIME = 2000
+const DURATION_TIME = 1500
 
 export function toast({ title, description, type }, toastOptions) {
   const itemType = {
@@ -65,7 +65,7 @@ toast.promise = (promise, { loading, success, error }) => {
       toast.success({
         title: typeof success.title === "function" ? success.title(data) : success.title,
         description: typeof success.description === "function" ? success.description(data) : success.description
-      }, { id: loadingToast, duration: DURATION_TIME })
+      }, { id: loadingToast, duration: success.duration ?? DURATION_TIME })
     })
     .catch((err) => {
       const errorType = error.type || "error"
@@ -73,7 +73,7 @@ toast.promise = (promise, { loading, success, error }) => {
       toastMethod({
         title: typeof error.title === "function" ? error.title(err) : error.title,
         description: typeof error.description === "function" ? error.description(err) : error.description
-      }, { id: loadingToast, duration: DURATION_TIME })
+      }, { id: loadingToast, duration: error.duration ?? DURATION_TIME })
     })
 
   return loadingToast
