@@ -58,7 +58,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
       <div ref={headerRef} className="sticky top-0 z-10 pl-1 border-b overflow-hidden">
         <div className="flex h-9" style={{ width: totalWidth }}>
           {header.map((item, index) => (
-            <div key={index} className="relative flex items-center border-r shrink-0" style={{ width: index === header.length - 1 ? columnWidths[index] + 5 : columnWidths[index] }}>
+            <div key={index} className="relative flex items-center border-r shrink-0" style={{ width: columnWidths[index] !== undefined ? (index === header.length - 1 ? columnWidths[index] + 5 : columnWidths[index]) : undefined }}>
               <p className="px-3 text-left">{item}</p>
               <div
                 className="absolute right-0 h-full w-1 rounded-full cursor-col-resize hover:bg-accent active:bg-accent transition"
