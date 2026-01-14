@@ -69,7 +69,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
         </div>
       </div>
 
-      <div ref={bodyRef} className="flex-1 overflow-auto p-1">
+      <div ref={bodyRef} className="flex-1 flex overflow-auto p-1">
         <div className="flex flex-col gap-1" style={{ minWidth: totalWidth }}>
           {data.map((row, rowIndex) => (
             <div key={rowIndex} className="flex odd:bg-muted/20 hover:bg-muted/40 rounded-sm transition">
