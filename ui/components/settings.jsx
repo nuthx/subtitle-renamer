@@ -106,8 +106,8 @@ export function SettingsItem({ title, subtitle, icon, children, isCardHeader, is
     >
       {icon && cloneElement(icon, { size: 26, weight: "light" })}
       <div className="flex-1 flex flex-col gap-0.5">
-        <p>{title}</p>
-        {subtitle && <p className="text-xs text-secondary">{subtitle}</p>}
+        <p className={cn(isCardHeader && "cursor-pointer")}>{title}</p>
+        {subtitle && <p className={cn("text-xs text-secondary", isCardHeader && "cursor-pointer")}>{subtitle}</p>}
       </div>
       {children}
       {isCardHeader && <CaretDownIcon className={cn("size-4 transition duration-300", isExpanded && "-rotate-180")} />}
