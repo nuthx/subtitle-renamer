@@ -68,9 +68,9 @@ export function NavUpgrade() {
       onClick={() => openUrl("https://github.com/nuthx/subtitle-renamer/releases/latest")}
     >
       <RocketIcon size={20} />
-      <div className="flex flex-col items-start gap-px">
+      <div className="flex flex-col items-start gap-0.5">
         <div className="font-medium">发现新版本</div>
-        <div className="text-xs opacity-90">v{latestVersion} ({publishDate.split("T")[0]})</div>
+        <div className="text-[11px] opacity-90">v{latestVersion} ({publishDate.split("T")[0]})</div>
       </div>
     </Button>
   )
