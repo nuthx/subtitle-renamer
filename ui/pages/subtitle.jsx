@@ -169,7 +169,6 @@ export function SubtitleRename() {
     )
   }, [cell, setFileList])
 
-
   // 重命名字幕
   const handleRename = async () => {
     const success = await renameSubtitles(fileData, archiveList)
