@@ -41,6 +41,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .invoke_handler(generate_handler![set_theme, extract_archive, move_to_trash])
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
