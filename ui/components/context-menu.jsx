@@ -7,31 +7,40 @@ const ContextMenuContext = createContext(null)
 export function ContextMenu({ cell, onClose, children, className }) {
   const menuRef = useRef(null)
 
+  // 确定菜单位置，在鼠标上方还是下方显示
+  useEffect(() => {
+    if (!cell || !menuRef.current) return
+
+    const MARGIN = 20
+    const menu = menuRef.current
+    const rect = menu.getBoundingClientRect()
+
+    const x = cell.x + rect.width + MARGIN > window.innerWidth ? Math.max(MARGIN, window.innerWidth - rect.width - MARGIN) : cell.x
+    const y = cell.y + rect.height + MARGIN > window.innerHeight ? Math.max(MARGIN, cell.y - rect.height) : cell.y
+
+    menu.style.left = `${x}px`
+    menu.style.top = `${y}px`
+  }, [cell])
+
+  // 关闭菜单
   useEffect(() => {
     if (!cell) return
 
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) onClose()
-    }
-    const handleEscape = (e) => {
-      if (e.key === "Escape") onClose()
-    }
+    const controller = new AbortController()
+    const handleClickOutside = (e) => menuRef.current && !menuRef.current.contains(e.target) && onClose()
+    const handleEscape = (e) => e.key === "Escape" && onClose()
 
-    document.addEventListener("mousedown", handleClickOutside)
-    document.addEventListener("keydown", handleEscape)
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-      document.removeEventListener("keydown", handleEscape)
-    }
+    document.addEventListener("mousedown", handleClickOutside, { signal: controller.signal })
+    document.addEventListener("keydown", handleEscape, { signal: controller.signal })
+    return () => controller.abort()
   }, [cell, onClose])
 
   return createPortal(
     <ContextMenuContext.Provider value={{ onClose }}>
       <div
         ref={menuRef}
-        style={{ left: cell?.x, top: cell?.y }}
         className={cn(
-          "fixed z-50 min-w-52 p-1 bg-background-dark border shadow-lg/10 rounded-md transition",
+          "fixed z-50 min-w-44 p-1 bg-background/90 backdrop-blur-sm border shadow-lg/15 rounded-lg transition",
           cell ? "opacity-100" : "opacity-0 pointer-events-none",
           className
         )}
@@ -54,7 +63,7 @@ export function ContextItem({ title, icon, onClick, danger }) {
   return (
     <button
       className={cn(
-        "flex items-center gap-2 w-full px-3 h-8 hover:bg-muted/40 rounded-sm cursor-pointer transition",
+        "flex items-center gap-2.5 w-full px-3 h-8 hover:bg-background-dark rounded-sm cursor-pointer transition",
         danger && "hover:text-error"
       )}
       onClick={handleClick}

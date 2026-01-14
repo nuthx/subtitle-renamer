@@ -3,7 +3,7 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { ArrowsClockwiseIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
+import { TagIcon, HighlighterIcon, NumberCircleFiveIcon, ArrowsClockwiseIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
 
 export function RenameSetting() {
@@ -13,6 +13,38 @@ export function RenameSetting() {
 
   return (
     <SettingsContent>
+      <SettingsTitle title="内容显示" />
+
+      <SettingsCard>
+        <SettingsItem title="显示配置标签" subtitle="在界面左下角显示主要配置状态的标签" icon={<TagIcon />}>
+          <Switch
+            checked={config?.subtitle?.config_badge}
+            onChange={(checked) => saveConfig("subtitle", "config_badge", checked)}
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsCard>
+        <SettingsItem title="高亮文件名差异" subtitle="在表格中加粗显示同列文件名之间的差异部分" icon={<HighlighterIcon />}>
+          <Switch
+            checked={config?.subtitle?.highlight_diff}
+            onChange={(checked) => saveConfig("subtitle", "highlight_diff", checked)}
+          />
+        </SettingsItem>
+        <SettingsItem title="忽略大小写" subtitle="对比差异时忽略字母大小写" icon={<TextAaIcon />}>
+          <Switch
+            checked={config?.subtitle?.highlight_ignore_case}
+            onChange={(checked) => saveConfig("subtitle", "highlight_ignore_case", checked)}
+          />
+        </SettingsItem>
+        <SettingsItem title="只对比数字" subtitle="只高亮显示数字部分的差异，忽略其他字符" icon={<NumberCircleFiveIcon />}>
+          <Switch
+            checked={config?.subtitle?.highlight_numbers_only}
+            onChange={(checked) => saveConfig("subtitle", "highlight_numbers_only", checked)}
+          />
+        </SettingsItem>
+      </SettingsCard>
+
       <SettingsTitle title="文件添加" />
 
       <SettingsCard>

@@ -11,7 +11,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
 
   // 初始化列宽和滚动条宽度
   useEffect(() => {
-    if (columnWidths.length === 0 && header.length > 0 && containerRef.current && bodyRef.current) {
+    if (data.length > 0 && header.length > 0 && containerRef.current && bodyRef.current) {
       const scrollbar = containerRef.current.offsetWidth - bodyRef.current.clientWidth
       const availableWidth = containerRef.current.clientWidth - scrollbar - 8
       const defaultWidth = Math.floor(availableWidth / header.length)
@@ -23,7 +23,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
         )
       )
     }
-  }, [header.length, columnWidths.length])
+  }, [header.length, data.length])
 
   // 横向滚动同步
   useEffect(() => {
@@ -58,7 +58,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
       <div ref={headerRef} className="sticky top-0 z-10 pl-1 border-b overflow-hidden">
         <div className="flex h-9" style={{ width: totalWidth }}>
           {header.map((item, index) => (
-            <div key={index} className="relative flex items-center border-r shrink-0" style={{ width: index === header.length - 1 ? columnWidths[index] + 5 : columnWidths[index] }}>
+            <div key={index} className="relative flex items-center border-r shrink-0" style={{ width: columnWidths[index] !== undefined ? (index === header.length - 1 ? columnWidths[index] + 5 : columnWidths[index]) : undefined }}>
               <p className="px-3 text-left">{item}</p>
               <div
                 className="absolute right-0 h-full w-1 rounded-full cursor-col-resize hover:bg-accent active:bg-accent transition"
@@ -69,7 +69,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
         </div>
       </div>
 
-      <div ref={bodyRef} className="flex-1 overflow-auto p-1">
+      <div ref={bodyRef} className="flex-1 flex overflow-auto p-1">
         <div className="flex flex-col gap-1" style={{ minWidth: totalWidth }}>
           {data.map((row, rowIndex) => (
             <div key={rowIndex} className="flex odd:bg-muted/20 hover:bg-muted/40 rounded-sm transition">
@@ -84,7 +84,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
                     onContextMenu?.({ x: e.clientX, y: e.clientY, row: rowIndex, col: colIndex })
                   }}
                 >
-                  <p className="truncate">{row[col.key] || ""}</p>
+                  <p className="truncate" dangerouslySetInnerHTML={{ __html: row[col.key] || "" }} />
                 </div>
               ))}
             </div>

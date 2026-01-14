@@ -1,9 +1,14 @@
-import { basename } from "@tauri-apps/api/path"
+import { basename, dirname } from "@tauri-apps/api/path"
+import { openPath } from "@tauri-apps/plugin-opener"
+import { writeText } from "@tauri-apps/plugin-clipboard-manager"
 import { useState, useCallback, useEffect } from "react"
+import { useConfig } from "@/hooks/useConfig"
+import { useSubtitleStore } from "@/store/subtitle"
 import { detectFiles } from "@/utils/detect"
 import { renameSubtitles } from "@/utils/rename"
 import { elapsedTime } from "@/utils/time"
 import { sortFiles } from "@/utils/sort"
+import { highlightDiff } from "@/utils/highlight"
 import { toast } from "@/components/toast"
 import { Page, PageBlock } from "@/components/page"
 import { ContextMenu, ContextItem, ContextSeparator } from "@/components/context-menu"
@@ -11,9 +16,7 @@ import { DropArea } from "@/components/drop"
 import { Table } from "@/components/table"
 import { Button } from "@/components/button"
 import { Badge } from "@/components/badge"
-import { FileVideoIcon, FileTextIcon, FileArchiveIcon } from "@phosphor-icons/react"
-import { useConfig } from "@/hooks/useConfig"
-import { useSubtitleStore } from "@/store/subtitle"
+import { FileVideoIcon, FileTextIcon, FileArchiveIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon } from "@phosphor-icons/react"
 
 const colKeys = ["video", "sc", "tc"]
 
@@ -53,11 +56,16 @@ export function SubtitleRename() {
         )
       )
 
-      setFileData(data)
-      setTableData(result)
+      if (config?.subtitle?.highlight_diff) {
+        setFileData(data)
+        setTableData(highlightDiff(result, config.subtitle.highlight_ignore_case, config.subtitle.highlight_numbers_only))
+      } else {
+        setFileData(data)
+        setTableData(result)
+      }
     }
     processData()
-  }, [fileList])
+  }, [fileList, config])
 
   // 拖拽添加文件
   const handleFileDrop = useCallback(async (paths) => {
@@ -84,10 +92,41 @@ export function SubtitleRename() {
 
     toast.promise(dropPromise, {
       loading: { title: "正在添加文件" },
-      success: { title: (data) => data.message },
-      error: { type: "warning", title: (err) => err }
+      success: { title: (data) => data.message, duration: 1000 },
+      error: { type: "warning", title: (error) => error.message || String(error) }
     })
   }, [fileList, archiveList, setFileList, setArchiveList])
+
+  // 打开文件位置
+  const handleOpenLocation = useCallback(async () => {
+    try {
+      const dir = await dirname(fileData[cell.row]?.[colKeys[cell.col]])
+      await openPath(dir)
+    } catch (error) {
+      toast.error({ title: "无法打开文件夹", description: error.message || String(error) })
+    }
+  }, [cell, fileData])
+
+  // 复制文件名
+  const handleCopyFileName = useCallback(async () => {
+    try {
+      const fileName = await basename(fileData[cell.row]?.[colKeys[cell.col]])
+      await writeText(fileName)
+      toast.success({ title: "已复制文件名" }, { duration: 800 })
+    } catch (error) {
+      toast.error({ title: "复制失败", description: error.message || String(error) })
+    }
+  }, [cell, fileData])
+
+  // 复制文件路径
+  const handleCopyFilePath = useCallback(async () => {
+    try {
+      await writeText(fileData[cell.row]?.[colKeys[cell.col]])
+      toast.success({ title: "已复制文件路径" }, { duration: 800 })
+    } catch (error) {
+      toast.error({ title: "复制失败", description: error.message || String(error) })
+    }
+  }, [cell, fileData])
 
   // 更改字幕类型
   const handleChangeType = useCallback(() => {
@@ -130,6 +169,7 @@ export function SubtitleRename() {
     )
   }, [cell, setFileList])
 
+
   // 重命名字幕
   const handleRename = async () => {
     const success = await renameSubtitles(fileData, archiveList)
@@ -148,13 +188,17 @@ export function SubtitleRename() {
           const detectLanguage = config?.subtitle?.detect_language
           return (
             <>
-              {isSubtitle && hasContent && detectLanguage && <ContextItem title={cell.col === 1 ? "更改为繁体字幕" : "更改为简体字幕"} onClick={handleChangeType} />}
-              {isSubtitle && hasContent && detectLanguage && <ContextSeparator />}
-              {canMoveUp && <ContextItem title="上移一行" onClick={() => handleMove(-1)} />}
-              {canMoveDown && <ContextItem title="下移一行" onClick={() => handleMove(1)} />}
-              {(canMoveUp || canMoveDown) && <ContextSeparator />}
-              {hasContent && <ContextItem title={cell.col === 0 ? "删除该视频" : "删除该字幕"} onClick={handleDeleteItem} danger />}
-              <ContextItem title="删除此行" onClick={handleDeleteRow} danger />
+              {hasContent && <ContextItem title="打开文件位置" icon={<FolderOpenIcon className="size-4" />} onClick={handleOpenLocation} />}
+              {hasContent && <ContextSeparator />}
+              {hasContent && <ContextItem title="复制文件名" icon={<CopyIcon className="size-4" />} onClick={handleCopyFileName} />}
+              {hasContent && <ContextItem title="复制文件路径" icon={<PathIcon className="size-4" />} onClick={handleCopyFilePath} />}
+              {hasContent && <ContextSeparator />}
+              {canMoveUp && <ContextItem title="上移一行" icon={<ArrowFatUpIcon className="size-4" />} onClick={() => handleMove(-1)} />}
+              {canMoveDown && <ContextItem title="下移一行" icon={<ArrowFatUpIcon className="size-4 rotate-180" />} onClick={() => handleMove(1)} />}
+              {isSubtitle && hasContent && detectLanguage && <ContextItem title={cell.col === 1 ? "更改为繁体字幕" : "更改为简体字幕"} icon={<ArrowsClockwiseIcon className="size-4" />} onClick={handleChangeType} />}
+              {(canMoveUp || canMoveDown || (isSubtitle && hasContent && detectLanguage)) && <ContextSeparator />}
+              {hasContent && <ContextItem title={cell.col === 0 ? "删除该视频" : "删除该字幕"} icon={<FileMinusIcon className="size-4" />} onClick={handleDeleteItem} danger />}
+              <ContextItem title="删除此行" icon={<StackMinusIcon className="size-4" />} onClick={handleDeleteRow} danger />
             </>
           )
         })()}

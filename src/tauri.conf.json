@@ -41,6 +41,8 @@
             "store:default",
             "dialog:default",
             "shell:default",
+            "clipboard-manager:default",
+            "clipboard-manager:allow-write-text",
             "fs:default",
             "fs:allow-read-file",
             "fs:allow-read-dir",
