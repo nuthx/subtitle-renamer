@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use encoding_rs::{BIG5, GBK};
 use std::fs::{self, File};
 use std::hash::{DefaultHasher, Hash, Hasher};
@@ -17,6 +17,11 @@ pub fn extract_archive_inner(app: AppHandle, archive_path: String) -> Result<Vec
         .unwrap_or_default()
         .to_lowercase();
 
+    // 检查格式是否支持
+    if !matches!(ext.as_str(), "zip" | "7z" | "rar") {
+        bail!("不支持的格式: {}", ext);
+    }
+
     // 用路径哈希生成唯一的文件夹路径
     let mut hasher = DefaultHasher::new();
     archive_path.hash(&mut hasher);
@@ -34,20 +39,28 @@ pub fn extract_archive_inner(app: AppHandle, archive_path: String) -> Result<Vec
         ));
     fs::create_dir_all(&output_dir).context("创建目录失败")?;
 
-    match ext.as_str() {
-        "zip" => extract_zip(&archive_path, &output_dir)?,
-        "7z" => extract_7z(&archive_path, &output_dir)?,
-        "rar" => extract_rar(&archive_path, &output_dir)?,
-        _ => bail!("不支持的格式: {}", ext),
-    }
+    // 同时使用三种程序解压，避免后缀错误
+    let results = [
+        ("zip", extract_zip(&archive_path, &output_dir)),
+        ("7z", extract_7z(&archive_path, &output_dir)),
+        ("rar", extract_rar(&archive_path, &output_dir)),
+    ];
 
-    // 遍历解压的文件，返回路径的数组
-    Ok(WalkDir::new(&output_dir)
-        .into_iter()
-        .flatten()
-        .filter(|e| e.file_type().is_file())
-        .map(|e| e.path().to_string_lossy().into_owned())
-        .collect())
+    // 如果有成功的就返回
+    if results.iter().any(|(_, r)| r.is_ok()) {
+        Ok(WalkDir::new(&output_dir)
+            .into_iter()
+            .flatten()
+            .filter(|e| e.file_type().is_file())
+            .map(|e| e.path().to_string_lossy().into_owned())
+            .collect())
+    } else {
+        results
+            .iter()
+            .find(|(format, _)| *format == ext.as_str())
+            .and_then(|(_, r)| r.as_ref().err())
+            .map_or_else(|| Err(anyhow!("解压失败")), |e| Err(anyhow!("{:?}", e)))
+    }
 }
 
 fn extract_zip(archive_path: &str, output_dir: &Path) -> Result<()> {

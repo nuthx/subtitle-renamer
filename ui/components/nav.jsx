@@ -42,18 +42,18 @@ export function NavButton({ path, title, icon, disabled }) {
 
 export function NavUpgrade() {
   const [hasUpdate, setHasUpdate] = useState(false)
+  const [latestVersion, setLatestVersion] = useState("")
+  const [publishDate, setPublishDate] = useState("")
 
   useEffect(() => {
-    fetch("https://api.github.com/repos/nuthx/subtitle-renamer/releases/latest", {
-      headers: {
-        "User-Agent": "subtitle-renamer"
-      }
-    })
+    fetch("https://api.github.com/repos/nuthx/subtitle-renamer/releases/latest", { headers: { "User-Agent": "subtitle-renamer" } })
       .then((res) => res.json())
       .then((data) => {
         const latestVersion = data.tag_name
         if (latestVersion && latestVersion !== packageJson.version) {
           setHasUpdate(true)
+          setLatestVersion(latestVersion)
+          setPublishDate(data.published_at)
         }
       })
       .catch(() => {})
@@ -64,11 +64,14 @@ export function NavUpgrade() {
   return (
     <Button
       variant="primary"
-      className="justify-start h-11 px-3 mb-1 border-none rounded-md"
+      className="justify-start h-15 px-3 mb-1 border-none rounded-md"
       onClick={() => openUrl("https://github.com/nuthx/subtitle-renamer/releases/latest")}
     >
       <RocketIcon size={20} />
-      发现新版本
+      <div className="flex flex-col items-start gap-0.5">
+        <div className="font-medium">发现新版本</div>
+        <div className="text-[11px] opacity-90">v{latestVersion} ({publishDate.split("T")[0]})</div>
+      </div>
     </Button>
   )
 }
