@@ -3,7 +3,7 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { TagIcon, HighlighterIcon, NumberCircleFiveIcon, ArrowsClockwiseIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
+import { TagIcon, HighlighterIcon, ArrowsClockwiseIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
 
 export function RenameSetting() {
@@ -17,19 +17,19 @@ export function RenameSetting() {
 
       <SettingsCard>
         <SettingsItem title="显示配置标签" subtitle="在界面左下角显示主要配置状态的标签" icon={<TagIcon />} />
-        <SettingsItem title="显示统一后缀名" subtitle="在配置标签中显示统一后缀名" icon={<TagIcon />}>
+        <SettingsItem title="显示统一后缀名" subtitle="在配置标签中显示统一后缀名">
           <Switch
             checked={config?.subtitle?.config_badge_union_extension}
             onChange={(checked) => saveConfig("subtitle", "config_badge_union_extension", checked)}
           />
         </SettingsItem>
-        <SettingsItem title="显示移动字幕选项" subtitle="在配置标签中显示移动字幕的状态选项" icon={<TagIcon />}>
+        <SettingsItem title="显示移动字幕选项" subtitle="在配置标签中显示移动字幕的状态选项">
           <Switch
             checked={config?.subtitle?.config_badge_move_sub}
             onChange={(checked) => saveConfig("subtitle", "config_badge_move_sub", checked)}
           />
         </SettingsItem>
-        <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项，不删除字幕时不显示" icon={<TagIcon />}>
+        <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项，不删除字幕时不显示">
           <Switch
             checked={config?.subtitle?.config_badge_remove_sub}
             onChange={(checked) => saveConfig("subtitle", "config_badge_remove_sub", checked)}
@@ -44,13 +44,13 @@ export function RenameSetting() {
             onChange={(checked) => saveConfig("subtitle", "highlight_diff", checked)}
           />
         </SettingsItem>
-        <SettingsItem title="忽略大小写" subtitle="对比差异时忽略字母大小写" icon={<TextAaIcon />}>
+        <SettingsItem title="忽略大小写" subtitle="对比差异时忽略字母大小写">
           <Switch
             checked={config?.subtitle?.highlight_ignore_case}
             onChange={(checked) => saveConfig("subtitle", "highlight_ignore_case", checked)}
           />
         </SettingsItem>
-        <SettingsItem title="只对比数字" subtitle="只高亮显示数字部分的差异，忽略其他字符" icon={<NumberCircleFiveIcon />}>
+        <SettingsItem title="只对比数字" subtitle="只高亮显示数字部分的差异，忽略其他字符">
           <Switch
             checked={config?.subtitle?.highlight_numbers_only}
             onChange={(checked) => saveConfig("subtitle", "highlight_numbers_only", checked)}
