@@ -105,6 +105,7 @@ export function SettingsItem({ title, subtitle, icon, children, isCardHeader, is
       {...props}
     >
       {icon && cloneElement(icon, { size: 26, weight: "light" })}
+      {isSubitem && !icon && <div className="size-6.5" />}
       <div className="flex-1 flex flex-col gap-0.5">
         <p className={cn(isCardHeader && "cursor-pointer")}>{title}</p>
         {subtitle && <p className={cn("text-xs text-secondary", isCardHeader && "cursor-pointer")}>{subtitle}</p>}

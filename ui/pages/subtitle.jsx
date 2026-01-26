@@ -4,6 +4,7 @@ import { writeText } from "@tauri-apps/plugin-clipboard-manager"
 import { useState, useCallback, useEffect } from "react"
 import { useConfig } from "@/hooks/useConfig"
 import { useSubtitleStore } from "@/store/subtitle"
+import { Link } from "react-router-dom"
 import { detectFiles } from "@/utils/detect"
 import { renameSubtitles } from "@/utils/rename"
 import { elapsedTime } from "@/utils/time"
@@ -16,7 +17,7 @@ import { DropArea } from "@/components/drop"
 import { Table } from "@/components/table"
 import { Button } from "@/components/button"
 import { Badge } from "@/components/badge"
-import { FileVideoIcon, FileTextIcon, FileArchiveIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon } from "@phosphor-icons/react"
+import { FileVideoIcon, FileTextIcon, FileArchiveIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon, GearIcon } from "@phosphor-icons/react"
 
 const colKeys = ["video", "sc", "tc"]
 
@@ -223,23 +224,27 @@ export function SubtitleRename() {
       </PageBlock>
 
       <PageBlock className="items-center justify-end gap-3 p-4" last>
-        {config?.subtitle?.config_badge !== false && (
-          <div className="flex-1 flex items-center gap-2">
-            {config?.subtitle?.move_sub && (
-              <Badge variant="outline">
-                {config.subtitle.move_sub === "none" && "保持原位"}
-                {config.subtitle.move_sub === "copy" && "复制字幕"}
-                {config.subtitle.move_sub === "cut" && "剪切字幕"}
-              </Badge>
-            )}
-            {config?.subtitle?.remove_sub && config.subtitle.remove_sub !== "none" && (
-              <Badge variant="outline">
-                {config.subtitle.remove_sub === "sc" ? "删除简体" : "删除繁体"}
-              </Badge>
-            )}
-          </div>
-        )}
+        <div className="flex-1 flex items-center gap-2">
+          {config?.subtitle?.config_badge_union_extension && config?.subtitle?.union_extension && (
+            <Badge variant="outline">添加后缀 {config.subtitle.union_extension}</Badge>
+          )}
+          {config?.subtitle?.config_badge_move_sub && config?.subtitle?.move_sub && (
+            <Badge variant="outline">
+              {config.subtitle.move_sub === "none" && "保持原位"}
+              {config.subtitle.move_sub === "copy" && "复制字幕"}
+              {config.subtitle.move_sub === "cut" && "剪切字幕"}
+            </Badge>
+          )}
+          {config?.subtitle?.config_badge_remove_sub && config?.subtitle?.remove_sub !== "none" && (
+            <Badge variant="outline">{config.subtitle.remove_sub === "sc" ? "删除简体" : "删除繁体"}</Badge>
+          )}
+        </div>
 
+        <Link to="/settings/rename" draggable={false}>
+          <Button className="w-8 p-0">
+            <GearIcon className="size-4" />
+          </Button>
+        </Link>
         <Button className="w-26" onClick={() => clearAll()}>清空列表</Button>
         <Button variant="primary" className="w-26" onClick={handleRename}>重命名</Button>
       </PageBlock>

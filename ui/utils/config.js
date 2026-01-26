@@ -7,7 +7,9 @@ const DEFAULT_CONFIG = {
     remember_window: true
   },
   subtitle: {
-    config_badge: true,
+    config_badge_union_extension: false,
+    config_badge_move_sub: true,
+    config_badge_remove_sub: true,
     highlight_diff: true,
     highlight_ignore_case: false,
     highlight_numbers_only: false,
