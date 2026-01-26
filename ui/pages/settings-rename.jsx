@@ -16,10 +16,23 @@ export function RenameSetting() {
       <SettingsTitle title="内容显示" />
 
       <SettingsCard>
-        <SettingsItem title="显示配置标签" subtitle="在界面左下角显示主要配置状态的标签" icon={<TagIcon />}>
+        <SettingsItem title="显示配置标签" subtitle="在界面左下角显示主要配置状态的标签" icon={<TagIcon />} />
+        <SettingsItem title="显示统一后缀名" subtitle="在配置标签中显示统一后缀名" icon={<TagIcon />}>
           <Switch
-            checked={config?.subtitle?.config_badge}
-            onChange={(checked) => saveConfig("subtitle", "config_badge", checked)}
+            checked={config?.subtitle?.config_badge_union_extension}
+            onChange={(checked) => saveConfig("subtitle", "config_badge_union_extension", checked)}
+          />
+        </SettingsItem>
+        <SettingsItem title="显示移动字幕选项" subtitle="在配置标签中显示移动字幕的状态选项" icon={<TagIcon />}>
+          <Switch
+            checked={config?.subtitle?.config_badge_move_sub}
+            onChange={(checked) => saveConfig("subtitle", "config_badge_move_sub", checked)}
+          />
+        </SettingsItem>
+        <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项，不删除字幕时不显示" icon={<TagIcon />}>
+          <Switch
+            checked={config?.subtitle?.config_badge_remove_sub}
+            onChange={(checked) => saveConfig("subtitle", "config_badge_remove_sub", checked)}
           />
         </SettingsItem>
       </SettingsCard>
