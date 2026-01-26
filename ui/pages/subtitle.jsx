@@ -4,6 +4,7 @@ import { writeText } from "@tauri-apps/plugin-clipboard-manager"
 import { useState, useCallback, useEffect } from "react"
 import { useConfig } from "@/hooks/useConfig"
 import { useSubtitleStore } from "@/store/subtitle"
+import { Link } from "react-router-dom"
 import { detectFiles } from "@/utils/detect"
 import { renameSubtitles } from "@/utils/rename"
 import { elapsedTime } from "@/utils/time"
@@ -16,7 +17,7 @@ import { DropArea } from "@/components/drop"
 import { Table } from "@/components/table"
 import { Button } from "@/components/button"
 import { Badge } from "@/components/badge"
-import { FileVideoIcon, FileTextIcon, FileArchiveIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon } from "@phosphor-icons/react"
+import { FileVideoIcon, FileTextIcon, FileArchiveIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon, GearIcon } from "@phosphor-icons/react"
 
 const colKeys = ["video", "sc", "tc"]
 
@@ -239,6 +240,11 @@ export function SubtitleRename() {
           )}
         </div>
 
+        <Link to="/settings/rename" draggable={false}>
+          <Button className="w-8 p-0">
+            <GearIcon className="size-4" />
+          </Button>
+        </Link>
         <Button className="w-26" onClick={() => clearAll()}>清空列表</Button>
         <Button variant="primary" className="w-26" onClick={handleRename}>重命名</Button>
       </PageBlock>
