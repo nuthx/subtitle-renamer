@@ -17,6 +17,12 @@ export function RenameSetting() {
 
       <SettingsCard>
         <SettingsItem title="显示配置标签" subtitle="在界面左下角显示主要配置状态的标签" icon={<TagIcon />} />
+        <SettingsItem title="显示统一后缀编辑框" subtitle="在首页显示统一后缀的快捷编辑框">
+          <Switch
+            checked={config?.subtitle?.config_quick_union_extension}
+            onChange={(checked) => saveConfig("subtitle", "config_quick_union_extension", checked)}
+          />
+        </SettingsItem>
         <SettingsItem title="显示统一后缀名" subtitle="在配置标签中显示统一后缀名">
           <Switch
             checked={config?.subtitle?.config_badge_union_extension}

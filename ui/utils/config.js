@@ -7,6 +7,7 @@ const DEFAULT_CONFIG = {
     remember_window: true
   },
   subtitle: {
+    config_quick_union_extension: false,
     config_badge_union_extension: false,
     config_badge_move_sub: true,
     config_badge_remove_sub: true,

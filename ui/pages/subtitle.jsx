@@ -17,6 +17,7 @@ import { DropArea } from "@/components/drop"
 import { Table } from "@/components/table"
 import { Button } from "@/components/button"
 import { Badge } from "@/components/badge"
+import { Combobox } from "@/components/combobox"
 import { FileVideoIcon, FileTextIcon, FileArchiveIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon, GearIcon } from "@phosphor-icons/react"
 
 const colKeys = ["video", "sc", "tc"]
@@ -26,7 +27,7 @@ export function SubtitleRename() {
   const [fileData, setFileData] = useState([]) // 展平为带路径的数组，用于重命名
   const [tableData, setTableData] = useState([]) // 上面数组的基础上移除了路径，只保留文件名
 
-  const { config } = useConfig()
+  const { config, saveConfig } = useConfig()
   const { fileList, archiveList, setFileList, setArchiveList, clearAll } = useSubtitleStore()
 
   const tableColumns = config?.subtitle?.detect_language
@@ -225,6 +226,16 @@ export function SubtitleRename() {
 
       <PageBlock className="items-center justify-end gap-3 p-4" last>
         <div className="flex-1 flex items-center gap-2">
+          {config?.subtitle?.config_quick_union_extension && (
+            <Combobox
+              options={config?.subtitle?.union_extension_options}
+              value={config?.subtitle?.union_extension}
+              onChange={(value) => saveConfig("subtitle", "union_extension", value)}
+              onOptionsChange={(options) => saveConfig("subtitle", "union_extension_options", options)}
+              placeholder="无后缀"
+              className="w-56"
+            />
+          )}
           {config?.subtitle?.config_badge_union_extension && config?.subtitle?.union_extension && (
             <Badge variant="outline">添加后缀 {config.subtitle.union_extension}</Badge>
           )}
