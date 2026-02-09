@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   build:
@@ -115,7 +115,7 @@ jobs:
           body: |
             ## 新增
             - 新增内容
-            
+
             ## 优化
             - 优化内容
 
