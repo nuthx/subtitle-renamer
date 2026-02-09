@@ -1,9 +1,9 @@
 import packageJson from "#/package.json"
-import { openUrl } from "@tauri-apps/plugin-opener"
 import { useState, useEffect, cloneElement } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/utils/cn"
 import { Button } from "@/components/button"
+import { UpdateDialog } from "@/dialogs/update"
 import { RocketIcon } from "@phosphor-icons/react"
 
 export function Nav({ children }) {
@@ -41,9 +41,11 @@ export function NavButton({ path, title, icon, disabled }) {
 }
 
 export function NavUpgrade() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [hasUpdate, setHasUpdate] = useState(false)
   const [latestVersion, setLatestVersion] = useState("")
   const [publishDate, setPublishDate] = useState("")
+  const [releaseNotes, setReleaseNotes] = useState("")
 
   useEffect(() => {
     fetch("https://api.github.com/repos/nuthx/subtitle-renamer/releases/latest", { headers: { "User-Agent": "subtitle-renamer" } })
@@ -54,6 +56,7 @@ export function NavUpgrade() {
           setHasUpdate(true)
           setLatestVersion(latestVersion)
           setPublishDate(data.published_at)
+          setReleaseNotes(data.body || "")
         }
       })
       .catch(() => {})
@@ -62,16 +65,26 @@ export function NavUpgrade() {
   if (!hasUpdate) return null
 
   return (
-    <Button
-      variant="primary"
-      className="justify-start h-15 px-3 mb-1 border-none rounded-md"
-      onClick={() => openUrl("https://github.com/nuthx/subtitle-renamer/releases/latest")}
-    >
-      <RocketIcon size={20} />
-      <div className="flex flex-col items-start gap-0.5">
-        <div className="font-medium">发现新版本</div>
-        <div className="text-[11px] opacity-90">v{latestVersion} ({publishDate.split("T")[0]})</div>
-      </div>
-    </Button>
+    <>
+      <Button
+        variant="primary"
+        className="justify-start h-15 px-3 mb-1 border-none rounded-md"
+        onClick={() => setIsDialogOpen(true)}
+      >
+        <RocketIcon size={20} />
+        <div className="flex flex-col items-start gap-0.5">
+          <div className="font-medium">发现新版本</div>
+          <div className="text-[11px] opacity-90">v{latestVersion} ({publishDate.split("T")[0]})</div>
+        </div>
+      </Button>
+
+      <UpdateDialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        latestVersion={latestVersion}
+        publishDate={publishDate.split("T")[0]}
+        releaseNotes={releaseNotes}
+      />
+    </>
   )
 }
