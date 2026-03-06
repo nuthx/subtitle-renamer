@@ -25,7 +25,7 @@ export async function renameSubtitles(fileData, archiveList) {
     toast.error({ title: "视频与字幕数量不相等" })
     return false
   }
-  if (config?.subtitle?.sc_extension === config?.subtitle?.tc_extension) {
+  if (config?.subtitle?.detect_language && config?.subtitle?.sc_extension === config?.subtitle?.tc_extension) {
     toast.error({ title: "配置无效", description: "简体字幕与繁体字幕的后缀不可相同" })
     return false
   }
