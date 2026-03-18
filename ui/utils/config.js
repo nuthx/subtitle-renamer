@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
     highlight_ignore_case: false,
     highlight_numbers_only: false,
     detect_language: true,
+    lite_detect: false,
     exclude_video: "",
     exclude_subtitle: "",
     union_extension: "",
