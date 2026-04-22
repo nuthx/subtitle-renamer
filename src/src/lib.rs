@@ -1,4 +1,5 @@
 mod extract;
+mod file_time;
 #[cfg(target_os = "macos")]
 mod menu;
 mod theme;
@@ -27,6 +28,11 @@ fn move_to_trash(paths: Vec<String>) -> Result<(), String> {
     trash::move_to_trash_inner(paths)
 }
 
+#[tauri::command]
+fn modify_time(source_path: String, target_path: String) -> Result<(), String> {
+    file_time::modify_time_inner(&source_path, &target_path).map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     Builder::default()
@@ -42,7 +48,12 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_clipboard_manager::init())
-        .invoke_handler(generate_handler![set_theme, extract_archive, move_to_trash])
+        .invoke_handler(generate_handler![
+            set_theme,
+            extract_archive,
+            move_to_trash,
+            modify_time
+        ])
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
 

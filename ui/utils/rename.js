@@ -74,6 +74,9 @@ export async function renameSubtitles(fileData, archiveList) {
         await writeFile(path.new, new TextEncoder().encode(text))
       }
 
+      // 同步文件时间
+      await invoke("modify_time", { sourcePath: path.old, targetPath: path.new })
+
       // 非复制模式，或复制模式但字幕在同文件夹时，删除旧字幕
       const oldDir = await dirname(path.old)
       const newDir = await dirname(path.new)
