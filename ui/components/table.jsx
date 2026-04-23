@@ -1,29 +1,43 @@
 import { useState, useRef, useEffect, useMemo } from "react"
+import { getTableWidths, saveTableWidths } from "@/utils/storage"
+
+const MIN_COLUMN_WIDTH = 200
 
 export function Table({ columns, data, onClick, onContextMenu }) {
   const [columnWidths, setColumnWidths] = useState([])
   const containerRef = useRef(null)
   const headerRef = useRef(null)
   const bodyRef = useRef(null)
+  const columnWidthsRef = useRef([])
 
   const header = columns.map((col) => col.title)
+  const columnKeys = useMemo(() => columns.map((col) => col.key), [columns])
+  const columnSignature = columnKeys.join("|")
   const totalWidth = useMemo(() => columnWidths.reduce((sum, width) => sum + width, 0), [columnWidths])
 
-  // 初始化列宽和滚动条宽度
+  useEffect(() => {
+    columnWidthsRef.current = columnWidths
+  }, [columnWidths])
+
+  // 初始化列宽和滚动条宽度，优先使用本地保存的列宽
   useEffect(() => {
     if (data.length > 0 && header.length > 0 && containerRef.current && bodyRef.current) {
       const scrollbar = containerRef.current.offsetWidth - bodyRef.current.clientWidth
       const availableWidth = containerRef.current.clientWidth - scrollbar - 8
       const defaultWidth = Math.floor(availableWidth / header.length)
       const remainder = availableWidth - defaultWidth * header.length
+      const storedWidths = getTableWidths()
+      const defaultWidths = Array(header.length).fill(defaultWidth).map((w, i) =>
+        i === header.length - 1 ? w + remainder : w
+      )
 
       setColumnWidths(
-        Array(header.length).fill(defaultWidth).map((w, i) =>
-          i === header.length - 1 ? w + remainder : w
+        columnKeys.map((key, i) =>
+          storedWidths[key] ?? defaultWidths[i]
         )
       )
     }
-  }, [header.length, data.length])
+  }, [columnKeys, columnSignature, data.length, header.length])
 
   // 横向滚动同步
   useEffect(() => {
@@ -39,18 +53,28 @@ export function Table({ columns, data, onClick, onContextMenu }) {
 
   // 拖拽调整列宽
   const handleResizeColumn = (index, event) => {
+    event.preventDefault()
+
     const controller = new AbortController()
     const startX = event.clientX
     const startWidth = columnWidths[index]
 
     const handleMouseMove = (e) => {
-      setColumnWidths((widths) =>
-        widths.map((w, i) => i === index ? Math.max(200, startWidth + e.clientX - startX) : w)
+      const nextWidth = Math.max(MIN_COLUMN_WIDTH, startWidth + e.clientX - startX)
+      const nextWidths = columnWidthsRef.current.map((w, i) => i === index ? nextWidth : w)
+      columnWidthsRef.current = nextWidths
+      setColumnWidths(nextWidths)
+    }
+
+    const handleMouseUp = () => {
+      saveTableWidths(
+        Object.fromEntries(columnKeys.map((key, i) => [key, columnWidthsRef.current[i]]))
       )
+      controller.abort()
     }
 
     document.addEventListener("mousemove", handleMouseMove, { signal: controller.signal })
-    document.addEventListener("mouseup", () => controller.abort(), { signal: controller.signal })
+    document.addEventListener("mouseup", handleMouseUp, { signal: controller.signal })
   }
 
   return (

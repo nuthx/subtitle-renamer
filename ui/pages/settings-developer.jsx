@@ -1,10 +1,11 @@
 import { appDataDir } from "@tauri-apps/api/path"
 import { openPath } from "@tauri-apps/plugin-opener"
 import { resetConfig } from "@/utils/config"
+import { clearTableWidths } from "@/utils/storage"
 import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
 import { toast } from "@/components/toast"
 import { Button } from "@/components/button"
-import { FolderOpenIcon, ArrowClockwiseIcon, BellRingingIcon } from "@phosphor-icons/react"
+import { FolderOpenIcon, ArrowClockwiseIcon, BellRingingIcon, TableIcon } from "@phosphor-icons/react"
 
 export function DeveloperSetting() {
   const handleOpenConfig = async () => {
@@ -25,6 +26,15 @@ export function DeveloperSetting() {
     }
   }
 
+  const handleResetTableWidths = () => {
+    try {
+      clearTableWidths()
+      toast.success({ title: "列宽已重置" })
+    } catch (error) {
+      toast.error({ title: "列宽重置失败", description: error.message })
+    }
+  }
+
   return (
     <SettingsContent>
       <SettingsTitle title="配置管理" />
@@ -38,6 +48,14 @@ export function DeveloperSetting() {
       <SettingsCard>
         <SettingsItem title="重置配置文件" subtitle="点击后立即重置所有配置项，没有二次弹窗确认。部分配置需重启后生效" icon={<ArrowClockwiseIcon />}>
           <Button onClick={handleResetConfig}>重置</Button>
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsTitle title="本地配置" />
+
+      <SettingsCard>
+        <SettingsItem title="重置列表列宽" subtitle="重置本地储存的字幕列表列宽。重置后即刻生效" icon={<TableIcon />}>
+          <Button onClick={handleResetTableWidths}>重置</Button>
         </SettingsItem>
       </SettingsCard>
 

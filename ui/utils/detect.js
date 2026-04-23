@@ -1,6 +1,6 @@
-import { readFile } from "@tauri-apps/plugin-fs"
+import { readDir, readFile, stat } from "@tauri-apps/plugin-fs"
 import { invoke } from "@tauri-apps/api/core"
-import { extname, basename } from "@tauri-apps/api/path"
+import { extname, basename, join } from "@tauri-apps/api/path"
 import { getConfig } from "@/utils/config"
 import { sortFiles } from "@/utils/sort"
 import { toast } from "@/components/toast"
@@ -61,25 +61,72 @@ export async function detectFiles(paths, fileList, archiveList) {
   let filteredCount = 0
   let duplicateCount = 0
   let excludedCount = 0
+  let skippedFolderCount = 0
 
-  // 跳过重复文件并展开压缩包
+  const addFile = (path) => {
+    if (!existingPaths.has(path)) {
+      existingPaths.add(path)
+      allFiles.push(path)
+    } else {
+      duplicateCount++
+    }
+  }
+
+  const rootItems = []
   for (const path of paths) {
+    try {
+      const ext = (await extname(path).catch(() => "")).toLowerCase()
+      rootItems.push({
+        path,
+        info: await stat(path),
+        ext
+      })
+    } catch {
+      filteredCount++
+    }
+  }
+
+  const hasDirectory = rootItems.some(({ info }) => info.isDirectory)
+  const hasRecognizedFile = rootItems.some(({ info, ext }) =>
+    info.isFile && (VIDEO_EXTENSIONS.has(ext) || SUBTITLE_EXTENSIONS.has(ext) || ARCHIVE_EXTENSIONS.has(ext))
+  )
+  const shouldSkipFolders = config.subtitle.skip_folder_mixed && hasDirectory && hasRecognizedFile
+
+  // 跳过重复文件，展开文件夹和直接拖入的压缩包
+  for (const { path, info, ext } of rootItems) {
+    if (info.isDirectory) {
+      if (shouldSkipFolders) {
+        skippedFolderCount++
+        continue
+      }
+
+      try {
+        const directoryFiles = await collectDirectoryFiles(path, config.subtitle.detect_folder_recursively)
+        for (const file of directoryFiles) {
+          addFile(file)
+        }
+      } catch (error) {
+        toast.error({ title: "读取文件夹失败", description: error.message || String(error) })
+        filteredCount++
+      }
+      continue
+    }
+
+    if (!info.isFile) {
+      filteredCount++
+      continue
+    }
+
     if (existingPaths.has(path)) {
       duplicateCount++
       continue
     }
 
-    const ext = (await extname(path).catch(() => "")).toLowerCase()
     if (ARCHIVE_EXTENSIONS.has(ext)) {
       try {
         const extracted = await invoke("extract_archive", { archivePath: path })
         for (const file of extracted) {
-          if (!existingPaths.has(file)) {
-            existingPaths.add(file)
-            allFiles.push(file)
-          } else {
-            duplicateCount++
-          }
+          addFile(file)
         }
         if (!existingArchives.has(path)) {
           archives.push(path)
@@ -89,8 +136,7 @@ export async function detectFiles(paths, fileList, archiveList) {
         filteredCount++
       }
     } else {
-      existingPaths.add(path)
-      allFiles.push(path)
+      addFile(path)
     }
   }
 
@@ -141,8 +187,28 @@ export async function detectFiles(paths, fileList, archiveList) {
     addedCount: Object.values(newFiles).reduce((sum, arr) => sum + arr.length, 0),
     filteredCount,
     duplicateCount,
-    excludedCount
+    excludedCount,
+    skippedFolderCount
   }
+}
+
+async function collectDirectoryFiles(directoryPath, recursive) {
+  const files = []
+  const entries = (await readDir(directoryPath)).sort((a, b) => sortFiles(a.name, b.name))
+
+  for (const entry of entries) {
+    if (entry.name.startsWith(".") || entry.name === "__MACOSX") continue
+
+    const entryPath = await join(directoryPath, entry.name)
+    if (entry.isFile) {
+      const ext = (await extname(entryPath).catch(() => "")).toLowerCase()
+      if (VIDEO_EXTENSIONS.has(ext) || SUBTITLE_EXTENSIONS.has(ext)) files.push(entryPath)
+    } else if (entry.isDirectory && recursive) {
+      files.push(...await collectDirectoryFiles(entryPath, recursive))
+    }
+  }
+
+  return files
 }
 
 async function detectSubtitleLanguage(path, config) {

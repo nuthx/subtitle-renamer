@@ -3,8 +3,20 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { TagIcon, HighlighterIcon, ArrowsClockwiseIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
+import { TagIcon, HighlighterIcon, ArrowsClockwiseIcon, FoldersIcon, FolderMinusIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
+
+export const moveSubOptions = [
+  { value: "none", label: "保持原位" },
+  { value: "copy", label: "复制字幕" },
+  { value: "cut", label: "剪切字幕" }
+]
+
+export const removeSubOptions = [
+  { value: "none", label: "不删除字幕" },
+  { value: "sc", label: "删除简体" },
+  { value: "tc", label: "删除繁体" }
+]
 
 export function RenameSetting() {
   const { config, saveConfig } = useConfig()
@@ -35,7 +47,7 @@ export function RenameSetting() {
             onChange={(checked) => saveConfig("subtitle", "config_badge_move_sub", checked)}
           />
         </SettingsItem>
-        <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项，不删除字幕时不显示">
+        <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项">
           <Switch
             checked={config?.subtitle?.config_badge_remove_sub}
             onChange={(checked) => saveConfig("subtitle", "config_badge_remove_sub", checked)}
@@ -81,6 +93,20 @@ export function RenameSetting() {
         </SettingsItem>
       </SettingsCard>
 
+      <SettingsItem title="文件夹递归" subtitle="拖入文件夹时，继续识别所有子文件夹中的视频和字幕" icon={<FoldersIcon />}>
+        <Switch
+          checked={config?.subtitle?.detect_folder_recursively}
+          onChange={(checked) => saveConfig("subtitle", "detect_folder_recursively", checked)}
+        />
+      </SettingsItem>
+
+      <SettingsItem title="文件夹过滤" subtitle="同时拖入包含视频、字幕或压缩包的多种文件时，自动排除文件夹" icon={<FolderMinusIcon />}>
+        <Switch
+          checked={config?.subtitle?.skip_folder_mixed}
+          onChange={(checked) => saveConfig("subtitle", "skip_folder_mixed", checked)}
+        />
+      </SettingsItem>
+
       <SettingsCard>
         <SettingsItem title="排除视频文件名" subtitle="是否排除文件名含特定内容的视频。使用 | 或正则表达式来匹配多个内容" icon={<ProhibitIcon />}>
           <Input
@@ -117,11 +143,7 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="移动字幕" subtitle="重命名完成后，是否移动字幕到视频文件夹" icon={<CopyIcon />}>
           <Select
-            options={[
-              { value: "none", label: "保持原位" },
-              { value: "copy", label: "复制到视频文件夹" },
-              { value: "cut", label: "剪切到视频文件夹" }
-            ]}
+            options={moveSubOptions}
             value={config?.subtitle?.move_sub}
             onChange={(value) => saveConfig("subtitle", "move_sub", value)}
             className="w-48"
@@ -132,11 +154,7 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="删除字幕" subtitle="重命名完成后，是否删除指定的字幕文件" icon={<TrashIcon />}>
           <Select
-            options={[
-              { value: "none", label: "不删除" },
-              { value: "sc", label: "删除简体字幕" },
-              { value: "tc", label: "删除繁体字幕" }
-            ]}
+            options={removeSubOptions}
             value={config?.subtitle?.remove_sub}
             onChange={(value) => saveConfig("subtitle", "remove_sub", value)}
             className="w-48"
