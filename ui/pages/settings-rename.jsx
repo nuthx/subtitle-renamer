@@ -6,6 +6,18 @@ import { Switch } from "@/components/switch"
 import { TagIcon, HighlighterIcon, ArrowsClockwiseIcon, FoldersIcon, FolderMinusIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
 
+export const moveSubOptions = [
+  { value: "none", label: "保持原位" },
+  { value: "copy", label: "复制字幕" },
+  { value: "cut", label: "剪切字幕" }
+]
+
+export const removeSubOptions = [
+  { value: "none", label: "不删除字幕" },
+  { value: "sc", label: "删除简体" },
+  { value: "tc", label: "删除繁体" }
+]
+
 export function RenameSetting() {
   const { config, saveConfig } = useConfig()
 
@@ -35,7 +47,7 @@ export function RenameSetting() {
             onChange={(checked) => saveConfig("subtitle", "config_badge_move_sub", checked)}
           />
         </SettingsItem>
-        <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项，不删除字幕时不显示">
+        <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项">
           <Switch
             checked={config?.subtitle?.config_badge_remove_sub}
             onChange={(checked) => saveConfig("subtitle", "config_badge_remove_sub", checked)}
@@ -125,11 +137,7 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="移动字幕" subtitle="重命名完成后，是否移动字幕到视频文件夹" icon={<CopyIcon />}>
           <Select
-            options={[
-              { value: "none", label: "保持原位" },
-              { value: "copy", label: "复制到视频文件夹" },
-              { value: "cut", label: "剪切到视频文件夹" }
-            ]}
+            options={moveSubOptions}
             value={config?.subtitle?.move_sub}
             onChange={(value) => saveConfig("subtitle", "move_sub", value)}
             className="w-48"
@@ -140,11 +148,7 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="删除字幕" subtitle="重命名完成后，是否删除指定的字幕文件" icon={<TrashIcon />}>
           <Select
-            options={[
-              { value: "none", label: "不删除" },
-              { value: "sc", label: "删除简体字幕" },
-              { value: "tc", label: "删除繁体字幕" }
-            ]}
+            options={removeSubOptions}
             value={config?.subtitle?.remove_sub}
             onChange={(value) => saveConfig("subtitle", "remove_sub", value)}
             className="w-48"

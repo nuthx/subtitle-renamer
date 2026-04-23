@@ -10,6 +10,7 @@ import { renameSubtitles } from "@/utils/rename"
 import { elapsedTime } from "@/utils/time"
 import { sortFiles } from "@/utils/sort"
 import { highlightDiff } from "@/utils/highlight"
+import { moveSubOptions, removeSubOptions } from "@/pages/settings-rename"
 import { toast } from "@/components/toast"
 import { Page, PageBlock } from "@/components/page"
 import { ContextMenu, ContextItem, ContextSeparator } from "@/components/context-menu"
@@ -172,6 +173,14 @@ export function SubtitleRename() {
     )
   }, [cell, setFileList])
 
+  // 切换配置标签状态
+  const handleCycleSubtitleConfig = useCallback((key, options) => {
+    const currentValue = config?.subtitle?.[key]
+    const currentIndex = options.findIndex((option) => option.value === currentValue)
+    const nextValue = options[(currentIndex + 1) % options.length].value
+    saveConfig("subtitle", key, nextValue)
+  }, [config, saveConfig])
+
   // 重命名字幕
   const handleRename = async () => {
     const success = await renameSubtitles(fileData, archiveList)
@@ -242,14 +251,20 @@ export function SubtitleRename() {
             <Badge variant="outline">添加后缀 {config.subtitle.union_extension}</Badge>
           )}
           {config?.subtitle?.config_badge_move_sub && config?.subtitle?.move_sub && (
-            <Badge variant="outline">
-              {config.subtitle.move_sub === "none" && "保持原位"}
-              {config.subtitle.move_sub === "copy" && "复制字幕"}
-              {config.subtitle.move_sub === "cut" && "剪切字幕"}
+            <Badge
+              variant="outline"
+              onClick={() => handleCycleSubtitleConfig("move_sub", moveSubOptions)}
+            >
+              {moveSubOptions.find((option) => option.value === config.subtitle.move_sub)?.label}
             </Badge>
           )}
-          {config?.subtitle?.config_badge_remove_sub && config?.subtitle?.remove_sub !== "none" && (
-            <Badge variant="outline">{config.subtitle.remove_sub === "sc" ? "删除简体" : "删除繁体"}</Badge>
+          {config?.subtitle?.config_badge_remove_sub && config?.subtitle?.remove_sub && (
+            <Badge
+              variant="outline"
+              onClick={() => handleCycleSubtitleConfig("remove_sub", removeSubOptions)}
+            >
+              {removeSubOptions.find((option) => option.value === config.subtitle.remove_sub)?.label}
+            </Badge>
           )}
         </div>
 
