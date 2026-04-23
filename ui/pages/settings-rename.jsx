@@ -85,6 +85,12 @@ export function RenameSetting() {
             onChange={(checked) => saveConfig("subtitle", "detect_language", checked)}
           />
         </SettingsItem>
+        <SettingsItem title="轻量识别" subtitle="优先根据文件名中的 sc/tc/chs/cht 等扩展名识别简繁类型，匹配失败再通过内容进行识别">
+          <Switch
+            checked={config?.subtitle?.lite_detect}
+            onChange={(checked) => saveConfig("subtitle", "lite_detect", checked)}
+          />
+        </SettingsItem>
       </SettingsCard>
 
       <SettingsItem title="文件夹递归" subtitle="拖入文件夹时，继续识别所有子文件夹中的视频和字幕" icon={<FoldersIcon />}>

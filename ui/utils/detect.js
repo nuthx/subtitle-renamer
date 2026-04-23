@@ -38,6 +38,19 @@ const ARCHIVE_EXTENSIONS = new Set([
   "zip", "7z", "rar"
 ])
 
+// 常用简繁字幕扩展名
+const SC_EXTENSIONS = new Set([
+  "sc", "chs", "zh-hans",
+  "zh-cn", "cn",
+  "gb", "zh-chs", "zhs",
+  "zho", "chi", "chn", "zh"
+])
+const TC_EXTENSIONS = new Set([
+  "tc", "cht", "zh-hant",
+  "zh-tw", "zh-hk", "tw", "hk",
+  "big5", "zh-cht", "zht"
+])
+
 export async function detectFiles(paths, fileList, archiveList) {
   const config = await getConfig()
   const newFiles = { video: [], sc: [], tc: [] }
@@ -153,7 +166,7 @@ export async function detectFiles(paths, fileList, archiveList) {
         excludedCount++
         return
       }
-      const lang = config?.subtitle?.detect_language ? await detectSubtitleLanguage(path) : "sc"
+      const lang = config?.subtitle?.detect_language ? await detectSubtitleLanguage(path, config) : "sc"
       newFiles[lang].push(path)
     } else {
       filteredCount++
@@ -198,7 +211,22 @@ async function collectDirectoryFiles(directoryPath, recursive) {
   return files
 }
 
-async function detectSubtitleLanguage(path) {
+async function detectSubtitleLanguage(path, config) {
+  // 先通过文件扩展名判断
+  if (config?.subtitle?.lite_detect) {
+    const extensions = await getMiddleExtensions(path)
+
+    for (const ext of extensions) {
+      // 再次以 _ 或 & 字符拆分，匹配双语字幕
+      const tags = ext.toLowerCase().split(/[_&]/)
+
+      for (const tag of tags) {
+        if (SC_EXTENSIONS.has(tag)) return "sc"
+        if (TC_EXTENSIONS.has(tag)) return "tc"
+      }
+    }
+  }
+
   const bytes = await readFile(path)
 
   // 猜测字幕编码，并解码为可读文本
@@ -229,4 +257,14 @@ async function detectSubtitleLanguage(path) {
   if (count > 0) return "sc"
   if (count < 0) return "tc"
   return "sc"
+}
+
+// 获取中间扩展名
+async function getMiddleExtensions(path) {
+  const ext = await extname(path)
+  const name = await basename(path, `.${ext}`)
+  const parts = name.split(".")
+
+  // 去掉文件名
+  return parts.slice(1)
 }

@@ -17,6 +17,7 @@ const DEFAULT_CONFIG = {
     detect_language: true,
     detect_folder_recursively: false,
     skip_folder_mixed: true,
+    lite_detect: false,
     exclude_video: "",
     exclude_subtitle: "",
     union_extension: "",
