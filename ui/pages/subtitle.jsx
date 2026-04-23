@@ -18,7 +18,7 @@ import { Table } from "@/components/table"
 import { Button } from "@/components/button"
 import { Badge } from "@/components/badge"
 import { Combobox } from "@/components/combobox"
-import { FileVideoIcon, FileTextIcon, FileArchiveIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon, GearIcon } from "@phosphor-icons/react"
+import { FileVideoIcon, FileTextIcon, FileArchiveIcon, FolderIcon, ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon, GearIcon } from "@phosphor-icons/react"
 
 const colKeys = ["video", "sc", "tc"]
 
@@ -75,16 +75,17 @@ export function SubtitleRename() {
 
     const dropPromise = (async () => {
       const startTime = Date.now()
-      const { files, archives, addedCount, filteredCount, duplicateCount, excludedCount } = await detectFiles(paths, fileList, archiveList)
+      const { files, archives, addedCount, filteredCount, duplicateCount, excludedCount, skippedFolderCount } = await detectFiles(paths, fileList, archiveList)
 
       const reasons = []
       if (filteredCount > 0) reasons.push(`${filteredCount} 个无效文件`)
       if (duplicateCount > 0) reasons.push(`${duplicateCount} 个重复文件`)
       if (excludedCount > 0) reasons.push(`${excludedCount} 个设置中排除的文件`)
+      if (skippedFolderCount > 0) reasons.push(`${skippedFolderCount} 个跳过的文件夹`)
       const filterText = reasons.length ? `过滤了 ${reasons.join("和 ")}` : ""
 
       if (addedCount === 0) {
-        throw new Error(`${filterText}，耗时 ${elapsedTime(startTime)}`)
+        throw new Error(`${filterText || "没有可添加的文件"}，耗时 ${elapsedTime(startTime)}`)
       } else {
         setFileList(() => files)
         setArchiveList(() => archives)
@@ -206,7 +207,7 @@ export function SubtitleRename() {
       </ContextMenu>
 
       <PageBlock className="flex-1 p-0">
-        <DropArea title="松手以添加视频或字幕" onFileDrop={handleFileDrop}>
+        <DropArea title="松手以添加所选内容" onFileDrop={handleFileDrop}>
           {tableData.length > 0
             ? (
                 <Table columns={tableColumns} data={tableData} onContextMenu={setCell} />
@@ -217,8 +218,9 @@ export function SubtitleRename() {
                     <FileVideoIcon className="size-7" weight="light" />
                     <FileTextIcon className="size-7" weight="light" />
                     <FileArchiveIcon className="size-7" weight="light" />
+                    <FolderIcon className="size-7" weight="light" />
                   </div>
-                  <span>请拖入视频、字幕或字幕压缩包</span>
+                  <span>请拖入视频、字幕、压缩包或文件夹</span>
                 </div>
               )}
         </DropArea>

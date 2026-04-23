@@ -3,7 +3,7 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { TagIcon, HighlighterIcon, ArrowsClockwiseIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
+import { TagIcon, HighlighterIcon, ArrowsClockwiseIcon, FoldersIcon, FolderMinusIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
 
 export function RenameSetting() {
@@ -74,6 +74,20 @@ export function RenameSetting() {
           />
         </SettingsItem>
       </SettingsCard>
+
+      <SettingsItem title="文件夹递归" subtitle="拖入文件夹时，继续识别所有子文件夹中的视频和字幕" icon={<FoldersIcon />}>
+        <Switch
+          checked={config?.subtitle?.detect_folder_recursively}
+          onChange={(checked) => saveConfig("subtitle", "detect_folder_recursively", checked)}
+        />
+      </SettingsItem>
+
+      <SettingsItem title="文件夹过滤" subtitle="同时拖入包含视频、字幕或压缩包的多种文件时，自动排除文件夹" icon={<FolderMinusIcon />}>
+        <Switch
+          checked={config?.subtitle?.skip_folder_mixed}
+          onChange={(checked) => saveConfig("subtitle", "skip_folder_mixed", checked)}
+        />
+      </SettingsItem>
 
       <SettingsCard>
         <SettingsItem title="排除视频文件名" subtitle="是否排除文件名含特定内容的视频。使用 | 或正则表达式来匹配多个内容" icon={<ProhibitIcon />}>
