@@ -3,7 +3,6 @@ import { Dialog as HeadlessDialog, DialogPanel, DialogTitle } from "@headlessui/
 import { cn } from "@/utils/cn"
 
 export function Dialog({ open, onClose, children, className }) {
-  console.log(type())
   return (
     <HeadlessDialog
       open={open}
