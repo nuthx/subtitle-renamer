@@ -1,17 +1,43 @@
 @import "tailwindcss";
 
-@theme {
-  --color-accent: light-dark(#1DA0E2, #1DA0E2);
+:root {
+  --app-color-primary: hsl(0 0 20);
+  --app-color-secondary: hsl(0 0 20 / 0.6);
+  --app-color-muted: hsl(0 0 20 / 0.24);
 
-  --color-primary: light-dark(hsl(0 0 20), hsl(0 0 90));
-  --color-secondary: light-dark(hsl(0 0 20 / 0.6), hsl(0 0 90 / 0.5));
-  --color-muted: light-dark(hsl(0 0 20 / 0.24), hsl(0 0 90 / 0.2));
+  --app-color-border: hsl(0 0 0 / 0.1);
+  --app-color-background: hsl(0 0 100);
+  --app-color-background-dark: hsl(0 0 96);
 
-  --color-border: light-dark(hsl(0 0 0 / 0.1), hsl(0 0 100 / 0.1));
-  --color-background: light-dark(hsl(0 0 100), hsl(0 0 12));
-  --color-background-dark: light-dark(hsl(0 0 96), hsl(0 0 20));
+  --app-color-accent: #1DA0E2;
+  --app-color-error: #FB2C37;
+}
 
-  --color-error: light-dark(#FB2C37, #FF6467);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-color-primary: hsl(0 0 90);
+    --app-color-secondary: hsl(0 0 90 / 0.5);
+    --app-color-muted: hsl(0 0 90 / 0.2);
+
+    --app-color-border: hsl(0 0 100 / 0.1);
+    --app-color-background: hsl(0 0 12);
+    --app-color-background-dark: hsl(0 0 20);
+
+    --app-color-error: #FF6467;
+  }
+}
+
+@theme inline {
+  --color-primary: var(--app-color-primary);
+  --color-secondary: var(--app-color-secondary);
+  --color-muted: var(--app-color-muted);
+
+  --color-border: var(--app-color-border);
+  --color-background: var(--app-color-background);
+  --color-background-dark: var(--app-color-background-dark);
+
+  --color-accent: var(--app-color-accent);
+  --color-error: var(--app-color-error);
 }
 
 @layer base {
@@ -20,7 +46,7 @@
   }
 
   body {
-    @apply text-sm text-primary antialiased select-none overflow-hidden scheme-light-dark;
+    @apply text-sm text-primary antialiased select-none overflow-hidden;
   }
 
   h1, h2, h3, h4, h5, h6, span, p, img {
