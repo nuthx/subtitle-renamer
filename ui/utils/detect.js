@@ -71,10 +71,25 @@ export async function detectFiles(paths, fileList, archiveList) {
     }
   }
 
+  const isRecognizedExtension = (ext) =>
+    VIDEO_EXTENSIONS.has(ext) || SUBTITLE_EXTENSIONS.has(ext) || ARCHIVE_EXTENSIONS.has(ext)
+
   const rootItems = []
   for (const path of paths) {
+    const ext = (await extname(path).catch(() => "")).toLowerCase()
+
+    // 直接接收已知扩展名，避免虚拟文件系统的 stat 结果误判为无效文件
+    if (isRecognizedExtension(ext)) {
+      rootItems.push({
+        path,
+        info: { isFile: true, isDirectory: false },
+        ext
+      })
+      continue
+    }
+
+    // 未知扩展名仍需查询元数据，以便识别用户拖入的文件夹。
     try {
-      const ext = (await extname(path).catch(() => "")).toLowerCase()
       rootItems.push({
         path,
         info: await stat(path),
@@ -86,9 +101,7 @@ export async function detectFiles(paths, fileList, archiveList) {
   }
 
   const hasDirectory = rootItems.some(({ info }) => info.isDirectory)
-  const hasRecognizedFile = rootItems.some(({ info, ext }) =>
-    info.isFile && (VIDEO_EXTENSIONS.has(ext) || SUBTITLE_EXTENSIONS.has(ext) || ARCHIVE_EXTENSIONS.has(ext))
-  )
+  const hasRecognizedFile = rootItems.some(({ info, ext }) => info.isFile && isRecognizedExtension(ext))
   const shouldSkipFolders = config.skip_folder_mixed && hasDirectory && hasRecognizedFile
 
   // 跳过重复文件，展开文件夹和直接拖入的压缩包
