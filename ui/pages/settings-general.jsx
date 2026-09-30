@@ -1,8 +1,9 @@
-import { useConfigStore } from "@/store/config"
-import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
+import { AppWindowIcon, FrameCornersIcon, HighlighterIcon, SunIcon, TagIcon } from "@phosphor-icons/react"
+
 import { Select } from "@/components/select"
+import { SettingsCard, SettingsContent, SettingsItem, SettingsTitle } from "@/components/settings"
 import { Switch } from "@/components/switch"
-import { SunIcon, AppWindowIcon, FrameCornersIcon, TagIcon, HighlighterIcon } from "@phosphor-icons/react"
+import { useConfigStore } from "@/store/config"
 
 export function GeneralSetting() {
   const config = useConfigStore((s) => s.config)
@@ -21,7 +22,7 @@ export function GeneralSetting() {
             options={[
               { value: "system", label: "跟随系统" },
               { value: "light", label: "浅色" },
-              { value: "dark", label: "深色" }
+              { value: "dark", label: "深色" },
             ]}
             value={config?.window_theme}
             onChange={(value) => saveConfig("window_theme", value)}
@@ -33,7 +34,11 @@ export function GeneralSetting() {
       <SettingsTitle title="窗口" />
 
       <SettingsCard>
-        <SettingsItem title="启用窗口材质" subtitle="启用系统的 Mica 或 Vibrancy 等窗口效果。修改后需重启生效" icon={<AppWindowIcon />}>
+        <SettingsItem
+          title="启用窗口材质"
+          subtitle="启用系统的 Mica 或 Vibrancy 等窗口效果。修改后需重启生效"
+          icon={<AppWindowIcon />}
+        >
           <Switch
             checked={config?.window_vibrancy ?? true}
             onChange={(checked) => saveConfig("window_vibrancy", checked)}
@@ -42,11 +47,12 @@ export function GeneralSetting() {
       </SettingsCard>
 
       <SettingsCard>
-        <SettingsItem title="记住窗口尺寸" subtitle="程序启动时恢复上次关闭时的窗口大小和位置" icon={<FrameCornersIcon />}>
-          <Switch
-            checked={config?.remember_window}
-            onChange={(checked) => saveConfig("remember_window", checked)}
-          />
+        <SettingsItem
+          title="记住窗口尺寸"
+          subtitle="程序启动时恢复上次关闭时的窗口大小和位置"
+          icon={<FrameCornersIcon />}
+        >
+          <Switch checked={config?.remember_window} onChange={(checked) => saveConfig("remember_window", checked)} />
         </SettingsItem>
       </SettingsCard>
 
@@ -81,11 +87,12 @@ export function GeneralSetting() {
       </SettingsCard>
 
       <SettingsCard>
-        <SettingsItem title="高亮文件名差异" subtitle="在表格中加粗显示同列文件名之间的差异部分" icon={<HighlighterIcon />}>
-          <Switch
-            checked={config?.highlight_diff}
-            onChange={(checked) => saveConfig("highlight_diff", checked)}
-          />
+        <SettingsItem
+          title="高亮文件名差异"
+          subtitle="在表格中加粗显示同列文件名之间的差异部分"
+          icon={<HighlighterIcon />}
+        >
+          <Switch checked={config?.highlight_diff} onChange={(checked) => saveConfig("highlight_diff", checked)} />
         </SettingsItem>
         <SettingsItem title="忽略大小写" subtitle="对比差异时忽略字母大小写">
           <Switch

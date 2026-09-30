@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect, useMemo } from "react"
+import { Modifier } from "@dnd-kit/abstract"
+import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers"
 import { DragDropProvider } from "@dnd-kit/react"
 import { isSortableOperation, useSortable } from "@dnd-kit/react/sortable"
-import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers"
-import { getTableWidths, saveTableWidths } from "@/utils/storage"
+import { useEffect, useMemo, useRef, useState } from "react"
+
 import { cn } from "@/utils/cn"
+import { getTableWidths, saveTableWidths } from "@/utils/storage"
 
 const MIN_COLUMN_WIDTH = 200
 
@@ -16,11 +18,12 @@ function TableCell({ id, columnKey, index, value, canDrag, isFirstColumn, isLast
     accept: columnKey,
     data: { columnKey, isEmpty: !canDrag },
     disabled: canDrag ? false : { draggable: true },
-    transition: { duration: 160, easing: "cubic-bezier(0.25, 1, 0.5, 1)" }
+    transition: { duration: 160, easing: "cubic-bezier(0.25, 1, 0.5, 1)" },
   })
 
   return (
-    <div
+    <button
+      type="button"
       ref={ref}
       className={cn(
         "flex items-center h-8 transition-colors shrink-0",
@@ -29,13 +32,13 @@ function TableCell({ id, columnKey, index, value, canDrag, isFirstColumn, isLast
         canDrag && "px-3 hover:bg-muted/40 cursor-grab active:cursor-grabbing",
         index % 2 === 0 && "bg-muted/20",
         isDragSource && "opacity-35",
-        isDropTarget && "bg-muted/40"
+        isDropTarget && "bg-muted/40",
       )}
       onClick={onClick}
       onContextMenu={onContextMenu}
     >
-      {value && <p className="truncate cursor-[inherit]" dangerouslySetInnerHTML={{ __html: value }} />}
-    </div>
+      {value && <span className="truncate cursor-[inherit]">{value}</span>}
+    </button>
   )
 }
 
@@ -49,6 +52,25 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
   const header = useMemo(() => columns.map((col) => col.title), [columns])
   const columnKeys = useMemo(() => columns.map((col) => col.key), [columns])
   const totalWidth = useMemo(() => columnWidths.reduce((sum, width) => sum + width, 0), [columnWidths])
+  const modifiers = useMemo(
+    () => [
+      RestrictToVerticalAxis,
+      class RestrictToTable extends Modifier {
+        apply({ shape, transform }) {
+          if (!shape) return transform
+
+          const { top, bottom } = bodyRef.current.getBoundingClientRect()
+          const halfHeight = shape.current.boundingRectangle.height / 2
+          const centerY = shape.initial.center.y
+          return {
+            ...transform,
+            y: Math.max(top + halfHeight - centerY, Math.min(transform.y, bottom - halfHeight - centerY)),
+          }
+        }
+      },
+    ],
+    [],
+  )
   const { baseOrders, itemMaps } = useMemo(() => {
     const baseOrders = {}
     const itemMaps = {}
@@ -81,15 +103,11 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
       const defaultWidth = Math.floor(availableWidth / header.length)
       const remainder = availableWidth - defaultWidth * header.length
       const storedWidths = getTableWidths()
-      const defaultWidths = Array(header.length).fill(defaultWidth).map((w, i) =>
-        i === header.length - 1 ? w + remainder : w
-      )
+      const defaultWidths = Array(header.length)
+        .fill(defaultWidth)
+        .map((w, i) => (i === header.length - 1 ? w + remainder : w))
 
-      setColumnWidths(
-        columnKeys.map((key, i) =>
-          storedWidths[key] ?? defaultWidths[i]
-        )
-      )
+      setColumnWidths(columnKeys.map((key, i) => storedWidths[key] ?? defaultWidths[i]))
     }
   }, [columnKeys, data.length, header.length])
 
@@ -99,7 +117,7 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
     const header = headerRef.current
 
     if (body && header) {
-      const handleScroll = () => header.scrollLeft = body.scrollLeft
+      const handleScroll = () => (header.scrollLeft = body.scrollLeft)
       body.addEventListener("scroll", handleScroll)
       return () => body.removeEventListener("scroll", handleScroll)
     }
@@ -115,15 +133,13 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
 
     const handleMouseMove = (e) => {
       const nextWidth = Math.max(MIN_COLUMN_WIDTH, startWidth + e.clientX - startX)
-      const nextWidths = columnWidthsRef.current.map((w, i) => i === index ? nextWidth : w)
+      const nextWidths = columnWidthsRef.current.map((w, i) => (i === index ? nextWidth : w))
       columnWidthsRef.current = nextWidths
       setColumnWidths(nextWidths)
     }
 
     const handleMouseUp = () => {
-      saveTableWidths(
-        Object.fromEntries(columnKeys.map((key, i) => [key, columnWidthsRef.current[i]]))
-      )
+      saveTableWidths(Object.fromEntries(columnKeys.map((key, i) => [key, columnWidthsRef.current[i]])))
       controller.abort()
     }
 
@@ -144,7 +160,7 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
     onReorder?.({
       columnKey,
       fromIndex,
-      targetIndex
+      targetIndex,
     })
   }
 
@@ -153,21 +169,33 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
       <div ref={headerRef} className="sticky top-0 z-10 pl-1 border-b overflow-hidden">
         <div className="flex h-9" style={{ width: totalWidth }}>
           {header.map((item, index) => (
-            <div key={index} className="relative flex items-center border-r shrink-0" style={{ width: columnWidths[index] !== undefined ? (index === header.length - 1 ? columnWidths[index] + 5 : columnWidths[index]) : undefined }}>
+            <div
+              key={index}
+              className="relative flex items-center border-r shrink-0"
+              style={{
+                width:
+                  columnWidths[index] !== undefined
+                    ? index === header.length - 1
+                      ? columnWidths[index] + 5
+                      : columnWidths[index]
+                    : undefined,
+              }}
+            >
               <p className="px-3 text-left">{item}</p>
-              <div
+              <button
+                type="button"
                 className="group absolute -right-2 z-10 h-full w-5 px-2 cursor-col-resize"
                 onMouseDown={(e) => handleResizeColumn(index, e)}
               >
                 <div className="w-1 h-full rounded-full transition group-hover:bg-accent" />
-              </div>
+              </button>
             </div>
           ))}
         </div>
       </div>
 
       <div ref={bodyRef} className="flex-1 flex overflow-auto p-1">
-        <DragDropProvider modifiers={[RestrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+        <DragDropProvider modifiers={modifiers} onDragEnd={handleDragEnd}>
           <div className="flex" style={{ minWidth: totalWidth }}>
             {columns.map((col, colIndex) => {
               const order = baseOrders[col.key] || []
@@ -175,18 +203,14 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
               const emptyCount = Math.max(0, data.length - order.length)
 
               return (
-                <div
-                  key={col.key}
-                  className="flex flex-col gap-1 shrink-0"
-                  style={{ width: columnWidths[colIndex] }}
-                >
+                <div key={col.key} className="flex flex-col gap-1 shrink-0" style={{ width: columnWidths[colIndex] }}>
                   {[
                     ...order.map((id, rowIndex) => ({ id, rowIndex, item: itemMap.get(id) })),
                     ...Array.from({ length: emptyCount }, (_, i) => ({
                       id: `${col.key}:empty:${order.length + i}`,
                       rowIndex: order.length + i,
-                      item: null
-                    }))
+                      item: null,
+                    })),
                   ].map(({ id, rowIndex, item }) => (
                     <TableCell
                       key={id}

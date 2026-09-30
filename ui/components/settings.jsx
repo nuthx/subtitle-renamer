@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, cloneElement, Children } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { cn } from "@/utils/cn"
 import { CaretDownIcon } from "@phosphor-icons/react"
+import { Children, cloneElement, useEffect, useRef, useState } from "react"
+import { Link, useLocation } from "react-router-dom"
+
+import { cn } from "@/utils/cn"
 
 export function SettingsNav({ children }) {
   const navRef = useRef(null)
@@ -18,7 +19,7 @@ export function SettingsNav({ children }) {
 
       setIndicatorStyle({
         left: buttonRect.left - navRect.left,
-        width: buttonRect.width
+        width: buttonRect.width,
       })
     }
   }, [location.pathname])
@@ -37,11 +38,11 @@ export function SettingsNav({ children }) {
       <div
         className={cn(
           "absolute bottom-0 h-0.75 bg-accent rounded-t-full",
-          enableTransition && "transition-all duration-300 ease-out"
+          enableTransition && "transition-all duration-300 ease-out",
         )}
         style={{
           left: `${indicatorStyle.left}px`,
-          width: `${indicatorStyle.width}px`
+          width: `${indicatorStyle.width}px`,
         }}
       />
     </div>
@@ -59,19 +60,13 @@ export function SettingsNavButton({ path, title }) {
 export function SettingsContent({ children }) {
   return (
     <div className="flex-1 overflow-auto">
-      <div className="flex flex-col items-center gap-2 p-6">
-        {children}
-      </div>
+      <div className="flex flex-col items-center gap-2 p-6">{children}</div>
     </div>
   )
 }
 
 export function SettingsTitle({ title }) {
-  return (
-    <div className="flex items-center w-full p-5 pb-1 first:pt-0 font-medium text-base">
-      {title}
-    </div>
-  )
+  return <div className="flex items-center w-full p-5 pb-1 first:pt-0 font-medium text-base">{title}</div>
 }
 
 export function SettingsCard({ children }) {
@@ -85,9 +80,7 @@ export function SettingsCard({ children }) {
       {cloneElement(items[0], { isCardHeader: true, isExpanded: expanded, onClick: () => setExpanded((v) => !v) })}
       <div className={cn("grid transition-all duration-300", expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
         <div className="overflow-hidden">
-          {items.slice(1).map((item, i) =>
-            cloneElement(item, { isSubitem: true, key: i })
-          )}
+          {items.slice(1).map((item, i) => cloneElement(item, { isSubitem: true, key: i }))}
         </div>
       </div>
     </div>
@@ -100,7 +93,7 @@ export function SettingsItem({ title, subtitle, icon, children, isCardHeader, is
       className={cn(
         "flex-center gap-4 h-18 w-full px-5 bg-background",
         isCardHeader ? "cursor-pointer" : "border rounded-md",
-        isSubitem && "border-0 border-t rounded-none bg-transparent"
+        isSubitem && "border-0 border-t rounded-none bg-transparent",
       )}
       {...props}
     >

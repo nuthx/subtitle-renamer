@@ -1,5 +1,6 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react"
 import { CaretDownIcon } from "@phosphor-icons/react"
+
 import { cn } from "@/utils/cn"
 
 export function Select({ options, value, onChange, className }) {
@@ -12,10 +13,10 @@ export function Select({ options, value, onChange, className }) {
           "group flex-center gap-2 w-full h-8 px-3 rounded-sm cursor-pointer transition",
           "bg-background hover:bg-background-dark/50 border border-b-muted active:border-muted",
           "data-open:bg-background-dark/50 data-open:border-muted",
-          className
+          className,
         )}
       >
-        <a className="flex-1 text-left truncate">{selectedOption?.label}</a>
+        <span className="flex-1 text-left truncate">{selectedOption?.label}</span>
         <CaretDownIcon className="size-4 text-secondary shrink-0 transition-all group-data-open:rotate-180" />
       </ListboxButton>
 
@@ -30,7 +31,7 @@ export function Select({ options, value, onChange, className }) {
             value={item.value}
             className={cn(
               "group relative flex items-center gap-1 h-8 px-3 rounded-sm cursor-pointer transition",
-              "hover:bg-background-dark data-selected:bg-background-dark"
+              "hover:bg-background-dark data-selected:bg-background-dark",
             )}
           >
             {item.label}

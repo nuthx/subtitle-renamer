@@ -46,12 +46,18 @@ pub fn hide_browser_inner(app: AppHandle) -> Result<(), String> {
     window.hide().map_err(|e| e.to_string())
 }
 
-pub fn search_posts_inner(app: AppHandle, query: &str) -> Result<(), String> {
-    let mut url = Url::parse(SEARCH_URL).map_err(|e| e.to_string())?;
-    url.query_pairs_mut()
-        .append_pair("mod", "forum")
-        .append_pair("searchsubmit", "yes")
-        .append_pair("srchtxt", query.trim());
+pub fn search_posts_inner(
+    app: AppHandle,
+    query: &str,
+    page_url: Option<&str>,
+) -> Result<(), String> {
+    let mut url = Url::parse(page_url.unwrap_or(SEARCH_URL)).map_err(|e| e.to_string())?;
+    if page_url.is_none() {
+        url.query_pairs_mut()
+            .append_pair("mod", "forum")
+            .append_pair("searchsubmit", "yes")
+            .append_pair("srchtxt", query.trim());
+    }
 
     navigate_browser_window(&app, url).map(|window| {
         let _ = window.hide();

@@ -1,27 +1,32 @@
 import "@/globals.css"
+
+import { DownloadSimpleIcon, GearSixIcon, SubtitlesIcon } from "@phosphor-icons/react"
 import { invoke } from "@tauri-apps/api/core"
 import { listen } from "@tauri-apps/api/event"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom"
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom"
 import { Toaster } from "sonner"
-import { AppWindow, TitleBar, MainContent } from "@/components/window.jsx"
+
 import { Nav, NavButton, NavSpace, NavUpgrade } from "@/components/nav.jsx"
-import { SubtitleRename } from "@/pages/subtitle-rename"
-import { SubtitleDownload } from "@/pages/subtitle-download"
+import { AppWindow, MainContent, TitleBar } from "@/components/window.jsx"
 import { Settings } from "@/pages/settings"
+import { AboutSetting } from "@/pages/settings-about"
+import { DeveloperSetting } from "@/pages/settings-developer"
+import { DownloadSetting } from "@/pages/settings-download"
 import { GeneralSetting } from "@/pages/settings-general"
 import { RenameSetting } from "@/pages/settings-rename"
-import { DownloadSetting } from "@/pages/settings-download"
-import { DeveloperSetting } from "@/pages/settings-developer"
-import { AboutSetting } from "@/pages/settings-about"
-import { SubtitlesIcon, GearSixIcon, DownloadSimpleIcon } from "@phosphor-icons/react"
+import { SubtitleDownload } from "@/pages/subtitle-download"
+import { SubtitleRename } from "@/pages/subtitle-rename"
 import { useConfigStore } from "@/store/config"
 
 // 初始化配置和主题模式
-useConfigStore.getState().initConfig().then(async (config) => {
-  await invoke("set_theme", { theme: config.window_theme })
-})
+useConfigStore
+  .getState()
+  .initConfig()
+  .then(async (config) => {
+    await invoke("set_theme", { theme: config.window_theme })
+  })
 
 // 监听菜单跳转
 listen("navigate", (event) => {
@@ -65,5 +70,5 @@ createRoot(document.getElementById("root")).render(
         </MainContent>
       </AppWindow>
     </HashRouter>
-  </StrictMode>
+  </StrictMode>,
 )

@@ -1,5 +1,6 @@
+import { DialogPanel, DialogTitle, Dialog as HeadlessDialog } from "@headlessui/react"
 import { type } from "@tauri-apps/plugin-os"
-import { Dialog as HeadlessDialog, DialogPanel, DialogTitle } from "@headlessui/react"
+
 import { cn } from "@/utils/cn"
 
 export function Dialog({ open, onClose, children, className }) {
@@ -13,11 +14,11 @@ export function Dialog({ open, onClose, children, className }) {
       <DialogPanel
         className={cn(
           "w-full max-w-135 bg-background border rounded-lg shadow-xl overflow-hidden data-closed:transform-[scale(95%)] data-closed:opacity-0 transition",
-          className
+          className,
         )}
         transition
       >
-        {type() === "macos" && (<div className="fixed top-0 left-0 right-0 h-9" data-tauri-drag-region />)}
+        {type() === "macos" && <div className="fixed top-0 left-0 right-0 h-9" data-tauri-drag-region />}
         {children}
       </DialogPanel>
     </HeadlessDialog>
@@ -31,9 +32,7 @@ export function DialogContent({ title, subtitle, children, className }) {
         <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
         {subtitle && <span className="text-xs text-secondary">{subtitle}</span>}
       </div>
-      <div className={cn("w-full", className)}>
-        {children}
-      </div>
+      <div className={cn("w-full", className)}>{children}</div>
     </div>
   )
 }
