@@ -1,10 +1,11 @@
-import chardet from "chardet"
-import { dirname, join, extname, basename, appConfigDir } from "@tauri-apps/api/path"
-import { copyFile, remove, rename, exists, readFile, writeFile } from "@tauri-apps/plugin-fs"
 import { invoke } from "@tauri-apps/api/core"
+import { appConfigDir, basename, dirname, extname, join } from "@tauri-apps/api/path"
+import { copyFile, exists, readFile, remove, rename, writeFile } from "@tauri-apps/plugin-fs"
+import chardet from "chardet"
+
+import { toast } from "@/components/toast"
 import { useConfigStore } from "@/store/config"
 import { elapsedTime } from "@/utils/time"
-import { toast } from "@/components/toast"
 
 export async function renameSubtitles(fileData, archiveList) {
   const startTime = Date.now()
@@ -42,7 +43,10 @@ export async function renameSubtitles(fileData, archiveList) {
       const videoExt = await extname(row.video)
       const videoName = await basename(row.video, `.${videoExt}`)
 
-      for (const [lang, subPath, suffix] of [["sc", row.sc, config.sc_extension], ["tc", row.tc, config.tc_extension]]) {
+      for (const [lang, subPath, suffix] of [
+        ["sc", row.sc, config.sc_extension],
+        ["tc", row.tc, config.tc_extension],
+      ]) {
         if (!subPath) continue
         if (lang === removeSub) continue
         const subExtRaw = await extname(subPath)
@@ -65,7 +69,7 @@ export async function renameSubtitles(fileData, archiveList) {
 
       // 不转换编码时：复制文件到新路径
       // 转换编码时：读取后直接写入
-      if (encoding === "UTF-8" && bytes[0] !== 0xEF) {
+      if (encoding === "UTF-8" && bytes[0] !== 0xef) {
         await copyFile(path.old, path.new) // 使用复制方式来重命名避坑
       } else {
         const text = new TextDecoder(encoding).decode(bytes).replace(/^\uFEFF/, "") // 移除utf-8 bom

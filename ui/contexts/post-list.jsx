@@ -1,8 +1,9 @@
+import { BrowserIcon } from "@phosphor-icons/react"
 import { openUrl } from "@tauri-apps/plugin-opener"
 import { useCallback } from "react"
+
+import { ContextItem, ContextMenu } from "@/components/context-menu"
 import { toast } from "@/components/toast"
-import { ContextMenu, ContextItem } from "@/components/context-menu"
-import { BrowserIcon } from "@phosphor-icons/react"
 
 export function PostListContextMenu({ cell, onClose }) {
   const handleOpenPost = useCallback(async () => {
@@ -15,13 +16,7 @@ export function PostListContextMenu({ cell, onClose }) {
 
   return (
     <ContextMenu cell={cell} onClose={onClose}>
-      {cell && (
-        <ContextItem
-          title="在网页中打开"
-          icon={<BrowserIcon className="size-4" />}
-          onClick={handleOpenPost}
-        />
-      )}
+      {cell && <ContextItem title="在网页中打开" icon={<BrowserIcon className="size-4" />} onClick={handleOpenPost} />}
     </ContextMenu>
   )
 }

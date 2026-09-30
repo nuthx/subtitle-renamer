@@ -1,8 +1,9 @@
-import packageJson from "#/package.json"
+import { ChatsIcon, FileTextIcon, GithubLogoIcon } from "@phosphor-icons/react"
 import { openUrl } from "@tauri-apps/plugin-opener"
-import { SettingsContent, SettingsCard, SettingsItem } from "@/components/settings"
+
+import packageJson from "#/package.json"
 import { Button } from "@/components/button"
-import { GithubLogoIcon, ChatsIcon, FileTextIcon } from "@phosphor-icons/react"
+import { SettingsCard, SettingsContent, SettingsItem } from "@/components/settings"
 
 export function AboutSetting() {
   return (

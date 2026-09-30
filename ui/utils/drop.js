@@ -3,7 +3,8 @@ import { elapsedTime } from "@/utils/time"
 
 export async function addDroppedFiles(paths, fileList, archiveList, tableScope, setFileList, setArchiveList) {
   const startTime = Date.now()
-  const { files, archives, addedCount, filteredCount, duplicateCount, excludedCount, skippedFolderCount } = await detectFiles(paths, fileList, archiveList)
+  const { files, archives, addedCount, filteredCount, duplicateCount, excludedCount, skippedFolderCount } =
+    await detectFiles(paths, fileList, archiveList)
 
   const reasons = []
   if (filteredCount > 0) reasons.push(`${filteredCount} 个无效文件`)

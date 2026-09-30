@@ -1,5 +1,6 @@
-import { useEffect, useRef, useCallback, createContext, useContext } from "react"
+import { createContext, useCallback, useContext, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
+
 import { cn } from "@/utils/cn"
 
 const ContextMenuContext = createContext(null)
@@ -15,7 +16,10 @@ export function ContextMenu({ cell, onClose, children, className }) {
     const menu = menuRef.current
     const rect = menu.getBoundingClientRect()
 
-    const x = cell.x + rect.width + MARGIN > window.innerWidth ? Math.max(MARGIN, window.innerWidth - rect.width - MARGIN) : cell.x
+    const x =
+      cell.x + rect.width + MARGIN > window.innerWidth
+        ? Math.max(MARGIN, window.innerWidth - rect.width - MARGIN)
+        : cell.x
     const y = cell.y + rect.height + MARGIN > window.innerHeight ? Math.max(MARGIN, cell.y - rect.height) : cell.y
 
     menu.style.left = `${x}px`
@@ -42,13 +46,13 @@ export function ContextMenu({ cell, onClose, children, className }) {
         className={cn(
           "fixed z-50 min-w-44 p-1 bg-background/90 backdrop-blur-sm border shadow-lg/15 rounded-lg transition",
           cell ? "opacity-100" : "opacity-0 pointer-events-none",
-          className
+          className,
         )}
       >
         {children}
       </div>
     </ContextMenuContext.Provider>,
-    document.body
+    document.body,
   )
 }
 
@@ -62,9 +66,10 @@ export function ContextItem({ title, icon, onClick, danger }) {
 
   return (
     <button
+      type="button"
       className={cn(
         "flex items-center gap-2.5 w-full px-3 h-8 hover:bg-background-dark rounded-sm cursor-pointer transition",
-        danger && "hover:text-error"
+        danger && "hover:text-error",
       )}
       onClick={handleClick}
     >

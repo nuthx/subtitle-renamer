@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react"
+import { DownloadSimpleIcon } from "@phosphor-icons/react"
 import { appConfigDir, dirname, join } from "@tauri-apps/api/path"
 import { open } from "@tauri-apps/plugin-dialog"
 import { exists } from "@tauri-apps/plugin-fs"
 import { openPath } from "@tauri-apps/plugin-opener"
-import { useConfigStore } from "@/store/config"
-import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
+import { useEffect, useState } from "react"
+
 import { Button } from "@/components/button"
+import { SettingsCard, SettingsContent, SettingsItem, SettingsTitle } from "@/components/settings"
 import { toast } from "@/components/toast"
-import { DownloadSimpleIcon } from "@phosphor-icons/react"
+import { useConfigStore } from "@/store/config"
 
 export function DownloadSetting() {
   const [defaultDirectory, setDefaultDirectory] = useState("")
@@ -30,7 +31,7 @@ export function DownloadSetting() {
       const selected = await open({
         directory: true,
         multiple: false,
-        defaultPath: config?.download_directory || defaultDirectory
+        defaultPath: config?.download_directory || defaultDirectory,
       })
       if (selected) await saveConfig("download_directory", selected)
     } catch (error) {
@@ -44,7 +45,7 @@ export function DownloadSetting() {
       await openPath(
         directoryExists
           ? config?.download_directory || defaultDirectory
-          : await dirname(config?.download_directory || defaultDirectory)
+          : await dirname(config?.download_directory || defaultDirectory),
       )
     } catch (error) {
       toast.error({ title: "文件夹打开失败", description: error.message || String(error) })

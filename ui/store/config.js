@@ -34,7 +34,7 @@ const DEFAULT_CONFIG = {
   remove_zip: true,
 
   // 字幕下载
-  download_directory: ""
+  download_directory: "",
 }
 
 let storeInstance = null
@@ -52,7 +52,7 @@ export const useConfigStore = create((set, get) => ({
   initConfig: async () => {
     const store = await getStore()
     for (const [key, value] of Object.entries(DEFAULT_CONFIG)) {
-      if (await store.get(key) === undefined) {
+      if ((await store.get(key)) === undefined) {
         await store.set(key, value)
       }
     }
@@ -60,13 +60,13 @@ export const useConfigStore = create((set, get) => ({
   },
 
   getConfig: async () => {
-    return get().config ?? await get().refreshConfig()
+    return get().config ?? (await get().refreshConfig())
   },
 
   refreshConfig: async () => {
     const store = await getStore()
     const entries = await Promise.all(
-      Object.entries(DEFAULT_CONFIG).map(async ([key, value]) => [key, await store.get(key) ?? value])
+      Object.entries(DEFAULT_CONFIG).map(async ([key, value]) => [key, (await store.get(key)) ?? value]),
     )
     const config = Object.fromEntries(entries)
     set({ config })
@@ -77,8 +77,8 @@ export const useConfigStore = create((set, get) => ({
     set((state) => ({
       config: {
         ...state.config,
-        [key]: value
-      }
+        [key]: value,
+      },
     }))
 
     const store = await getStore()
@@ -96,5 +96,5 @@ export const useConfigStore = create((set, get) => ({
       await store.set(key, value)
     }
     await get().refreshConfig()
-  }
+  },
 }))

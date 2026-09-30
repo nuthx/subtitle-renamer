@@ -1,20 +1,19 @@
 import { basename } from "@tauri-apps/api/path"
 import { diffChars } from "diff"
+import { createElement } from "react"
 
 export async function createSubtitleTableData(fileList, config) {
   const entries = Object.entries(fileList)
   const maxLength = Math.max(0, ...entries.map(([, v]) => v?.length || 0))
 
   const fileData = Array.from({ length: maxLength }, (_, i) =>
-    Object.fromEntries(entries.map(([k, v]) => [k, v?.[i] || ""]))
+    Object.fromEntries(entries.map(([k, v]) => [k, v?.[i] || ""])),
   )
 
   const basenameData = await Promise.all(
     fileData.map((row) =>
-      Promise.all(
-        Object.entries(row).map(async ([k, v]) => [k, v ? await basename(v) : ""])
-      ).then(Object.fromEntries)
-    )
+      Promise.all(Object.entries(row).map(async ([k, v]) => [k, v ? await basename(v) : ""])).then(Object.fromEntries),
+    ),
   )
 
   const tableData = config?.highlight_diff
@@ -47,19 +46,18 @@ export function highlightDiff(data, ignoreCase, numbersOnly) {
 
         // // 将当前值与其他值进行两两比较，计算字符级差异
         let pos = 0
-        diffChars(
-          ignoreCase ? value.toLowerCase() : value,
-          ignoreCase ? other.toLowerCase() : other
-        ).forEach((part) => {
-          if (part.removed) {
-            for (let i = 0; i < part.value.length; i++) {
-              diffPositions.add(pos + i)
+        diffChars(ignoreCase ? value.toLowerCase() : value, ignoreCase ? other.toLowerCase() : other).forEach(
+          (part) => {
+            if (part.removed) {
+              for (let i = 0; i < part.value.length; i++) {
+                diffPositions.add(pos + i)
+              }
             }
-          }
-          if (!part.added) {
-            pos += part.value.length
-          }
-        })
+            if (!part.added) {
+              pos += part.value.length
+            }
+          },
+        )
       })
       diffMap.set(value, diffPositions)
     })
@@ -72,12 +70,9 @@ export function highlightDiff(data, ignoreCase, numbersOnly) {
       if (diffs?.size) {
         row[key] = value
           .split("")
-          .map((char, i) => {
-            const shouldHighlight = diffs.has(i) && (!numbersOnly || /\d/.test(char))
-            return shouldHighlight ? `<strong>${char}</strong>` : char
-          })
-          .join("")
-          .replace(/<\/strong><strong>/g, "") // 合并相邻的标签
+          .map((char, i) =>
+            diffs.has(i) && (!numbersOnly || /\d/.test(char)) ? createElement("strong", { key: i }, char) : char,
+          )
       }
     })
   })

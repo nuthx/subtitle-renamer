@@ -1,31 +1,41 @@
+import {
+  DownloadSimpleIcon,
+  EmptyIcon,
+  FileArchiveIcon,
+  FileVideoIcon,
+  FolderIcon,
+  MagnifyingGlassIcon,
+  ShieldChevronIcon,
+  WarningDiamondIcon,
+} from "@phosphor-icons/react"
 import { invoke } from "@tauri-apps/api/core"
-import { useState, useCallback, useEffect, useMemo, useRef } from "react"
-import { useConfigStore } from "@/store/config"
-import { useTableStore } from "@/store/table"
-import { useDownloadStore } from "@/store/download"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+
+import { Badge } from "@/components/badge"
+import { Button } from "@/components/button"
+import { Combobox } from "@/components/combobox"
+import { DropArea } from "@/components/drop"
+import { Input } from "@/components/input"
+import { Page, PageBlock, PageGroup } from "@/components/page"
+import { Select } from "@/components/select"
+import { Table } from "@/components/table"
+import { toast } from "@/components/toast"
+import { PostListContextMenu } from "@/contexts/post-list"
+import { SubtitleTableContextMenu } from "@/contexts/subtitle-table"
 import { useListen } from "@/hooks/use-listen"
-import { renameSubtitles } from "@/utils/rename"
+import { moveSubOptions, removeSubOptions } from "@/pages/settings-rename"
+import { useConfigStore } from "@/store/config"
+import { useDownloadStore } from "@/store/download"
+import { useTableStore } from "@/store/table"
+import { cn } from "@/utils/cn"
 import { addDroppedFiles } from "@/utils/drop"
 import { createSubtitleTableData } from "@/utils/highlight"
 import { parseAcgripPage } from "@/utils/parse"
-import { moveSubOptions, removeSubOptions } from "@/pages/settings-rename"
-import { SubtitleTableContextMenu } from "@/contexts/subtitle-table"
-import { PostListContextMenu } from "@/contexts/post-list"
-import { toast } from "@/components/toast"
-import { Page, PageGroup, PageBlock } from "@/components/page"
-import { DropArea } from "@/components/drop"
-import { Table } from "@/components/table"
-import { Button } from "@/components/button"
-import { Badge } from "@/components/badge"
-import { Combobox } from "@/components/combobox"
-import { Input } from "@/components/input"
-import { Select } from "@/components/select"
-import { cn } from "@/utils/cn"
-import { FileVideoIcon, FileArchiveIcon, FolderIcon, DownloadSimpleIcon, MagnifyingGlassIcon, ShieldChevronIcon, WarningDiamondIcon, EmptyIcon } from "@phosphor-icons/react"
+import { renameSubtitles } from "@/utils/rename"
 
 const postFileSortOptions = [
   { value: "default", label: "默认" },
-  { value: "downloads", label: "下载数量" }
+  { value: "downloads", label: "下载数量" },
 ]
 
 export function SubtitleDownload() {
@@ -65,9 +75,11 @@ export function SubtitleDownload() {
   const setFilesError = useDownloadStore((s) => s.setFilesError)
 
   // 排序字幕附件
-  const sortedPostFiles = useMemo(() =>
-    postFileSort !== "downloads" ? postFiles : [...postFiles].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)),
-  [postFiles, postFileSort])
+  const sortedPostFiles = useMemo(
+    () =>
+      postFileSort !== "downloads" ? postFiles : [...postFiles].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)),
+    [postFiles, postFileSort],
+  )
 
   // 将文件列表转换为表格数据，并根据配置决定是否高亮差异
   useEffect(() => {
@@ -80,15 +92,18 @@ export function SubtitleDownload() {
   }, [fileList, config])
 
   // 拖拽添加文件
-  const handleFileDrop = useCallback(async (paths) => {
-    if (!paths || paths.length === 0) return
-    const dropPromise = addDroppedFiles(paths, fileList, archiveList, tableScope, setFileList, setArchiveList)
-    toast.promise(dropPromise, {
-      loading: { title: "正在添加文件" },
-      success: { title: (data) => data.message, duration: 1000 },
-      error: { type: "warning", title: (error) => error.message || String(error) }
-    })
-  }, [fileList, archiveList, setFileList, setArchiveList, tableScope])
+  const handleFileDrop = useCallback(
+    async (paths) => {
+      if (!paths || paths.length === 0) return
+      const dropPromise = addDroppedFiles(paths, fileList, archiveList, tableScope, setFileList, setArchiveList)
+      toast.promise(dropPromise, {
+        loading: { title: "正在添加文件" },
+        success: { title: (data) => data.message, duration: 1000 },
+        error: { type: "warning", title: (error) => error.message || String(error) },
+      })
+    },
+    [fileList, archiveList, setFileList, setArchiveList],
+  )
 
   // 设置过盾验证状态
   const setVerificationWaiting = useCallback((waiting) => {
@@ -189,17 +204,23 @@ export function SubtitleDownload() {
   }
 
   // 表格重新排序
-  const handleTableReorder = useCallback(({ columnKey, fromIndex, targetIndex }) => {
-    moveFileItem(tableScope, columnKey, fromIndex, targetIndex)
-  }, [moveFileItem, tableScope])
+  const handleTableReorder = useCallback(
+    ({ columnKey, fromIndex, targetIndex }) => {
+      moveFileItem(tableScope, columnKey, fromIndex, targetIndex)
+    },
+    [moveFileItem],
+  )
 
   // 切换配置标签状态
-  const handleCycleSubtitleConfig = useCallback((key, options) => {
-    const currentValue = config?.[key]
-    const currentIndex = options.findIndex((option) => option.value === currentValue)
-    const nextValue = options[(currentIndex + 1) % options.length].value
-    saveConfig(key, nextValue)
-  }, [config, saveConfig])
+  const handleCycleSubtitleConfig = useCallback(
+    (key, options) => {
+      const currentValue = config?.[key]
+      const currentIndex = options.findIndex((option) => option.value === currentValue)
+      const nextValue = options[(currentIndex + 1) % options.length].value
+      saveConfig(key, nextValue)
+    },
+    [config, saveConfig],
+  )
 
   // 重命名字幕
   const handleRename = async () => {
@@ -214,40 +235,34 @@ export function SubtitleDownload() {
 
       <PageBlock className="flex-1">
         <DropArea title="松手以添加所选内容" onFileDrop={handleFileDrop}>
-          {tableData.length > 0
-            ? (
-                <Table
-                  columns={[
-                    { key: "video", title: "视频文件" },
-                    { key: "sc", title: config?.detect_language ? "简体字幕" : "字幕文件" },
-                    ...(config?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : [])
-                  ]}
-                  data={tableData}
-                  cellIds={fileData}
-                  onContextMenu={setCell}
-                  onReorder={handleTableReorder}
-                />
-              )
-            : (
-                <div className="flex-1 flex-center flex-col gap-3 text-secondary">
-                  <div className="flex-center gap-3">
-                    <FileVideoIcon className="size-7" weight="light" />
-                    <FolderIcon className="size-7" weight="light" />
-                  </div>
-                  <span>请拖入视频或文件夹</span>
-                </div>
-              )}
+          {tableData.length > 0 ? (
+            <Table
+              columns={[
+                { key: "video", title: "视频文件" },
+                { key: "sc", title: config?.detect_language ? "简体字幕" : "字幕文件" },
+                ...(config?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : []),
+              ]}
+              data={tableData}
+              cellIds={fileData}
+              onContextMenu={setCell}
+              onReorder={handleTableReorder}
+            />
+          ) : (
+            <div className="flex-1 flex-center flex-col gap-3 text-secondary">
+              <div className="flex-center gap-3">
+                <FileVideoIcon className="size-7" weight="light" />
+                <FolderIcon className="size-7" weight="light" />
+              </div>
+              <span>请拖入视频或文件夹</span>
+            </div>
+          )}
         </DropArea>
       </PageBlock>
 
       <PageGroup className="flex-1">
         <PageBlock className="flex-1 flex-col">
           <form className="flex-center gap-2 h-14 p-3 border-b" onSubmit={handleSearch}>
-            <Input
-              placeholder="搜索字幕"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <Input placeholder="搜索字幕" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             <Button
               type="submit"
               variant="primary"
@@ -258,19 +273,28 @@ export function SubtitleDownload() {
           </form>
 
           <div className="flex-1 flex flex-col gap-1 p-2 overflow-auto">
-            {!isSearching && !isWaitingForVerification && !searchError && searchResults.length === 0 && (!submittedSearchQuery || submittedSearchQuery !== searchQuery.trim()) && (
-              <div className="flex-1 flex-center flex-col gap-3 text-secondary">
-                <MagnifyingGlassIcon className="size-7" weight="light" />
-                <span>输入关键词开始搜索</span>
-              </div>
-            )}
+            {!isSearching &&
+              !isWaitingForVerification &&
+              !searchError &&
+              searchResults.length === 0 &&
+              (!submittedSearchQuery || submittedSearchQuery !== searchQuery.trim()) && (
+                <div className="flex-1 flex-center flex-col gap-3 text-secondary">
+                  <MagnifyingGlassIcon className="size-7" weight="light" />
+                  <span>输入关键词开始搜索</span>
+                </div>
+              )}
 
-            {!isSearching && !isWaitingForVerification && !searchError && searchResults.length === 0 && submittedSearchQuery && submittedSearchQuery === searchQuery.trim() && (
-              <div className="flex-1 flex-center flex-col gap-3 text-secondary">
-                <EmptyIcon className="size-7" weight="light" />
-                <span>没有搜索结果</span>
-              </div>
-            )}
+            {!isSearching &&
+              !isWaitingForVerification &&
+              !searchError &&
+              searchResults.length === 0 &&
+              submittedSearchQuery &&
+              submittedSearchQuery === searchQuery.trim() && (
+                <div className="flex-1 flex-center flex-col gap-3 text-secondary">
+                  <EmptyIcon className="size-7" weight="light" />
+                  <span>没有搜索结果</span>
+                </div>
+              )}
 
             {isWaitingForVerification && (
               <div className="flex-1 flex-center flex-col gap-3 text-secondary">
@@ -293,29 +317,31 @@ export function SubtitleDownload() {
               </div>
             )}
 
-            {!isSearching && !isWaitingForVerification && !searchError && searchResults.map((post) => (
-              <button
-                key={post.id}
-                className={cn(
-                  "px-3 py-2 text-left rounded-sm transition cursor-pointer hover:bg-muted/40",
-                  selectedPost?.id === post.id && "bg-muted/40"
-                )}
-                onClick={() => handlePostSelect(post)}
-                onContextMenu={(event) => {
-                  event.preventDefault()
-                  setPostMenu({ x: event.clientX, y: event.clientY, post })
-                }}
-              >
-                <p className="font-medium line-clamp-2 cursor-pointer">{post.title}</p>
-                <p className="mt-0.5 text-xs text-secondary cursor-pointer">
-                  {[
-                    post.date,
-                    post.views && `${post.views} 查看`,
-                    post.replies && `${post.replies} 回复`
-                  ].filter(Boolean).join(" · ")}
-                </p>
-              </button>
-            ))}
+            {!isSearching &&
+              !isWaitingForVerification &&
+              !searchError &&
+              searchResults.map((post) => (
+                <button
+                  type="button"
+                  key={post.id}
+                  className={cn(
+                    "px-3 py-2 text-left rounded-sm transition cursor-pointer hover:bg-muted/40",
+                    selectedPost?.id === post.id && "bg-muted/40",
+                  )}
+                  onClick={() => handlePostSelect(post)}
+                  onContextMenu={(event) => {
+                    event.preventDefault()
+                    setPostMenu({ x: event.clientX, y: event.clientY, post })
+                  }}
+                >
+                  <p className="font-medium line-clamp-2 cursor-pointer">{post.title}</p>
+                  <p className="mt-0.5 text-xs text-secondary cursor-pointer">
+                    {[post.date, post.views && `${post.views} 查看`, post.replies && `${post.replies} 回复`]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                </button>
+              ))}
           </div>
         </PageBlock>
 
@@ -325,12 +351,7 @@ export function SubtitleDownload() {
               <h3 className="font-medium truncate">字幕列表</h3>
               <p className="text-xs text-secondary">共 {postFiles.length} 个附件</p>
             </div>
-            <Select
-              options={postFileSortOptions}
-              value={postFileSort}
-              onChange={setPostFileSort}
-              className="w-32"
-            />
+            <Select options={postFileSortOptions} value={postFileSort} onChange={setPostFileSort} className="w-32" />
           </div>
 
           <div className="flex-1 flex flex-col gap-1 p-2 overflow-auto">
@@ -362,24 +383,23 @@ export function SubtitleDownload() {
               </div>
             )}
 
-            {!isLoadingFiles && !filesError && sortedPostFiles.map((file) => (
-              <div key={file.url} className="flex-center gap-3 px-3 py-2 rounded-sm transition hover:bg-muted/40">
-                <FileArchiveIcon className="size-6 text-secondary shrink-0" weight="light" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium line-clamp-2">{file.name}</p>
-                  {file.description && <p className="mt-0.5 text-xs text-secondary truncate">{file.description}</p>}
-                  <p className="mt-0.5 text-xs text-secondary">
-                    {[
-                      file.size,
-                      file.downloads && `${file.downloads} 下载`
-                    ].filter(Boolean).join(" · ")}
-                  </p>
+            {!isLoadingFiles &&
+              !filesError &&
+              sortedPostFiles.map((file) => (
+                <div key={file.url} className="flex-center gap-3 px-3 py-2 rounded-sm transition hover:bg-muted/40">
+                  <FileArchiveIcon className="size-6 text-secondary shrink-0" weight="light" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium line-clamp-2">{file.name}</p>
+                    {file.description && <p className="mt-0.5 text-xs text-secondary truncate">{file.description}</p>}
+                    <p className="mt-0.5 text-xs text-secondary">
+                      {[file.size, file.downloads && `${file.downloads} 下载`].filter(Boolean).join(" · ")}
+                    </p>
+                  </div>
+                  <Button className="w-8 p-0" onClick={() => handleDownloadFile(file)}>
+                    <DownloadSimpleIcon className="size-4" />
+                  </Button>
                 </div>
-                <Button className="w-8 p-0" onClick={() => handleDownloadFile(file)}>
-                  <DownloadSimpleIcon className="size-4" />
-                </Button>
-              </div>
-            ))}
+              ))}
           </div>
         </PageBlock>
       </PageGroup>
@@ -400,25 +420,23 @@ export function SubtitleDownload() {
             <Badge variant="outline">添加后缀 {config.union_extension}</Badge>
           )}
           {config?.config_badge_move_sub && config?.move_sub && (
-            <Badge
-              variant="outline"
-              onClick={() => handleCycleSubtitleConfig("move_sub", moveSubOptions)}
-            >
+            <Badge variant="outline" onClick={() => handleCycleSubtitleConfig("move_sub", moveSubOptions)}>
               {moveSubOptions.find((option) => option.value === config.move_sub)?.label}
             </Badge>
           )}
           {config?.config_badge_remove_sub && config?.remove_sub && (
-            <Badge
-              variant="outline"
-              onClick={() => handleCycleSubtitleConfig("remove_sub", removeSubOptions)}
-            >
+            <Badge variant="outline" onClick={() => handleCycleSubtitleConfig("remove_sub", removeSubOptions)}>
               {removeSubOptions.find((option) => option.value === config.remove_sub)?.label}
             </Badge>
           )}
         </div>
 
-        <Button className="w-26" onClick={() => clearAll(tableScope)}>清空列表</Button>
-        <Button variant="primary" className="w-26" onClick={handleRename}>重命名</Button>
+        <Button className="w-26" onClick={() => clearAll(tableScope)}>
+          清空列表
+        </Button>
+        <Button variant="primary" className="w-26" onClick={handleRename}>
+          重命名
+        </Button>
       </PageBlock>
     </Page>
   )
