@@ -1,3 +1,4 @@
+import { Modifier } from "@dnd-kit/abstract"
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers"
 import { DragDropProvider } from "@dnd-kit/react"
 import { isSortableOperation, useSortable } from "@dnd-kit/react/sortable"
@@ -51,6 +52,25 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
   const header = useMemo(() => columns.map((col) => col.title), [columns])
   const columnKeys = useMemo(() => columns.map((col) => col.key), [columns])
   const totalWidth = useMemo(() => columnWidths.reduce((sum, width) => sum + width, 0), [columnWidths])
+  const modifiers = useMemo(
+    () => [
+      RestrictToVerticalAxis,
+      class RestrictToTable extends Modifier {
+        apply({ shape, transform }) {
+          if (!shape) return transform
+
+          const { top, bottom } = bodyRef.current.getBoundingClientRect()
+          const halfHeight = shape.current.boundingRectangle.height / 2
+          const centerY = shape.initial.center.y
+          return {
+            ...transform,
+            y: Math.max(top + halfHeight - centerY, Math.min(transform.y, bottom - halfHeight - centerY)),
+          }
+        }
+      },
+    ],
+    [],
+  )
   const { baseOrders, itemMaps } = useMemo(() => {
     const baseOrders = {}
     const itemMaps = {}
@@ -175,7 +195,7 @@ export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorde
       </div>
 
       <div ref={bodyRef} className="flex-1 flex overflow-auto p-1">
-        <DragDropProvider modifiers={[RestrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+        <DragDropProvider modifiers={modifiers} onDragEnd={handleDragEnd}>
           <div className="flex" style={{ minWidth: totalWidth }}>
             {columns.map((col, colIndex) => {
               const order = baseOrders[col.key] || []
