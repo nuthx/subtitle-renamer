@@ -1,4 +1,6 @@
 allowBuilds:
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@tauri-apps/plugin-opener@2.7.0'
 onlyBuiltDependencies:
   - esbuild
