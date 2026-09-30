@@ -57,6 +57,9 @@
   h6,
   span,
   p,
+  ul,
+  ol,
+  li,
   img {
     @apply cursor-default;
   }
