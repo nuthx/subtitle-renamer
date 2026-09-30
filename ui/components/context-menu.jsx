@@ -44,7 +44,7 @@ export function ContextMenu({ cell, onClose, children, className }) {
       <div
         ref={menuRef}
         className={cn(
-          "fixed z-50 min-w-44 p-1 bg-background/90 backdrop-blur-sm border shadow-lg/15 rounded-lg transition",
+          "fixed z-50 min-w-44 p-1 bg-linear-to-b from-background/90 to-background-dark/90 backdrop-blur-sm border shadow-lg/15 rounded-lg transition",
           cell ? "opacity-100" : "opacity-0 pointer-events-none",
           className,
         )}
@@ -68,7 +68,7 @@ export function ContextItem({ title, icon, onClick, danger }) {
     <button
       type="button"
       className={cn(
-        "flex items-center gap-2.5 w-full px-3 h-8 hover:bg-background-dark rounded-sm cursor-pointer transition",
+        "flex items-center gap-2 w-full pl-2 pr-3 h-8 hover:bg-muted/40 rounded-sm cursor-pointer transition",
         danger && "hover:text-error",
       )}
       onClick={handleClick}
