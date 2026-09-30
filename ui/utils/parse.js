@@ -3,6 +3,26 @@ import dayjs from "dayjs"
 
 import { ARCHIVE_EXTENSIONS, SUBTITLE_EXTENSIONS } from "@/utils/detect"
 
+function parsePagination(url, $) {
+  const nextHref = $(".pg a.nxt").first().attr("href")
+  if (!nextHref) return { nextPageUrl: null, nextPageLabel: null }
+
+  const pageNumber = (href) => {
+    const link = new URL(href, url)
+    return Number(link.searchParams.get("page") || link.pathname.match(/thread-\d+-(\d+)-\d+\.html$/)?.[1] || 0)
+  }
+  const nextPage = pageNumber(nextHref)
+  const pageNumbers = $(".pg a[href]")
+    .toArray()
+    .map((link) => pageNumber($(link).attr("href")))
+  const totalPages = Math.max(...pageNumbers)
+
+  return {
+    nextPageUrl: new URL(nextHref, url).href,
+    nextPageLabel: nextPage ? `(${nextPage - 1}/${totalPages || "?"})` : null,
+  }
+}
+
 function parseSearchPage(url, $) {
   const items = $(".slst li, #threadlist li, .pbw").toArray()
   const seen = new Set()
@@ -40,6 +60,7 @@ function parseSearchPage(url, $) {
   return {
     kind: "search",
     results,
+    ...parsePagination(url, $),
   }
 }
 
@@ -55,14 +76,16 @@ function parsePostPage(url, $) {
       if (!subtitleExtensions.has(extension)) return []
 
       const href = new URL($link.attr("href"), url).href
-      if (seen.has(href)) return []
-      seen.add(href)
+      const id = new URL(href).searchParams.get("aid") || href
+      if (seen.has(id)) return []
+      seen.add(id)
 
       const $container = $link.closest("dl.tattl, dl, li, .attach, .tattl")
       const context = ($container.length ? $container.text() : $link.parent().text()).trim()
 
       return [
         {
+          id,
           name,
           url: href,
           extension,
@@ -77,6 +100,7 @@ function parsePostPage(url, $) {
   return {
     kind: "post",
     files,
+    ...parsePagination(url, $),
   }
 }
 
@@ -84,10 +108,14 @@ export function parseAcgripPage(snapshot) {
   const url = new URL(snapshot.url)
   const $ = load(snapshot.html)
 
-  const isSearchPage = url.pathname.endsWith("/search.php") && url.searchParams.get("searchsubmit") === "yes"
+  const isSearchPage =
+    url.pathname.endsWith("/search.php") &&
+    (url.searchParams.get("searchsubmit") === "yes" || url.searchParams.has("searchid"))
   if (isSearchPage) return parseSearchPage(url, $)
 
-  const isPostPage = url.pathname.endsWith("/forum.php") && url.searchParams.get("mod") === "viewthread"
+  const isPostPage =
+    (url.pathname.endsWith("/forum.php") && url.searchParams.get("mod") === "viewthread") ||
+    /\/thread-\d+-\d+-\d+\.html$/.test(url.pathname)
   if (isPostPage) return parsePostPage(url, $)
 
   return null

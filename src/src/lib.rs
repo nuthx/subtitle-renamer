@@ -45,8 +45,8 @@ fn hide_browser(app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn search_posts(app: AppHandle, query: String) -> Result<(), String> {
-    browser::search_posts_inner(app, &query)
+fn search_posts(app: AppHandle, query: String, page_url: Option<String>) -> Result<(), String> {
+    browser::search_posts_inner(app, &query, page_url.as_deref())
 }
 
 #[tauri::command]

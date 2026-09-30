@@ -61,9 +61,17 @@ export function SubtitleDownload() {
   const clearAll = useTableStore((s) => s.clearAll)
   const searchResults = useDownloadStore((s) => s.searchResults)
   const isSearching = useDownloadStore((s) => s.isSearching)
+  const nextPageUrl = useDownloadStore((s) => s.nextPageUrl)
+  const nextPageLabel = useDownloadStore((s) => s.nextPageLabel)
+  const isLoadingMore = useDownloadStore((s) => s.isLoadingMore)
+  const setLoadingMore = useDownloadStore((s) => s.setLoadingMore)
   const searchError = useDownloadStore((s) => s.searchError)
   const selectedPost = useDownloadStore((s) => s.selectedPost)
   const postFiles = useDownloadStore((s) => s.postFiles)
+  const postNextPageUrl = useDownloadStore((s) => s.postNextPageUrl)
+  const postNextPageLabel = useDownloadStore((s) => s.postNextPageLabel)
+  const isLoadingMoreFiles = useDownloadStore((s) => s.isLoadingMoreFiles)
+  const setLoadingMoreFiles = useDownloadStore((s) => s.setLoadingMoreFiles)
   const isLoadingFiles = useDownloadStore((s) => s.isLoadingFiles)
   const filesError = useDownloadStore((s) => s.filesError)
   const setSearching = useDownloadStore((s) => s.setSearching)
@@ -139,11 +147,11 @@ export function SubtitleDownload() {
     const payload = parseAcgripPage(event.payload)
     if (payload?.kind === "search") {
       clearVerificationRetry()
-      setSearchResults(payload.results || [])
+      setSearchResults(payload.results || [], payload.nextPageUrl, payload.nextPageLabel)
     }
     if (payload?.kind === "post") {
       clearVerificationRetry()
-      setPostFiles(payload.files || [])
+      setPostFiles(payload.files || [], payload.nextPageUrl, payload.nextPageLabel)
     }
   })
 
@@ -171,6 +179,20 @@ export function SubtitleDownload() {
     })()
   }
 
+  // 追加下一页搜索结果
+  const handleLoadMore = async () => {
+    retryAfterVerificationRef.current = handleLoadMore
+    setVerificationWaiting(false)
+    setLoadingMore(true)
+    try {
+      await invoke("search_posts", { query: submittedSearchQuery, pageUrl: nextPageUrl })
+    } catch (error) {
+      clearVerificationRetry()
+      setLoadingMore(false)
+      toast.error({ title: "加载下一页结果失败", description: String(error) })
+    }
+  }
+
   // 选择主题贴
   const handlePostSelect = async (post) => {
     setSelectedPost(post)
@@ -186,6 +208,20 @@ export function SubtitleDownload() {
         toast.error({ title: "附件加载失败", description: String(error) })
       }
     })()
+  }
+
+  // 追加帖子下一页的字幕附件
+  const handleLoadMoreFiles = async () => {
+    retryAfterVerificationRef.current = handleLoadMoreFiles
+    setVerificationWaiting(false)
+    setLoadingMoreFiles(true)
+    try {
+      await invoke("get_post", { postUrl: postNextPageUrl })
+    } catch (error) {
+      clearVerificationRetry()
+      setLoadingMoreFiles(false)
+      toast.error({ title: "加载下一页内容失败", description: String(error) })
+    }
   }
 
   // 下载字幕文件
@@ -266,7 +302,7 @@ export function SubtitleDownload() {
             <Button
               type="submit"
               variant="primary"
-              disabled={isSearching || isWaitingForVerification || !searchQuery.trim()}
+              disabled={isSearching || isLoadingMore || isWaitingForVerification || !searchQuery.trim()}
             >
               搜索
             </Button>
@@ -296,7 +332,7 @@ export function SubtitleDownload() {
                 </div>
               )}
 
-            {isWaitingForVerification && (
+            {isWaitingForVerification && !isLoadingMore && !isLoadingMoreFiles && (
               <div className="flex-1 flex-center flex-col gap-3 text-secondary">
                 <ShieldChevronIcon className="size-7" weight="light" />
                 等待 Cloudflare 验证...
@@ -318,14 +354,15 @@ export function SubtitleDownload() {
             )}
 
             {!isSearching &&
-              !isWaitingForVerification &&
+              (!isWaitingForVerification || isLoadingMore || isLoadingMoreFiles) &&
               !searchError &&
               searchResults.map((post) => (
                 <button
                   type="button"
                   key={post.id}
+                  disabled={isLoadingMore || isLoadingMoreFiles}
                   className={cn(
-                    "px-3 py-2 text-left rounded-sm transition cursor-pointer hover:bg-muted/40",
+                    "px-3 py-1.5 text-left rounded-sm transition cursor-pointer hover:bg-muted/40",
                     selectedPost?.id === post.id && "bg-muted/40",
                   )}
                   onClick={() => handlePostSelect(post)}
@@ -335,13 +372,25 @@ export function SubtitleDownload() {
                   }}
                 >
                   <p className="font-medium line-clamp-2 cursor-pointer">{post.title}</p>
-                  <p className="mt-0.5 text-xs text-secondary cursor-pointer">
+                  <p className="mt-px text-xs text-secondary cursor-pointer">
                     {[post.date, post.views && `${post.views} 查看`, post.replies && `${post.replies} 回复`]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>
                 </button>
               ))}
+
+            {nextPageUrl && !isSearching && !searchError && (
+              <button
+                type="button"
+                className="py-2 text-xs text-secondary enabled:cursor-pointer enabled:hover:text-primary transition shrink-0"
+                disabled={isLoadingMore || isLoadingFiles || isLoadingMoreFiles || isWaitingForVerification}
+                onClick={handleLoadMore}
+              >
+                {isLoadingMore ? (isWaitingForVerification ? "等待 Cloudflare 验证..." : "加载中...") : "加载更多"}{" "}
+                {nextPageLabel}
+              </button>
+            )}
           </div>
         </PageBlock>
 
@@ -365,7 +414,7 @@ export function SubtitleDownload() {
             {!isLoadingFiles && !filesError && selectedPost && postFiles.length === 0 && (
               <div className="flex-1 flex-center flex-col gap-3 text-secondary">
                 <EmptyIcon className="size-7" weight="light" />
-                <span>主题贴下没有发现字幕文件</span>
+                <span>{postNextPageUrl ? "已加载页面没有发现字幕文件" : "没有发现字幕文件"}</span>
               </div>
             )}
 
@@ -386,20 +435,38 @@ export function SubtitleDownload() {
             {!isLoadingFiles &&
               !filesError &&
               sortedPostFiles.map((file) => (
-                <div key={file.url} className="flex-center gap-3 px-3 py-2 rounded-sm transition hover:bg-muted/40">
+                <div
+                  key={file.id || file.url}
+                  className="flex-center gap-3 px-3 py-1.5 rounded-sm transition hover:bg-muted/40"
+                >
                   <FileArchiveIcon className="size-6 text-secondary shrink-0" weight="light" />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium line-clamp-2">{file.name}</p>
-                    {file.description && <p className="mt-0.5 text-xs text-secondary truncate">{file.description}</p>}
+                    {file.description && <p className="mt-px text-xs text-secondary truncate">{file.description}</p>}
                     <p className="mt-0.5 text-xs text-secondary">
                       {[file.size, file.downloads && `${file.downloads} 下载`].filter(Boolean).join(" · ")}
                     </p>
                   </div>
-                  <Button className="w-8 p-0" onClick={() => handleDownloadFile(file)}>
+                  <Button
+                    className="w-8 p-0"
+                    disabled={isLoadingMore || isLoadingMoreFiles}
+                    onClick={() => handleDownloadFile(file)}
+                  >
                     <DownloadSimpleIcon className="size-4" />
                   </Button>
                 </div>
               ))}
+            {postNextPageUrl && !isLoadingFiles && !filesError && (
+              <button
+                type="button"
+                className="py-2 text-xs text-secondary enabled:cursor-pointer enabled:hover:text-primary transition shrink-0"
+                disabled={isSearching || isLoadingMore || isLoadingMoreFiles || isWaitingForVerification}
+                onClick={handleLoadMoreFiles}
+              >
+                {isLoadingMoreFiles ? (isWaitingForVerification ? "等待 Cloudflare 验证..." : "加载中...") : "加载更多"}{" "}
+                {postNextPageLabel}
+              </button>
+            )}
           </div>
         </PageBlock>
       </PageGroup>
