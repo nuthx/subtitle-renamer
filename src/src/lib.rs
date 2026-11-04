@@ -6,7 +6,7 @@ mod menu;
 mod theme;
 mod trash;
 
-use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, Window};
+use tauri::{generate_context, generate_handler, AppHandle, Builder, Manager, Window, WindowEvent};
 use tauri_plugin_store::StoreExt;
 use tauri_plugin_window_state::{StateFlags, WindowExt};
 #[cfg(target_os = "windows")]
@@ -86,6 +86,11 @@ pub fn run() {
             get_post,
             download_subtitle
         ])
+        .on_window_event(|window, event| {
+            if window.label() == "main" && matches!(event, WindowEvent::CloseRequested { .. }) {
+                window.app_handle().exit(0);
+            }
+        })
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
 
